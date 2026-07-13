@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Se2L — Onboarding</title>
+  <link href="css/output.css" rel="stylesheet">
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900">
+
+  <div class="max-w-xl mx-auto py-16 px-6">
+
+    <span class="inline-flex items-center bg-indigo-50 text-indigo-700 text-sm px-4 py-1.5 rounded-full mb-4">
+      Start your settlement journey
+    </span>
+
+    <h1 class="text-2xl font-semibold mb-1">Tell us about your move to the UK</h1>
+    <p class="text-slate-600 text-sm mb-6">We use this to build a personalised checklist for you.</p>
+
+    <form id="onboarding-form" class="bg-white border border-slate-200 rounded-xl p-6">
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="text-sm font-medium block mb-1">Visa type</label>
+          <select id="visa_type" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+            <option value="skilled_worker">Skilled Worker</option>
+            <option value="student">Student</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-sm font-medium block mb-1">Arrival date</label>
+         <input id="arrival_date" type="date" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+         <p class="text-xs text-slate-400 mt-1">Already in the UK? Enter your arrival date. Not yet arrived? Enter your planned arrival date — we'll get you ready in advance.</p>
+        </div>
+        <div>
+          <label class="text-sm font-medium block mb-1">UK region</label>
+          <select id="uk_region" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+            <option value="england">England</option>
+            <option value="scotland">Scotland</option>
+            <option value="wales">Wales</option>
+            <option value="northern_ireland">Northern Ireland</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-sm font-medium block mb-1">Preferred language</label>
+          <select id="language" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+            <option value="english">English</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <label class="text-sm font-medium block mb-1">Settling with dependants?</label>
+        <select id="has_dependants" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+          <option value="">Select an option</option>
+          <option value="no">No</option>
+          <option value="yes">Yes</option>
+        </select>
+      </div>
+
+   <div class="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-slate-200">
+  <div>
+    <label class="text-sm font-medium block mb-1">Email</label>
+    <input id="email" type="email" required placeholder="you@example.com" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+  </div>
+  <div>
+    <label class="text-sm font-medium block mb-1">Password</label>
+    <input id="password" type="password" required minlength="6" placeholder="At least 6 characters" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+  </div>
+</div>
+
+      <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-200">
+        <a href="index.html" class="border border-slate-300 px-4 py-2 rounded-lg text-sm font-medium">Back</a>
+        <button type="submit" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium">Create my journey</button>
+      </div>
+
+    </form>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/onboarding.js"></script>
+
+</body>
+</html>

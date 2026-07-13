@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Se2L — App manager</title>
+  <link href="css/output.css" rel="stylesheet">
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900">
+
+  <div class="max-w-2xl mx-auto py-10 px-6">
+
+    <a href="dashboard.html" class="text-sm text-slate-500 flex items-center gap-1 mb-4">
+      ← Back to dashboard
+    </a>
+
+    <span class="inline-flex bg-indigo-50 text-indigo-700 text-sm px-4 py-1.5 rounded-full mb-4">
+      App manager
+    </span>
+
+    <h1 id="form-heading" class="text-xl font-semibold mb-1">Create a task</h1>
+    <p class="text-sm text-slate-500 mb-6">Add a new settlement task and assign it to a phase and visa type.</p>
+
+    <form id="task-form" class="bg-white border border-slate-200 rounded-xl p-6 mb-8">
+
+      <input type="hidden" id="task_id" value="" />
+
+      <div class="mb-4">
+        <label class="text-sm font-medium block mb-1">Title</label>
+        <input id="title" type="text" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="e.g. Register for council tax" />
+      </div>
+
+      <div class="mb-4">
+        <label class="text-sm font-medium block mb-1">Description / guidance</label>
+        <textarea id="body_html" rows="4" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="Explain why it matters and what to do. Use lines starting with '- ' for a bullet list."></textarea>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="text-sm font-medium block mb-1">Category</label>
+          <select id="category" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+            <option value="Housing">Housing</option>
+            <option value="Legal">Legal</option>
+            <option value="Banking">Banking</option>
+            <option value="Healthcare">Healthcare</option>
+            <option value="Education">Education</option>
+            <option value="Employment">Employment</option>
+            <option value="Social">Social</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-sm font-medium block mb-1">Urgency</label>
+          <select id="urgency" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+            <option value="Critical">Critical</option>
+            <option value="Important">Important</option>
+            <option value="Optional">Optional</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="text-sm font-medium block mb-1">Time estimate (minutes)</label>
+          <input id="time_estimate" type="number" min="1" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="20" />
+        </div>
+        <div>
+          <label class="text-sm font-medium block mb-1">Phase</label>
+          <select id="phase_id" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+            <option value="">Loading phases...</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label class="text-sm font-medium block mb-1">Applies to visa type(s)</label>
+        <div class="flex gap-4 text-sm">
+          <label class="flex items-center gap-1"><input type="checkbox" id="visa_skilled_worker" checked /> Skilled Worker</label>
+          <label class="flex items-center gap-1"><input type="checkbox" id="visa_student" checked /> Student</label>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label class="text-sm font-medium block mb-1">Applies to UK region(s)</label>
+        <div class="flex gap-4 text-sm flex-wrap">
+          <label class="flex items-center gap-1"><input type="checkbox" id="region_england" checked /> England</label>
+          <label class="flex items-center gap-1"><input type="checkbox" id="region_scotland" /> Scotland</label>
+          <label class="flex items-center gap-1"><input type="checkbox" id="region_wales" /> Wales</label>
+          <label class="flex items-center gap-1"><input type="checkbox" id="region_northern_ireland" /> Northern Ireland</label>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label class="text-sm font-medium block mb-1">External link (optional)</label>
+        <input id="link_url" type="url" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="https://gov.uk/..." />
+      </div>
+
+      <div class="mb-4">
+        <label class="text-sm font-medium block mb-1">YouTube video URL (optional)</label>
+        <input id="youtube_url" type="url" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="https://youtube.com/watch?v=..." />
+      </div>
+
+      <div class="mb-4">
+        <label class="text-sm font-medium block mb-1">Depends on (optional)</label>
+        <select id="depends_on" multiple class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm h-28">
+          <option value="">Loading tasks...</option>
+        </select>
+        <p class="text-xs text-slate-400 mt-1">
+          Hold Ctrl (Cmd on Mac) to select more than one. This task stays hidden from newcomers until every selected task is marked complete.
+        </p>
+      </div>
+
+      <div class="mb-4">
+        <label class="flex items-center gap-2 text-sm">
+          <input type="checkbox" id="is_minor_task" />
+          This task is for children / minors (shows under "For Your Family")
+        </label>
+      </div>
+
+      <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
+        <button type="button" id="cancel-edit-btn" class="border border-slate-300 px-4 py-2 rounded-lg text-sm font-medium hidden">Cancel edit</button>
+        <button type="submit" id="submit-btn" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium">Publish task</button>
+      </div>
+
+    </form>
+
+    <h2 class="text-base font-medium mb-3">Existing tasks</h2>
+    <div id="task-list" class="flex flex-col gap-2"></div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/app-manager.js"></script>
+
+</body>
+</html>

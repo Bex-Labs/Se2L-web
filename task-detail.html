@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Se2L — Task detail</title>
+  <link href="css/output.css" rel="stylesheet">
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900">
+
+  <div class="max-w-xl mx-auto py-10 px-6">
+
+    <a href="dashboard.html" class="text-sm text-slate-500 flex items-center gap-1 mb-4">
+      ← Back to dashboard
+    </a>
+
+    <span id="task-meta" class="text-xs text-red-600 font-medium">Loading...</span>
+    <h1 id="task-title" class="text-xl font-semibold mt-1 mb-2"></h1>
+    <p id="task-time" class="text-sm text-slate-500 mb-4"></p>
+
+    <div id="task-body" class="bg-white border border-slate-200 rounded-xl p-4 text-sm text-slate-700 mb-4"></div>
+
+    <div id="task-video-container" class="mb-4"></div>
+
+    <div id="task-link-container" class="mb-6"></div>
+
+    <div class="flex gap-3">
+      <button id="mark-complete-btn" class="flex-1 bg-slate-900 text-white rounded-lg py-2.5 text-sm font-medium">
+        ✓ Mark complete
+      </button>
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/task-detail.js"></script>
+
+</body>
+</html>
