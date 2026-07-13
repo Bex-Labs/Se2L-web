@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Se2L — Preview as newcomer</title>
+  <link href="css/output.css" rel="stylesheet">
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900">
+
+  <div class="max-w-2xl mx-auto py-10 px-6">
+
+    <a href="app-manager.html" class="text-sm text-slate-500 flex items-center gap-1 mb-4">
+      ← Back to App Manager
+    </a>
+
+    <span class="inline-flex bg-indigo-50 text-indigo-700 text-sm px-4 py-1.5 rounded-full mb-4">
+      Preview mode
+    </span>
+
+    <h1 class="text-xl font-semibold mb-1">Preview a newcomer profile</h1>
+    <p class="text-sm text-slate-500 mb-6">
+      Pick a visa type and UK region to see exactly which tasks that profile would see, phase by phase — including drafts, if you want to check content before publishing.
+    </p>
+
+    <div class="bg-white border border-slate-200 rounded-xl p-6 mb-8">
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="text-sm font-medium block mb-1">Visa type</label>
+          <select id="preview_visa_type" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+            <option value="skilled_worker">Skilled Worker</option>
+            <option value="student">Student</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-sm font-medium block mb-1">UK region</label>
+          <select id="preview_uk_region" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+            <option value="england">England</option>
+            <option value="scotland">Scotland</option>
+            <option value="wales">Wales</option>
+            <option value="northern_ireland">Northern Ireland</option>
+          </select>
+        </div>
+      </div>
+
+      <label class="flex items-center gap-2 text-sm mb-4">
+        <input type="checkbox" id="include_unpublished" checked />
+        Include draft and in-review tasks (uncheck to see exactly what's live right now)
+      </label>
+
+      <button id="load-preview-btn" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium">
+        Load preview
+      </button>
+    </div>
+
+    <div id="preview-results"></div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/preview.js"></script>
+
+</body>
+</html>

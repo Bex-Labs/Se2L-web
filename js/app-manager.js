@@ -70,11 +70,31 @@ function extractYouTubeId(url) {
   return match ? match[1] : null;
 }
 
+// --- SE2L-63: content version audit trail helper ---
+// Writes a snapshot row every time a task is created or changed, so App
+// Managers (and later, Super Admins) can see a full history of edits.
+async function recordTaskVersion(taskId, changeType, snapshot, previousStatus, newStatus) {
+  const { error } = await supabaseClient.from("task_versions").insert({
+    task_id: taskId,
+    changed_by: currentUser.id,
+    change_type: changeType,
+    previous_status: previousStatus || null,
+    new_status: newStatus || null,
+    snapshot: snapshot
+  });
+
+  if (error) {
+    // Don't block the main save flow if version logging fails — just warn.
+    console.error("Could not record task version:", error);
+  }
+}
+
 function resetForm() {
   document.getElementById("task-form").reset();
   document.getElementById("task_id").value = "";
   document.getElementById("form-heading").textContent = "Create a task";
-  document.getElementById("submit-btn").textContent = "Publish task";
+  document.getElementById("submit-btn").textContent = "Save as draft";
+  document.getElementById("status").value = "draft";
   document.getElementById("cancel-edit-btn").classList.add("hidden");
   document.getElementById("region_england").checked = true;
   Array.from(document.getElementById("depends_on").options).forEach(opt => opt.selected = false);
@@ -107,6 +127,7 @@ async function loadTaskForEdit(taskId) {
   document.getElementById("urgency").value = task.urgency;
   document.getElementById("time_estimate").value = task.time_estimate_minutes || "";
   document.getElementById("is_minor_task").checked = task.is_minor_task || false;
+  document.getElementById("status").value = task.status || "draft";
 
   const phaseName = task.task_phases?.[0]?.phases?.name;
   if (phaseName) document.getElementById("phase_id").value = phaseName;
@@ -147,18 +168,76 @@ async function loadTaskForEdit(taskId) {
 
 async function archiveTask(taskId) {
   if (!confirm("Archive this task? It will no longer show to newcomers.")) return;
+  await changeTaskStatus(taskId, "archived");
+}
 
-  const { error } = await supabaseClient
+// --- SE2L-62: draft -> in_review -> published state transitions ---
+// Handles moving a task through the review workflow, and logs every
+// transition into task_versions (SE2L-63) so there's a full audit trail.
+async function changeTaskStatus(taskId, newStatus) {
+  const { data: existingTask, error: fetchError } = await supabaseClient
     .from("tasks")
-    .update({ status: "archived" })
-    .eq("id", taskId);
+    .select("*")
+    .eq("id", taskId)
+    .single();
 
-  if (error) {
-    alert("Could not archive task: " + error.message);
+  if (fetchError || !existingTask) {
+    alert("Could not load task to change its status.");
     return;
   }
 
+  const previousStatus = existingTask.status;
+
+  const { error: updateError } = await supabaseClient
+    .from("tasks")
+    .update({ status: newStatus })
+    .eq("id", taskId);
+
+  if (updateError) {
+    alert("Could not update task status: " + updateError.message);
+    return;
+  }
+
+  await recordTaskVersion(
+    taskId,
+    "status_change",
+    { ...existingTask, status: newStatus },
+    previousStatus,
+    newStatus
+  );
+
   loadExistingTasks();
+}
+
+const statusBadgeStyles = {
+  draft: "bg-slate-100 text-slate-600",
+  in_review: "bg-amber-50 text-amber-700",
+  published: "bg-green-50 text-green-700",
+  archived: "bg-slate-100 text-slate-400"
+};
+
+const statusLabels = {
+  draft: "Draft",
+  in_review: "In review",
+  published: "Published",
+  archived: "Archived"
+};
+
+function renderStatusActions(task) {
+  const buttons = [];
+
+  if (task.status === "draft") {
+    buttons.push(`<button data-status-action="in_review" data-task-id="${task.id}" class="text-xs text-amber-700 font-medium">Submit for review</button>`);
+  }
+  if (task.status === "in_review") {
+    buttons.push(`<button data-status-action="published" data-task-id="${task.id}" class="text-xs text-green-700 font-medium">Publish</button>`);
+    buttons.push(`<button data-status-action="draft" data-task-id="${task.id}" class="text-xs text-slate-500 font-medium">Send back to draft</button>`);
+  }
+  if (task.status === "published") {
+    buttons.push(`<button data-status-action="draft" data-task-id="${task.id}" class="text-xs text-slate-500 font-medium">Unpublish to draft</button>`);
+  }
+
+  return buttons.join("");
 }
 
 async function loadExistingTasks() {
@@ -178,9 +257,14 @@ async function loadExistingTasks() {
     <div class="bg-white border border-slate-200 rounded-lg p-3 flex justify-between items-center ${t.status === "archived" ? "opacity-50" : ""}">
       <div>
         <p class="text-sm font-medium">${t.title} ${t.is_minor_task ? "· <span class=\"text-indigo-600\">Minor</span>" : ""}</p>
-        <p class="text-xs text-slate-500">${t.urgency} · ${t.category || "Uncategorised"} · ${t.status}</p>
+        <p class="text-xs text-slate-500 mt-0.5">
+          <span class="${statusBadgeStyles[t.status] || "bg-slate-100 text-slate-500"} px-2 py-0.5 rounded-full">${statusLabels[t.status] || t.status}</span>
+          · ${t.urgency} · ${t.category || "Uncategorised"}
+        </p>
       </div>
-      <div class="flex gap-2">
+      <div class="flex gap-3 items-center flex-wrap justify-end">
+        ${renderStatusActions(t)}
+        <a href="preview.html?task=${t.id}" target="_blank" class="text-xs text-slate-500 font-medium">Preview</a>
         ${t.status !== "archived" ? `<button data-edit-id="${t.id}" class="text-xs text-indigo-600 font-medium">Edit</button>` : ""}
         ${t.status !== "archived" ? `<button data-archive-id="${t.id}" class="text-xs text-red-600 font-medium">Archive</button>` : ""}
       </div>
@@ -193,6 +277,10 @@ async function loadExistingTasks() {
 
   listDiv.querySelectorAll("[data-archive-id]").forEach(btn => {
     btn.addEventListener("click", () => archiveTask(btn.dataset.archiveId));
+  });
+
+  listDiv.querySelectorAll("[data-status-action]").forEach(btn => {
+    btn.addEventListener("click", () => changeTaskStatus(btn.dataset.taskId, btn.dataset.statusAction));
   });
 }
 
@@ -207,6 +295,7 @@ async function handleFormSubmit(e) {
   const timeEstimate = document.getElementById("time_estimate").value || null;
   const phaseName = document.getElementById("phase_id").value;
   const isMinorTask = document.getElementById("is_minor_task").checked;
+  const status = document.getElementById("status").value;
   const linkUrl = document.getElementById("link_url").value;
   const youtubeUrl = document.getElementById("youtube_url").value;
   const youtubeId = extractYouTubeId(youtubeUrl);
@@ -230,8 +319,16 @@ async function handleFormSubmit(e) {
   }
 
   let taskRowId = taskId;
+  let previousStatus = null;
 
   if (taskId) {
+    const { data: taskBeforeUpdate } = await supabaseClient
+      .from("tasks")
+      .select("status")
+      .eq("id", taskId)
+      .single();
+    previousStatus = taskBeforeUpdate ? taskBeforeUpdate.status : null;
+
     const { error: updateError } = await supabaseClient
       .from("tasks")
       .update({
@@ -240,7 +337,8 @@ async function handleFormSubmit(e) {
         category,
         urgency,
         time_estimate_minutes: timeEstimate,
-        is_minor_task: isMinorTask
+        is_minor_task: isMinorTask,
+        status
       })
       .eq("id", taskId);
 
@@ -265,7 +363,7 @@ async function handleFormSubmit(e) {
         urgency,
         time_estimate_minutes: timeEstimate,
         is_minor_task: isMinorTask,
-        status: "published",
+        status: status || "draft",
         created_by: currentUser.id
       })
       .select()
@@ -308,7 +406,22 @@ async function handleFormSubmit(e) {
     await supabaseClient.from("task_dependencies").insert(dependencyLinks);
   }
 
-  alert(taskId ? "Task updated!" : "Task published!");
+  // SE2L-63: log this save as a version, with the full final state as the snapshot
+  const { data: finalTaskState } = await supabaseClient
+    .from("tasks")
+    .select("*")
+    .eq("id", taskRowId)
+    .single();
+
+  await recordTaskVersion(
+    taskRowId,
+    taskId ? "updated" : "created",
+    finalTaskState || { id: taskRowId, title, status },
+    previousStatus,
+    status
+  );
+
+  alert(taskId ? "Task saved." : "Task created as " + statusLabels[status || "draft"] + ".");
   resetForm();
   loadExistingTasks();
 }
