@@ -263,7 +263,4 @@ async function loadFamilySection(userId) {
   `;
 }
 
-document.getElementById("signout-btn").addEventListener("click", async () => {
-  await supabaseClient.auth.signOut();
-  window.location.href = "login.html";
-});
+// Sign out handled by shell.js, shared across every shelled page.
