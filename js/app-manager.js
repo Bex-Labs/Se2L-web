@@ -24,6 +24,307 @@ async function checkAppManagerAccess() {
   return user;
 }
 
+// --- SE2L-64: create new Journey for a visa category ---
+
+let phaseRowCounter = 0;
+
+function addPhaseRow(prefill) {
+  const rowId = `phase-row-${phaseRowCounter++}`;
+  const row = document.createElement("div");
+  row.id = rowId;
+  row.className = "flex gap-2 items-start";
+  row.innerHTML = `
+    <input type="text" class="phase-name flex-1 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="e.g. First week" value="${prefill?.name || ""}" />
+    <input type="number" class="phase-start w-20 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="From" value="${prefill?.start ?? ""}" />
+    <input type="number" class="phase-end w-20 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="To" value="${prefill?.end ?? ""}" />
+    <button type="button" class="remove-phase-row-btn text-xs text-red-600 font-medium px-2 py-2" data-row-id="${rowId}">Remove</button>
+  `;
+  document.getElementById("phase-rows").appendChild(row);
+
+  row.querySelector(".remove-phase-row-btn").addEventListener("click", () => {
+    document.getElementById(rowId)?.remove();
+  });
+}
+
+function resetJourneyForm() {
+  document.getElementById("journey-form").reset();
+  document.getElementById("journey_visa_type_other").classList.add("hidden");
+  document.getElementById("phase-rows").innerHTML = "";
+  addPhaseRow();
+  addPhaseRow();
+}
+
+function collectPhaseRows() {
+  const rows = Array.from(document.querySelectorAll("#phase-rows > div"));
+  return rows.map((row, index) => ({
+    name: row.querySelector(".phase-name").value.trim(),
+    days_after_arrival_start: row.querySelector(".phase-start").value,
+    days_after_arrival_end: row.querySelector(".phase-end").value,
+    sort_order: index
+  }));
+}
+
+async function loadExistingJourneys() {
+  const { data: journeys, error } = await supabaseClient
+    .from("journeys")
+    .select("id, name, visa_type, uk_region, phases(id)")
+    .order("visa_type", { ascending: true });
+
+  const listDiv = document.getElementById("journey-list");
+
+  if (error || !journeys || journeys.length === 0) {
+    listDiv.innerHTML = `<p class="text-sm text-slate-400">No journeys created yet.</p>`;
+    return;
+  }
+
+  listDiv.innerHTML = journeys.map(j => `
+    <div class="bg-slate-50 border border-slate-200 rounded-lg p-3" id="journey-card-${j.id}">
+      <div class="flex justify-between items-center">
+        <div>
+          <p class="text-sm font-medium">${j.name}</p>
+          <p class="text-xs text-slate-500 mt-0.5">
+            ${j.visa_type.replace("_", " ")} · ${j.uk_region.replace("_", " ")} · ${j.phases?.length || 0} phase${j.phases?.length === 1 ? "" : "s"}
+          </p>
+        </div>
+        <button data-edit-journey-id="${j.id}" class="text-xs text-indigo-600 font-medium">Edit phases</button>
+      </div>
+      <div id="phase-editor-${j.id}" class="hidden mt-3 pt-3 border-t border-slate-200"></div>
+    </div>
+  `).join("");
+
+  listDiv.querySelectorAll("[data-edit-journey-id]").forEach(btn => {
+    btn.addEventListener("click", () => toggleJourneyPhaseEditor(btn.dataset.editJourneyId));
+  });
+}
+
+// --- SE2L-65: configure Phase time windows on an existing journey ---
+
+function addPhaseEditRow(rowsDiv, phase) {
+  const row = document.createElement("div");
+  row.className = "flex gap-2 items-start";
+  row.dataset.phaseId = phase?.id || "";
+  row.innerHTML = `
+    <input type="text" class="edit-phase-name flex-1 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="e.g. First week" value="${phase?.name || ""}" />
+    <input type="number" class="edit-phase-start w-20 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="From" value="${phase?.days_after_arrival_start ?? ""}" />
+    <input type="number" class="edit-phase-end w-20 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="To" value="${phase?.days_after_arrival_end ?? ""}" />
+    <button type="button" class="remove-edit-phase-row-btn text-xs text-red-600 font-medium px-2 py-2">Remove</button>
+  `;
+  rowsDiv.appendChild(row);
+  row.querySelector(".remove-edit-phase-row-btn").addEventListener("click", () => row.remove());
+}
+
+async function toggleJourneyPhaseEditor(journeyId) {
+  const container = document.getElementById(`phase-editor-${journeyId}`);
+  if (!container) return;
+
+  // Toggle closed if already open
+  if (!container.classList.contains("hidden")) {
+    container.classList.add("hidden");
+    container.innerHTML = "";
+    return;
+  }
+
+  const { data: phases, error } = await supabaseClient
+    .from("phases")
+    .select("*")
+    .eq("journey_id", journeyId)
+    .order("sort_order", { ascending: true });
+
+  if (error) {
+    alert("Could not load phases for this journey: " + error.message);
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="edit-phase-rows flex flex-col gap-2 mb-2"></div>
+    <button type="button" class="add-edit-phase-row-btn text-xs text-indigo-600 font-medium">+ Add phase</button>
+    <div class="flex justify-end gap-2 mt-3">
+      <button type="button" class="cancel-phase-edit-btn border border-slate-300 px-3 py-1.5 rounded-lg text-xs font-medium">Cancel</button>
+      <button type="button" class="save-phase-edit-btn bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-medium">Save phases</button>
+    </div>
+  `;
+  container.classList.remove("hidden");
+
+  const rowsDiv = container.querySelector(".edit-phase-rows");
+  (phases || []).forEach(p => addPhaseEditRow(rowsDiv, p));
+  if (!phases || phases.length === 0) addPhaseEditRow(rowsDiv, null);
+
+  container.querySelector(".add-edit-phase-row-btn").addEventListener("click", () => addPhaseEditRow(rowsDiv, null));
+  container.querySelector(".cancel-phase-edit-btn").addEventListener("click", () => {
+    container.classList.add("hidden");
+    container.innerHTML = "";
+  });
+  container.querySelector(".save-phase-edit-btn").addEventListener("click", () => savePhaseEdits(journeyId, rowsDiv));
+}
+
+async function savePhaseEdits(journeyId, rowsDiv) {
+  const rows = Array.from(rowsDiv.children);
+
+  if (rows.length === 0) {
+    alert("A journey needs at least one phase — add one before saving.");
+    return;
+  }
+
+  const parsed = rows.map(row => ({
+    row,
+    phaseId: row.dataset.phaseId || null,
+    name: row.querySelector(".edit-phase-name").value.trim(),
+    start: row.querySelector(".edit-phase-start").value,
+    end: row.querySelector(".edit-phase-end").value
+  }));
+
+  for (const p of parsed) {
+    if (!p.name || p.start === "" || p.end === "") {
+      alert("Every phase needs a name, a start day, and an end day.");
+      return;
+    }
+    if (Number(p.start) > Number(p.end)) {
+      alert(`Phase "${p.name}" has a start day after its end day.`);
+      return;
+    }
+  }
+
+  // Non-blocking overlap warning — a newcomer's dashboard picks one phase per
+  // day, so overlapping windows are usually a mistake, but not always.
+  const byStart = [...parsed].sort((a, b) => Number(a.start) - Number(b.start));
+  for (let i = 1; i < byStart.length; i++) {
+    if (Number(byStart[i].start) <= Number(byStart[i - 1].end)) {
+      const proceed = confirm(
+        `"${byStart[i - 1].name}" and "${byStart[i].name}" have overlapping day ranges. ` +
+        `Newcomers may not see the phase you expect on those days. Save anyway?`
+      );
+      if (!proceed) return;
+      break;
+    }
+  }
+
+  // Find which existing phases were removed from the form entirely
+  const { data: existingPhases } = await supabaseClient
+    .from("phases")
+    .select("id")
+    .eq("journey_id", journeyId);
+
+  const existingIds = new Set((existingPhases || []).map(p => p.id));
+  const keptIds = new Set(parsed.map(p => p.phaseId).filter(id => id));
+  const removedIds = [...existingIds].filter(id => !keptIds.has(id));
+
+  const blockedDeletions = [];
+  for (const removedId of removedIds) {
+    const { error: deleteError } = await supabaseClient.from("phases").delete().eq("id", removedId);
+    if (deleteError) {
+      blockedDeletions.push(removedId);
+    }
+  }
+
+  for (let i = 0; i < parsed.length; i++) {
+    const p = parsed[i];
+    const payload = {
+      name: p.name,
+      days_after_arrival_start: Number(p.start),
+      days_after_arrival_end: Number(p.end),
+      sort_order: i
+    };
+
+    if (p.phaseId) {
+      await supabaseClient.from("phases").update(payload).eq("id", p.phaseId);
+    } else {
+      await supabaseClient.from("phases").insert({ ...payload, journey_id: journeyId });
+    }
+  }
+
+  if (blockedDeletions.length > 0) {
+    alert(
+      `Phases saved, but ${blockedDeletions.length} phase(s) couldn't be removed because they still have tasks assigned. ` +
+      `Reassign or archive those tasks first, then remove the phase.`
+    );
+  } else {
+    alert("Phases updated.");
+  }
+
+  document.getElementById(`phase-editor-${journeyId}`).classList.add("hidden");
+  document.getElementById(`phase-editor-${journeyId}`).innerHTML = "";
+  await loadExistingJourneys();
+  await loadPhaseOptions();
+}
+
+async function handleJourneyFormSubmit(e) {
+  e.preventDefault();
+
+  const visaTypeSelect = document.getElementById("journey_visa_type").value;
+  const visaType = visaTypeSelect === "other"
+    ? document.getElementById("journey_visa_type_other").value.trim()
+    : visaTypeSelect;
+  const ukRegion = document.getElementById("journey_uk_region").value;
+  const name = document.getElementById("journey_name").value.trim();
+  const phaseRows = collectPhaseRows();
+
+  if (!visaType) {
+    alert("Please specify a visa type.");
+    return;
+  }
+
+  if (phaseRows.length === 0) {
+    alert("Add at least one phase — a journey with no phases has nowhere to attach tasks.");
+    return;
+  }
+
+  for (const phase of phaseRows) {
+    if (!phase.name || phase.days_after_arrival_start === "" || phase.days_after_arrival_end === "") {
+      alert("Every phase needs a name, a start day, and an end day.");
+      return;
+    }
+    if (Number(phase.days_after_arrival_start) > Number(phase.days_after_arrival_end)) {
+      alert(`Phase "${phase.name}" has a start day after its end day.`);
+      return;
+    }
+  }
+
+  // Guard against a duplicate (visa_type, uk_region) journey — dashboard.js
+  // does a .single() lookup on this exact combo and would break with two matches.
+  const { data: existingJourney } = await supabaseClient
+    .from("journeys")
+    .select("id")
+    .eq("visa_type", visaType)
+    .eq("uk_region", ukRegion)
+    .maybeSingle();
+
+  if (existingJourney) {
+    alert(`A journey already exists for ${visaType.replace("_", " ")} · ${ukRegion.replace("_", " ")}. Edit or clone that one instead of creating a duplicate.`);
+    return;
+  }
+
+  const { data: newJourney, error: journeyError } = await supabaseClient
+    .from("journeys")
+    .insert({ name, visa_type: visaType, uk_region: ukRegion })
+    .select()
+    .single();
+
+  if (journeyError || !newJourney) {
+    alert("Could not create journey: " + (journeyError?.message || "unknown error"));
+    return;
+  }
+
+  const phaseInserts = phaseRows.map(p => ({
+    journey_id: newJourney.id,
+    name: p.name,
+    days_after_arrival_start: Number(p.days_after_arrival_start),
+    days_after_arrival_end: Number(p.days_after_arrival_end),
+    sort_order: p.sort_order
+  }));
+
+  const { error: phaseError } = await supabaseClient.from("phases").insert(phaseInserts);
+
+  if (phaseError) {
+    alert("Journey was created, but its phases failed to save: " + phaseError.message + "\nYou can add phases for it separately.");
+  } else {
+    alert("Journey created with " + phaseInserts.length + " phase(s).");
+  }
+
+  resetJourneyForm();
+  await loadExistingJourneys();
+  await loadPhaseOptions(); // so the task form's phase dropdown includes the new journey's phases
+}
+
 async function loadPhaseOptions() {
   const { data: phases } = await supabaseClient
     .from("phases")
@@ -434,9 +735,19 @@ async function init() {
   await loadPhaseOptions();
   await loadDependsOnOptions(null);
   await loadExistingTasks();
+  await loadExistingJourneys();
+
+  addPhaseRow();
+  addPhaseRow();
 
   document.getElementById("task-form").addEventListener("submit", handleFormSubmit);
   document.getElementById("cancel-edit-btn").addEventListener("click", resetForm);
+
+  document.getElementById("journey-form").addEventListener("submit", handleJourneyFormSubmit);
+  document.getElementById("add-phase-row-btn").addEventListener("click", () => addPhaseRow());
+  document.getElementById("journey_visa_type").addEventListener("change", (e) => {
+    document.getElementById("journey_visa_type_other").classList.toggle("hidden", e.target.value !== "other");
+  });
 }
 
 init();

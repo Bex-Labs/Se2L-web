@@ -21,6 +21,12 @@ async function loadDashboard() {
     document.getElementById("app-manager-link").classList.remove("hidden");
   }
 
+  // --- SE2L-39: For Your Family section ---
+  // Called early and independently of the task-list logic below, since that
+  // logic has early returns (no tasks for current phase) that would skip
+  // anything placed after it in this function.
+  loadFamilySection(user.id);
+
   const welcomeDiv = document.getElementById("welcome-message");
   welcomeDiv.innerHTML = `
     <p class="text-lg font-semibold">Welcome back!</p>
@@ -166,6 +172,81 @@ async function loadDashboard() {
 }
 
 loadDashboard();
+
+// --- SE2L-39: For Your Family dashboard section ---
+//
+// Queries ONLY through family_dependants_view (built in SE2L-27), never the
+// raw `dependants` table with a custom join — that view deliberately excludes
+// email/invite_token and has no path to an adult dependant's own users/
+// user_task_state rows, which is what keeps an accepted adult's account
+// private from the primary user, per the SE2L-27 boundary.
+async function loadFamilySection(userId) {
+  const familyDiv = document.getElementById("family-section");
+
+  const { data: dependants, error: dependantsError } = await supabaseClient
+    .from("family_dependants_view")
+    .select("*")
+    .eq("primary_user_id", userId);
+
+  if (dependantsError || !dependants || dependants.length === 0) {
+    familyDiv.innerHTML = ""; // no family members — section simply doesn't show
+    return;
+  }
+
+  const minors = dependants.filter(d => d.type === "minor");
+  const adults = dependants.filter(d => d.type === "adult");
+
+  // Bulk-fetch pending checklist counts for all minors in one query, rather
+  // than one query per dependant.
+  let pendingCounts = {};
+  if (minors.length > 0) {
+    const minorIds = minors.map(m => m.id);
+    const { data: states } = await supabaseClient
+      .from("dependant_checklist_state")
+      .select("dependant_id, status")
+      .in("dependant_id", minorIds)
+      .eq("status", "pending");
+
+    for (const s of states || []) {
+      pendingCounts[s.dependant_id] = (pendingCounts[s.dependant_id] || 0) + 1;
+    }
+  }
+
+  const minorRows = minors.map(m => {
+    const count = pendingCounts[m.id] || 0;
+    const relationshipLabel = m.relationship ? m.relationship : "Child";
+    return `
+      <p class="text-sm text-indigo-700">
+        ${relationshipLabel} · ${m.name} — ${count} task${count === 1 ? "" : "s"} pending
+      </p>
+    `;
+  }).join("");
+
+  const adultStatusLabel = {
+    pending: "Invite sent",
+    accepted: "Account set up"
+  };
+
+  const adultRows = adults.map(a => {
+    const relationshipLabel = a.relationship ? a.relationship : "Adult";
+    const statusLabel = adultStatusLabel[a.invite_status] || a.invite_status || "—";
+    return `
+      <p class="text-sm text-indigo-700">
+        ${relationshipLabel} · ${a.name} — ${statusLabel}
+      </p>
+    `;
+  }).join("");
+
+  familyDiv.innerHTML = `
+    <div class="mt-6 bg-indigo-50 rounded-xl p-4">
+      <p class="text-sm font-medium text-indigo-700 mb-2">For your family</p>
+      <div class="flex flex-col gap-1">
+        ${minorRows}
+        ${adultRows}
+      </div>
+    </div>
+  `;
+}
 
 document.getElementById("signout-btn").addEventListener("click", async () => {
   await supabaseClient.auth.signOut();

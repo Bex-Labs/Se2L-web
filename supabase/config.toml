@@ -9,3 +9,58 @@ entrypoint = "./functions/notification-scheduler/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/notification-scheduler/*.html" ]
+
+[functions.send-queued-notifications]
+enabled = true
+verify_jwt = false
+import_map = "./functions/send-queued-notifications/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/send-queued-notifications/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/send-queued-notifications/*.html" ]
+
+[functions.send-dependant-invite]
+enabled = true
+verify_jwt = false
+import_map = "./functions/send-dependant-invite/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/send-dependant-invite/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/send-dependant-invite/*.html" ]
+
+[functions.get-dependant-invite]
+enabled = true
+verify_jwt = false
+import_map = "./functions/get-dependant-invite/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/get-dependant-invite/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/get-dependant-invite/*.html" ]
+
+[functions.accept-dependant-invite]
+enabled = true
+verify_jwt = false
+import_map = "./functions/accept-dependant-invite/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/accept-dependant-invite/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/accept-dependant-invite/*.html" ]
+
+[functions.assign-child-checklist]
+enabled = true
+verify_jwt = false
+import_map = "./functions/assign-child-checklist/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/assign-child-checklist/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/assign-child-checklist/*.html" ]

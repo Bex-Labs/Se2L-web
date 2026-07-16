@@ -18,6 +18,61 @@
       App manager
     </span>
 
+    <!-- SE2L-64: create new Journey for a visa category -->
+    <details id="journey-section" class="bg-white border border-slate-200 rounded-xl mb-8">
+      <summary class="cursor-pointer p-6 font-semibold text-lg">Manage journeys</summary>
+      <div class="px-6 pb-6">
+        <p class="text-sm text-slate-500 mb-4">
+          A journey is the full settlement path for one visa type in one UK region. Create it here first — a journey needs at least one phase before tasks can be assigned to it.
+        </p>
+
+        <form id="journey-form" class="border-t border-slate-200 pt-4">
+
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label class="text-sm font-medium block mb-1">Visa type</label>
+              <select id="journey_visa_type" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+                <option value="skilled_worker">Skilled Worker</option>
+                <option value="student">Student</option>
+                <option value="other">Other (specify)</option>
+              </select>
+              <input id="journey_visa_type_other" type="text" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mt-2 hidden" placeholder="e.g. health_care_worker" />
+            </div>
+            <div>
+              <label class="text-sm font-medium block mb-1">UK region</label>
+              <select id="journey_uk_region" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+                <option value="england">England</option>
+                <option value="scotland">Scotland</option>
+                <option value="wales">Wales</option>
+                <option value="northern_ireland">Northern Ireland</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="text-sm font-medium block mb-1">Journey name</label>
+            <input id="journey_name" type="text" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="e.g. Skilled Worker — England" />
+          </div>
+
+          <div class="mb-4">
+            <label class="text-sm font-medium block mb-2">Phases</label>
+            <div id="phase-rows" class="flex flex-col gap-2 mb-2"></div>
+            <button type="button" id="add-phase-row-btn" class="text-xs text-indigo-600 font-medium">+ Add phase</button>
+            <p class="text-xs text-slate-400 mt-1">
+              Days are counted from the newcomer's arrival date, e.g. 0–7 for "First week".
+            </p>
+          </div>
+
+          <div class="flex justify-end pt-4 border-t border-slate-200">
+            <button type="submit" id="journey-submit-btn" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium">Create journey</button>
+          </div>
+        </form>
+
+        <h3 class="text-sm font-medium mt-6 mb-3">Existing journeys</h3>
+        <div id="journey-list" class="flex flex-col gap-2"></div>
+      </div>
+    </details>
+
     <h1 id="form-heading" class="text-xl font-semibold mb-1">Create a task</h1>
     <p class="text-sm text-slate-500 mb-6">Add a new settlement task and assign it to a phase and visa type.</p>
 

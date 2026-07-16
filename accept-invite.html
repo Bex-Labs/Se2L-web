@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Se2L — Accept invite</title>
+  <link href="css/output.css" rel="stylesheet">
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900">
+
+  <div class="max-w-xl mx-auto py-16 px-6">
+
+    <span class="inline-flex items-center bg-indigo-50 text-indigo-700 text-sm px-4 py-1.5 rounded-full mb-4">
+      You've been invited
+    </span>
+
+    <h1 id="invite-heading" class="text-2xl font-semibold mb-1">Set up your Se2L account</h1>
+    <p id="invite-subtext" class="text-slate-600 text-sm mb-6">Loading your invite...</p>
+
+    <!-- Shown if the token is invalid, expired, or already used -->
+    <div id="invite-error" class="hidden bg-white border border-red-200 rounded-xl p-6 text-sm text-red-700">
+      This invite link isn't valid. It may have already been used, or the link may be incomplete.
+      Please check the link in your email, or contact whoever invited you for a new one.
+    </div>
+
+    <form id="accept-invite-form" class="hidden bg-white border border-slate-200 rounded-xl p-6">
+
+      <div>
+        <label class="text-sm font-medium block mb-1">Email</label>
+        <input id="dependant-email" type="email" disabled class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-slate-50 text-slate-500" />
+      </div>
+
+      <div class="mt-4">
+        <label class="text-sm font-medium block mb-1">Password</label>
+        <input id="password" type="password" required minlength="6" placeholder="At least 6 characters" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-slate-200">
+        <div>
+          <label class="text-sm font-medium block mb-1">Visa type</label>
+          <select id="visa_type" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+            <option value="skilled_worker">Skilled Worker</option>
+            <option value="student">Student</option>
+            <option value="dependant">Dependant</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-sm font-medium block mb-1">Arrival date</label>
+          <input id="arrival_date" type="date" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+          <p class="text-xs text-slate-400 mt-1">This can be different from the person who invited you.</p>
+        </div>
+        <div>
+          <label class="text-sm font-medium block mb-1">UK region</label>
+          <select id="uk_region" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+            <option value="england">England</option>
+            <option value="scotland">Scotland</option>
+            <option value="wales">Wales</option>
+            <option value="northern_ireland">Northern Ireland</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-sm font-medium block mb-1">Preferred language</label>
+          <select id="language" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+            <option value="english">English</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-200">
+        <button type="submit" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium">Create my account</button>
+      </div>
+
+    </form>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/accept-invite.js"></script>
+
+</body>
+</html>

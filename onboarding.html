@@ -58,16 +58,28 @@
         </select>
       </div>
 
-   <div class="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-slate-200">
-  <div>
-    <label class="text-sm font-medium block mb-1">Email</label>
-    <input id="email" type="email" required placeholder="you@example.com" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
-  </div>
-  <div>
-    <label class="text-sm font-medium block mb-1">Password</label>
-    <input id="password" type="password" required minlength="6" placeholder="At least 6 characters" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
-  </div>
-</div>
+      <!-- SE2L-23: household members section, shown only when has_dependants = yes -->
+      <div id="dependants-section" class="mt-4 pt-4 border-t border-slate-200 hidden">
+        <div class="flex items-center justify-between mb-3">
+          <label class="text-sm font-medium">Household members</label>
+          <button type="button" id="add-dependant-btn" class="text-indigo-700 text-xs font-medium border border-indigo-200 bg-indigo-50 px-3 py-1.5 rounded-lg">
+            + Add household member
+          </button>
+        </div>
+        <p class="text-xs text-slate-400 mb-3">Add anyone settling with you — partner, children, or other relatives. Adults you add will get their own invite to set up an account.</p>
+        <div id="dependants-container"></div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-slate-200">
+        <div>
+          <label class="text-sm font-medium block mb-1">Email</label>
+          <input id="email" type="email" required placeholder="you@example.com" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+        </div>
+        <div>
+          <label class="text-sm font-medium block mb-1">Password</label>
+          <input id="password" type="password" required minlength="6" placeholder="At least 6 characters" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+        </div>
+      </div>
 
       <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-200">
         <a href="index.html" class="border border-slate-300 px-4 py-2 rounded-lg text-sm font-medium">Back</a>
@@ -77,6 +89,38 @@
     </form>
 
   </div>
+
+  <!-- SE2L-23: template for one household member entry, cloned by onboarding.js -->
+  <template id="dependant-entry-template">
+    <div class="dependant-entry border border-slate-200 rounded-lg p-4 mb-3">
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="text-xs font-medium block mb-1">Full name</label>
+          <input type="text" class="dependant-name w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" required />
+        </div>
+        <div>
+          <label class="text-xs font-medium block mb-1">Date of birth</label>
+          <input type="date" class="dependant-dob w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+        </div>
+        <div>
+          <label class="text-xs font-medium block mb-1">Category</label>
+          <select class="dependant-type w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+            <option value="minor">Child</option>
+            <option value="adult">Adult (partner / relative)</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs font-medium block mb-1">Relationship</label>
+          <input type="text" class="dependant-relationship w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="e.g. Son, Daughter, Niece" />
+        </div>
+        <div class="dependant-email-wrapper hidden">
+          <label class="text-xs font-medium block mb-1">Email (for their invite)</label>
+          <input type="email" class="dependant-email w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="their@email.com" />
+        </div>
+      </div>
+      <button type="button" class="remove-dependant-btn text-xs text-red-600 mt-3">Remove</button>
+    </div>
+  </template>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
