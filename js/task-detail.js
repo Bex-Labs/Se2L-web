@@ -127,6 +127,74 @@ async function loadTaskDetail() {
     `;
   }
 
+  // --- SE2L-44: bookmark and personal notes ---
+  // Strictly private per user — task_bookmarks RLS scopes every row to
+  // user_id = auth.uid(), so App Managers/Super Admins never see this.
+  const { data: existingBookmark } = await supabaseClient
+    .from("task_bookmarks")
+    .select("*")
+    .eq("user_id", user.id)
+    .eq("task_id", taskId)
+    .maybeSingle();
+
+  const bookmarkBtn = document.getElementById("bookmark-btn");
+  const noteTextarea = document.getElementById("personal-note");
+  const saveNoteBtn = document.getElementById("save-note-btn");
+
+  let isBookmarked = existingBookmark?.is_bookmarked || false;
+  noteTextarea.value = existingBookmark?.personal_note || "";
+
+  function setBookmarkButtonState(bookmarked) {
+    bookmarkBtn.textContent = bookmarked ? "★ Bookmarked" : "☆ Bookmark";
+    bookmarkBtn.classList.toggle("text-amber-500", bookmarked);
+    bookmarkBtn.classList.toggle("text-slate-400", !bookmarked);
+  }
+  setBookmarkButtonState(isBookmarked);
+
+  async function saveBookmarkState(nextIsBookmarked) {
+    const { error } = await supabaseClient
+      .from("task_bookmarks")
+      .upsert({
+        user_id: user.id,
+        task_id: taskId,
+        is_bookmarked: nextIsBookmarked,
+        personal_note: noteTextarea.value || null,
+        updated_at: new Date().toISOString()
+      }, { onConflict: "user_id,task_id" });
+
+    return error;
+  }
+
+  if (isPreview) {
+    [bookmarkBtn, noteTextarea, saveNoteBtn].forEach(el => {
+      el.disabled = true;
+      el.style.opacity = "0.5";
+      el.style.cursor = "not-allowed";
+    });
+    bookmarkBtn.title = "Disabled in preview mode";
+  } else {
+    bookmarkBtn.addEventListener("click", async () => {
+      isBookmarked = !isBookmarked;
+      setBookmarkButtonState(isBookmarked);
+      const error = await saveBookmarkState(isBookmarked);
+      if (error) {
+        console.error(error);
+        alert("Could not update bookmark.");
+      }
+    });
+
+    saveNoteBtn.addEventListener("click", async () => {
+      const error = await saveBookmarkState(isBookmarked);
+      if (error) {
+        console.error(error);
+        alert("Could not save note.");
+      } else {
+        saveNoteBtn.textContent = "Saved ✓";
+        setTimeout(() => { saveNoteBtn.textContent = "Save note"; }, 1500);
+      }
+    });
+  }
+
   const { data: existingState } = await supabaseClient
     .from("user_task_state")
     .select("*")
@@ -173,6 +241,87 @@ async function loadTaskDetail() {
       if (upsertError) {
         console.error(upsertError);
         alert("Could not update task status.");
+      }
+    });
+  }
+  // --- SE2L-45: thumbs up/down feedback with optional comment ---
+  // Visible to App Managers/Super Admins (see task_feedback RLS), unlike
+  // the strictly-private bookmarks/notes above.
+  const { data: existingFeedback } = await supabaseClient
+    .from("task_feedback")
+    .select("*")
+    .eq("user_id", user.id)
+    .eq("task_id", taskId)
+    .maybeSingle();
+
+  const thumbsUpBtn = document.getElementById("thumbs-up-btn");
+  const thumbsDownBtn = document.getElementById("thumbs-down-btn");
+  const feedbackComment = document.getElementById("feedback-comment");
+  const saveFeedbackBtn = document.getElementById("save-feedback-btn");
+
+  let currentRating = existingFeedback?.rating || null;
+  feedbackComment.value = existingFeedback?.comment || "";
+
+  function setFeedbackButtonState(rating) {
+    thumbsUpBtn.classList.toggle("bg-green-50", rating === "up");
+    thumbsUpBtn.classList.toggle("border-green-600", rating === "up");
+    thumbsUpBtn.classList.toggle("text-green-700", rating === "up");
+
+    thumbsDownBtn.classList.toggle("bg-red-50", rating === "down");
+    thumbsDownBtn.classList.toggle("border-red-600", rating === "down");
+    thumbsDownBtn.classList.toggle("text-red-700", rating === "down");
+  }
+  setFeedbackButtonState(currentRating);
+
+  async function saveFeedbackState(rating) {
+    const { error } = await supabaseClient
+      .from("task_feedback")
+      .upsert({
+        user_id: user.id,
+        task_id: taskId,
+        rating: rating,
+        comment: feedbackComment.value || null,
+        updated_at: new Date().toISOString()
+      }, { onConflict: "user_id,task_id" });
+
+    return error;
+  }
+
+  if (isPreview) {
+    [thumbsUpBtn, thumbsDownBtn, feedbackComment, saveFeedbackBtn].forEach(el => {
+      el.disabled = true;
+      el.style.opacity = "0.5";
+      el.style.cursor = "not-allowed";
+    });
+  } else {
+    thumbsUpBtn.addEventListener("click", async () => {
+      currentRating = currentRating === "up" ? null : "up";
+      setFeedbackButtonState(currentRating);
+      const error = await saveFeedbackState(currentRating);
+      if (error) {
+        console.error(error);
+        alert("Could not save feedback.");
+      }
+    });
+
+    thumbsDownBtn.addEventListener("click", async () => {
+      currentRating = currentRating === "down" ? null : "down";
+      setFeedbackButtonState(currentRating);
+      const error = await saveFeedbackState(currentRating);
+      if (error) {
+        console.error(error);
+        alert("Could not save feedback.");
+      }
+    });
+
+    saveFeedbackBtn.addEventListener("click", async () => {
+      const error = await saveFeedbackState(currentRating);
+      if (error) {
+        console.error(error);
+        alert("Could not save feedback.");
+      } else {
+        saveFeedbackBtn.textContent = "Saved ✓";
+        setTimeout(() => { saveFeedbackBtn.textContent = "Save feedback"; }, 1500);
       }
     });
   }

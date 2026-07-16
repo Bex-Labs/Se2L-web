@@ -67,7 +67,7 @@ async function loadDashboard() {
     daysSinceArrival < p.days_after_arrival_end
   );
 
-  const timelineDiv = document.querySelector(".flex.gap-2.mb-8");
+  const timelineDiv = document.getElementById("phase-timeline");
   const currentSortOrder = currentPhase ? currentPhase.sort_order : phases[phases.length - 1].sort_order + 1;
 
   timelineDiv.innerHTML = phases.map(p => {
@@ -89,8 +89,8 @@ async function loadDashboard() {
     }
   }).join("");
 
-  const taskListDiv = document.querySelector(".flex.flex-col.gap-3");
-  const taskCountSpan = document.querySelector(".flex.justify-between.items-center.mb-4 span");
+  const taskListDiv = document.getElementById("task-list");
+  const taskCountSpan = document.getElementById("task-count");
 
   if (!currentPhase) {
     taskListDiv.innerHTML = `<p class="text-sm text-slate-500">No active phase yet.</p>`;
@@ -100,7 +100,7 @@ async function loadDashboard() {
 
   const { data: tasks, error: tasksError } = await supabaseClient
     .from("tasks")
-    .select("*, task_phases!inner(phase_id), task_visa_types!inner(visa_type), task_uk_regions!inner(uk_region)")
+    .select("*, task_phases!inner(phase_id, sort_order), task_visa_types!inner(visa_type), task_uk_regions!inner(uk_region)")
     .eq("task_phases.phase_id", currentPhase.id)
     .eq("task_visa_types.visa_type", profile.visa_type)
     .eq("task_uk_regions.uk_region", profile.uk_region)
@@ -131,6 +131,21 @@ async function loadDashboard() {
     Important: "text-amber-600",
     Optional: "text-slate-500"
   };
+
+  // SE2L-66: urgency tier first (Critical > Important > Optional) — this
+  // stays fixed because urgency reflects real consequences (visa deadlines,
+  // healthcare windows). The App Manager's manual sort_order only breaks
+  // ties *within* the same tier, so it can't bury a Critical task under
+  // Optional ones by accident.
+  const urgencyRank = { Critical: 0, Important: 1, Optional: 2 };
+  tasks.sort((a, b) => {
+    const rankA = urgencyRank[a.urgency] ?? 3;
+    const rankB = urgencyRank[b.urgency] ?? 3;
+    if (rankA !== rankB) return rankA - rankB;
+    const sortA = a.task_phases?.[0]?.sort_order ?? 0;
+    const sortB = b.task_phases?.[0]?.sort_order ?? 0;
+    return sortA - sortB;
+  });
 
   const completedCount = tasks.filter(t => completedIds.has(t.id)).length;
   taskCountSpan.textContent = `${completedCount} of ${tasks.length} complete`;

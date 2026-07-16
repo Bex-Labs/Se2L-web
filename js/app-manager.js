@@ -86,7 +86,10 @@ async function loadExistingJourneys() {
             ${j.visa_type.replace("_", " ")} · ${j.uk_region.replace("_", " ")} · ${j.phases?.length || 0} phase${j.phases?.length === 1 ? "" : "s"}
           </p>
         </div>
-        <button data-edit-journey-id="${j.id}" class="text-xs text-indigo-600 font-medium">Edit phases</button>
+        <div class="flex gap-3 items-center">
+          <button data-clone-journey-id="${j.id}" class="text-xs text-slate-500 font-medium">Clone</button>
+          <button data-edit-journey-id="${j.id}" class="text-xs text-indigo-600 font-medium">Edit phases</button>
+        </div>
       </div>
       <div id="phase-editor-${j.id}" class="hidden mt-3 pt-3 border-t border-slate-200"></div>
     </div>
@@ -95,6 +98,64 @@ async function loadExistingJourneys() {
   listDiv.querySelectorAll("[data-edit-journey-id]").forEach(btn => {
     btn.addEventListener("click", () => toggleJourneyPhaseEditor(btn.dataset.editJourneyId));
   });
+
+  listDiv.querySelectorAll("[data-clone-journey-id]").forEach(btn => {
+    btn.addEventListener("click", () => cloneJourneyIntoForm(btn.dataset.cloneJourneyId));
+  });
+}
+
+// --- SE2L-67: clone an existing Journey as a starting point ---
+// Loads a source journey's fields and phases into the create-journey form
+// (reusing SE2L-64's addPhaseRow/handleJourneyFormSubmit) so the person just
+// changes visa type/region/name and saves it as a brand-new journey. The
+// duplicate guard in handleJourneyFormSubmit already stops them from
+// accidentally saving an exact duplicate of the source.
+async function cloneJourneyIntoForm(journeyId) {
+  const { data: journey, error } = await supabaseClient
+    .from("journeys")
+    .select("*, phases(*)")
+    .eq("id", journeyId)
+    .single();
+
+  if (error || !journey) {
+    alert("Could not load journey to clone: " + (error?.message || "not found"));
+    return;
+  }
+
+  document.getElementById("journey-section").open = true;
+
+  const visaSelect = document.getElementById("journey_visa_type");
+  const otherInput = document.getElementById("journey_visa_type_other");
+  const knownVisaTypes = Array.from(visaSelect.options).map(o => o.value).filter(v => v !== "other");
+
+  if (knownVisaTypes.includes(journey.visa_type)) {
+    visaSelect.value = journey.visa_type;
+    otherInput.classList.add("hidden");
+    otherInput.value = "";
+  } else {
+    visaSelect.value = "other";
+    otherInput.value = journey.visa_type;
+    otherInput.classList.remove("hidden");
+  }
+
+  document.getElementById("journey_uk_region").value = journey.uk_region;
+  document.getElementById("journey_name").value = `${journey.name} (Copy)`;
+
+  const phaseRowsDiv = document.getElementById("phase-rows");
+  phaseRowsDiv.innerHTML = "";
+
+  const sortedPhases = (journey.phases || []).slice().sort((a, b) => a.sort_order - b.sort_order);
+  sortedPhases.forEach(p => addPhaseRow({
+    name: p.name,
+    start: p.days_after_arrival_start,
+    end: p.days_after_arrival_end
+  }));
+  if (sortedPhases.length === 0) addPhaseRow();
+
+  document.getElementById("journey-section").scrollIntoView({ behavior: "smooth", block: "start" });
+  document.getElementById("journey_uk_region").focus();
+
+  alert(`Loaded "${journey.name}" as a starting point with its ${sortedPhases.length} phase(s). Change the visa type and/or UK region below, then click "Create journey" to save it as a new journey.`);
 }
 
 // --- SE2L-65: configure Phase time windows on an existing journey ---
@@ -727,6 +788,183 @@ async function handleFormSubmit(e) {
   loadExistingTasks();
 }
 
+// --- SE2L-66: reorder tasks within a Phase ---
+// Grouped by urgency tier, matching dashboard.js's actual sort (urgency
+// tier first, sort_order as tiebreak within a tier). Reordering only ever
+// happens *within* one tier's list here, so what an App Manager does in
+// this UI can never silently fail to matter on the real dashboard.
+
+let currentReorderGroups = { Critical: [], Important: [], Optional: [] };
+let currentReorderPhaseIds = [];
+
+async function loadReorderPhaseOptions() {
+  const { data: phases } = await supabaseClient
+    .from("phases")
+    .select("name")
+    .order("name", { ascending: true });
+
+  const seen = new Set();
+  const uniqueNames = (phases || [])
+    .filter(p => {
+      if (seen.has(p.name)) return false;
+      seen.add(p.name);
+      return true;
+    })
+    .map(p => p.name);
+
+  const select = document.getElementById("reorder_phase_select");
+
+  if (uniqueNames.length === 0) {
+    select.innerHTML = `<option value="">No phases yet</option>`;
+    return;
+  }
+
+  select.innerHTML = `<option value="">Select a phase...</option>` +
+    uniqueNames.map(n => `<option value="${n}">${n}</option>`).join("");
+}
+
+async function loadTasksForReorder(phaseName) {
+  const listDiv = document.getElementById("reorder-task-list");
+  const saveBtn = document.getElementById("save-task-order-btn");
+
+  currentReorderGroups = { Critical: [], Important: [], Optional: [] };
+  currentReorderPhaseIds = [];
+
+  if (!phaseName) {
+    listDiv.innerHTML = `<p class="text-sm text-slate-400">Select a phase.</p>`;
+    saveBtn.classList.add("hidden");
+    return;
+  }
+
+  const { data: phaseRows } = await supabaseClient
+    .from("phases")
+    .select("id")
+    .eq("name", phaseName);
+
+  currentReorderPhaseIds = (phaseRows || []).map(p => p.id);
+
+  if (currentReorderPhaseIds.length === 0) {
+    listDiv.innerHTML = `<p class="text-sm text-slate-400">No phases found with that name.</p>`;
+    saveBtn.classList.add("hidden");
+    return;
+  }
+
+  // Every phase sharing this name gets the same tasks assigned (see
+  // handleFormSubmit), so the first matching phase id is a representative
+  // sample of the task set and its ordering.
+  const { data: taskLinks, error } = await supabaseClient
+    .from("task_phases")
+    .select("task_id, sort_order, tasks(id, title, urgency, status)")
+    .eq("phase_id", currentReorderPhaseIds[0])
+    .order("sort_order", { ascending: true });
+
+  if (error) {
+    listDiv.innerHTML = `<p class="text-sm text-red-600">Could not load tasks: ${error.message}</p>`;
+    saveBtn.classList.add("hidden");
+    return;
+  }
+
+  const tasks = (taskLinks || []).map(l => l.tasks).filter(t => t && t.status !== "archived");
+
+  if (tasks.length === 0) {
+    listDiv.innerHTML = `<p class="text-sm text-slate-400">No tasks assigned to this phase yet.</p>`;
+    saveBtn.classList.add("hidden");
+    return;
+  }
+
+  currentReorderGroups = {
+    Critical: tasks.filter(t => t.urgency === "Critical"),
+    Important: tasks.filter(t => t.urgency === "Important"),
+    Optional: tasks.filter(t => t.urgency === "Optional")
+  };
+
+  renderReorderGroups();
+}
+
+function renderReorderGroups() {
+  const listDiv = document.getElementById("reorder-task-list");
+  const saveBtn = document.getElementById("save-task-order-btn");
+
+  const tierStyles = {
+    Critical: "text-red-600",
+    Important: "text-amber-600",
+    Optional: "text-slate-500"
+  };
+
+  const tiers = ["Critical", "Important", "Optional"];
+  const hasAnyTasks = tiers.some(t => currentReorderGroups[t].length > 0);
+
+  if (!hasAnyTasks) {
+    listDiv.innerHTML = `<p class="text-sm text-slate-400">No tasks assigned to this phase yet.</p>`;
+    saveBtn.classList.add("hidden");
+    return;
+  }
+
+  listDiv.innerHTML = tiers.map(tier => {
+    const group = currentReorderGroups[tier];
+    if (group.length === 0) return "";
+
+    const rows = group.map((t, i) => `
+      <div class="bg-slate-50 border border-slate-200 rounded-lg p-2 flex justify-between items-center">
+        <span class="text-sm">${i + 1}. ${t.title}</span>
+        <div class="flex gap-2">
+          <button type="button" data-tier="${tier}" data-move="up" data-index="${i}" class="text-xs text-slate-500 font-medium px-1" ${i === 0 ? "disabled" : ""}>↑</button>
+          <button type="button" data-tier="${tier}" data-move="down" data-index="${i}" class="text-xs text-slate-500 font-medium px-1" ${i === group.length - 1 ? "disabled" : ""}>↓</button>
+        </div>
+      </div>
+    `).join("");
+
+    return `
+      <div class="mb-3">
+        <p class="text-xs font-medium ${tierStyles[tier]} mb-1">${tier}</p>
+        <div class="flex flex-col gap-1">${rows}</div>
+      </div>
+    `;
+  }).join("");
+
+  saveBtn.classList.remove("hidden");
+
+  listDiv.querySelectorAll("[data-move]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const tier = btn.dataset.tier;
+      const index = Number(btn.dataset.index);
+      const direction = btn.dataset.move;
+      const swapWith = direction === "up" ? index - 1 : index + 1;
+      const group = currentReorderGroups[tier];
+      if (swapWith < 0 || swapWith >= group.length) return;
+      [group[index], group[swapWith]] = [group[swapWith], group[index]];
+      renderReorderGroups();
+    });
+  });
+}
+
+async function saveTaskOrder() {
+  if (currentReorderPhaseIds.length === 0) return;
+
+  const updates = [];
+  ["Critical", "Important", "Optional"].forEach(tier => {
+    currentReorderGroups[tier].forEach((task, index) => {
+      currentReorderPhaseIds.forEach(phaseId => {
+        updates.push(
+          supabaseClient
+            .from("task_phases")
+            .update({ sort_order: index })
+            .eq("phase_id", phaseId)
+            .eq("task_id", task.id)
+        );
+      });
+    });
+  });
+
+  const results = await Promise.all(updates);
+  const failed = results.filter(r => r.error);
+
+  alert(failed.length > 0
+    ? `Order saved, but ${failed.length} update(s) failed. Try again.`
+    : "Task order saved.");
+}
+
+
 async function init() {
   const user = await checkAppManagerAccess();
   if (!user) return;
@@ -748,6 +986,10 @@ async function init() {
   document.getElementById("journey_visa_type").addEventListener("change", (e) => {
     document.getElementById("journey_visa_type_other").classList.toggle("hidden", e.target.value !== "other");
   });
+
+  await loadReorderPhaseOptions();
+  document.getElementById("reorder_phase_select").addEventListener("change", (e) => loadTasksForReorder(e.target.value));
+  document.getElementById("save-task-order-btn").addEventListener("click", saveTaskOrder);
 }
 
 init();

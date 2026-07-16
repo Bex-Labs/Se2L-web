@@ -193,6 +193,27 @@
     <h2 class="text-base font-medium mb-3">Existing tasks</h2>
     <div id="task-list" class="flex flex-col gap-2"></div>
 
+    <!-- SE2L-66: reorder tasks within a Phase -->
+    <details id="reorder-section" class="bg-white border border-slate-200 rounded-xl mt-8">
+      <summary class="cursor-pointer p-6 font-semibold text-lg">Reorder tasks within a phase</summary>
+      <div class="px-6 pb-6">
+        <p class="text-sm text-slate-500 mb-4">
+          This controls the order newcomers see tasks of the <strong>same urgency</strong> in a phase. Critical always shows before Important, and Important before Optional — reordering here only breaks ties within one urgency tier, so it can't bury a Critical task under Optional ones.
+        </p>
+
+        <label class="text-sm font-medium block mb-1">Phase</label>
+        <select id="reorder_phase_select" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mb-4">
+          <option value="">Loading phases...</option>
+        </select>
+
+        <div id="reorder-task-list" class="flex flex-col gap-2 mb-4"></div>
+
+        <div class="flex justify-end">
+          <button type="button" id="save-task-order-btn" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium hidden">Save order</button>
+        </div>
+      </div>
+    </details>
+
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
