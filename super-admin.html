@@ -89,19 +89,19 @@
     <div class="grid grid-cols-4 gap-3 mb-6">
       <div class="bg-slate-100 rounded-lg p-4">
         <p class="text-xs text-slate-500">App managers</p>
-        <p class="text-xl font-semibold mt-1">2</p>
+        <p id="stat-app-managers" class="text-xl font-semibold mt-1">—</p>
       </div>
       <div class="bg-slate-100 rounded-lg p-4">
         <p class="text-xs text-slate-500">Visa journeys</p>
-        <p class="text-xl font-semibold mt-1">4</p>
+        <p id="stat-journeys" class="text-xl font-semibold mt-1">—</p>
       </div>
       <div class="bg-slate-100 rounded-lg p-4">
         <p class="text-xs text-slate-500">UK regions</p>
-        <p class="text-xl font-semibold mt-1">4</p>
+        <p id="stat-regions" class="text-xl font-semibold mt-1">—</p>
       </div>
       <div class="bg-slate-100 rounded-lg p-4">
         <p class="text-xs text-slate-500">Content status</p>
-        <p class="text-base font-semibold mt-1">Draft</p>
+        <p id="stat-content-status" class="text-base font-semibold mt-1">Loading...</p>
       </div>
     </div>
 
@@ -109,20 +109,38 @@
     <div class="flex flex-col gap-2">
       <div class="flex justify-between items-center bg-white border border-slate-200 rounded-lg px-4 py-2.5">
         <span class="text-sm">Task content configured</span>
-        <span class="text-xs bg-green-50 text-green-700 px-3 py-1 rounded-full">Ready</span>
+        <span id="check-task-content" class="text-xs bg-slate-100 text-slate-500 px-3 py-1 rounded-full">Checking...</span>
       </div>
       <div class="flex justify-between items-center bg-white border border-slate-200 rounded-lg px-4 py-2.5">
         <span class="text-sm">Newcomer onboarding flow</span>
-        <span class="text-xs bg-green-50 text-green-700 px-3 py-1 rounded-full">Ready</span>
+        <span id="check-onboarding" class="text-xs bg-slate-100 text-slate-500 px-3 py-1 rounded-full">Checking...</span>
       </div>
       <div class="flex justify-between items-center bg-white border border-slate-200 rounded-lg px-4 py-2.5">
         <span class="text-sm">Backend connection</span>
-        <span class="text-xs bg-amber-50 text-amber-700 px-3 py-1 rounded-full">Pending</span>
+        <span id="check-backend" class="text-xs bg-slate-100 text-slate-500 px-3 py-1 rounded-full">Checking...</span>
       </div>
       <div class="flex justify-between items-center bg-white border border-slate-200 rounded-lg px-4 py-2.5">
         <span class="text-sm">Authentication and roles</span>
-        <span class="text-xs bg-amber-50 text-amber-700 px-3 py-1 rounded-full">Pending</span>
+        <span id="check-auth-roles" class="text-xs bg-slate-100 text-slate-500 px-3 py-1 rounded-full">Checking...</span>
       </div>
+    </div>
+
+    <!-- SE2L-73: manage App Manager accounts -->
+    <div class="mt-8">
+      <h2 class="text-base font-semibold mb-3">App Manager accounts</h2>
+
+      <form id="invite-form" class="bg-white border border-slate-200 rounded-xl p-4 flex gap-3 items-end mb-4">
+        <div class="flex-1">
+          <label class="text-sm font-medium block mb-1">Invite a new App Manager</label>
+          <input id="invite_email" type="email" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="name@example.com" />
+        </div>
+        <button type="submit" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium">Send invite</button>
+      </form>
+
+      <div id="app-manager-list" class="flex flex-col gap-2 mb-4"></div>
+
+      <h3 class="text-sm font-medium mb-2">Pending invites</h3>
+      <div id="pending-invite-list" class="flex flex-col gap-2"></div>
     </div>
 
       </div>
@@ -133,6 +151,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
   <script src="js/shell.js"></script>
+  <script src="js/super-admin.js"></script>
 
 </body>
 </html>

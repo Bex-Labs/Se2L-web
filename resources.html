@@ -5,41 +5,169 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Se2L — Resources</title>
   <link href="css/output.css" rel="stylesheet">
+  <style>
+    .app-shell { display: flex; min-height: 100vh; }
+
+    .app-sidebar {
+      position: fixed;
+      top: 0; bottom: 0; left: 0;
+      z-index: 30;
+      width: 224px;
+      background: #fff;
+      border-right: 1px solid #e2e8f0;
+      padding: 1.5rem 1rem;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(-100%);
+      transition: transform 0.2s ease;
+    }
+    .app-sidebar.open { transform: translateX(0); }
+
+    .app-sidebar-title { display: none; }
+
+    .mobile-topbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 20;
+      background: #fff;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+    }
+
+    .sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.3);
+      z-index: 20;
+    }
+    .sidebar-backdrop.open { display: block; }
+
+    .app-main { flex: 1; width: 100%; padding: 4rem 1.5rem 2.5rem; }
+
+    @media (min-width: 768px) {
+      .mobile-topbar { display: none; }
+      .app-sidebar {
+        position: static;
+        transform: none;
+        flex-shrink: 0;
+      }
+      .app-sidebar-title { display: block; }
+      .sidebar-backdrop { display: none !important; }
+      .app-main { padding: 2.5rem 1.5rem; }
+      .app-sidebar nav { margin-top: 0; }
+    }
+
+    /* Default state: nobody's confirmed logged in yet (or never will be).
+       Shell stays fully hidden and the page reads as a plain public page —
+       no flash of sidebar/topbar for anonymous visitors. resources.js
+       removes this class only after a real session is confirmed. */
+    body.shell-inactive .mobile-topbar,
+    body.shell-inactive .app-sidebar,
+    body.shell-inactive .sidebar-backdrop {
+      display: none !important;
+    }
+    body.shell-inactive .app-main {
+      padding: 2.5rem 1.5rem;
+    }
+  </style>
 </head>
-<body class="min-h-screen bg-slate-50 text-slate-900">
+<body class="min-h-screen bg-slate-50 text-slate-900 shell-inactive">
 
-  <div class="max-w-2xl mx-auto py-10 px-6">
+  <div class="mobile-topbar">
+    <span class="text-base font-semibold">Se2L</span>
+    <button id="mobile-menu-btn" class="text-2xl leading-none text-slate-600" aria-label="Open menu">☰</button>
+  </div>
 
-    <a href="index.html" class="text-sm text-slate-500 flex items-center gap-1 mb-6">
-      ← Back home
-    </a>
+  <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+
+  <div class="app-shell">
+
+    <aside id="app-sidebar" class="app-sidebar">
+      <p class="app-sidebar-title text-lg font-semibold mb-6 px-2">Se2L</p>
+      <nav class="flex flex-col gap-1" style="margin-top: 3rem;">
+        <a href="dashboard.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Dashboard</a>
+        <a id="app-manager-link" href="app-manager.html" class="hidden px-3 py-2 rounded-lg text-sm text-slate-600">Manage content</a>
+      </nav>
+      <button id="signout-btn" class="mt-auto text-xs text-slate-400 underline text-left px-3">Sign out</button>
+    </aside>
+
+    <main class="app-main">
+      <div class="max-w-2xl mx-auto">
+
+        <a href="index.html" class="text-sm text-slate-500 flex items-center gap-1 mb-6">
+          ← Back home
+        </a>
 
     <h1 class="text-xl font-semibold mb-1">Trusted settlement resources</h1>
     <p class="text-sm text-slate-500 mb-4">Browse guidance for healthcare, work, money, and family setup.</p>
 
-    <input type="search" placeholder="Search resources" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mb-4" />
+    <input id="resource-search" type="search" placeholder="Search resources" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mb-4" />
 
-    <div class="flex gap-2 mb-6 flex-wrap">
-      <span class="bg-slate-900 text-white text-xs px-3 py-1.5 rounded-full">All</span>
-      <span class="bg-slate-100 text-xs px-3 py-1.5 rounded-full">Healthcare</span>
-      <span class="bg-slate-100 text-xs px-3 py-1.5 rounded-full">Legal</span>
-      <span class="bg-slate-100 text-xs px-3 py-1.5 rounded-full">Banking</span>
+    <div id="category-pills" class="flex gap-2 mb-6 flex-wrap"></div>
+
+    <div id="resource-list" class="grid grid-cols-2 gap-3">
+      <p class="text-sm text-slate-400 col-span-2">Loading resources...</p>
     </div>
 
-    <div class="grid grid-cols-2 gap-3">
-      <div class="bg-white border border-slate-200 rounded-xl p-4">
-        <span class="text-xs text-indigo-600 font-medium">Healthcare</span>
-        <p class="text-sm font-medium mt-1">Registering with a GP</p>
-        <p class="text-xs text-slate-500 mt-1">NHS / Local GP guidance</p>
+    <!-- SE2L-51: only shown to a logged-in app_manager, checked without
+         redirecting anyone else — this page stays fully public otherwise. -->
+    <details id="add-resource-section" class="hidden bg-white border border-slate-200 rounded-xl mt-8">
+      <summary class="cursor-pointer p-6 font-semibold text-lg">Add a resource</summary>
+      <div class="px-6 pb-6">
+        <form id="resource-form" class="border-t border-slate-200 pt-4">
+          <div class="mb-4">
+            <label class="text-sm font-medium block mb-1">Title</label>
+            <input id="resource_title" type="text" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="e.g. Registering with a GP" />
+          </div>
+          <div class="mb-4">
+            <label class="text-sm font-medium block mb-1">Description</label>
+            <textarea id="resource_description" rows="2" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="Short summary of what this resource covers"></textarea>
+          </div>
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label class="text-sm font-medium block mb-1">Category</label>
+              <select id="resource_category" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+                <option value="Housing">Housing</option>
+                <option value="Legal">Legal</option>
+                <option value="Banking">Banking</option>
+                <option value="Healthcare">Healthcare</option>
+                <option value="Education">Education</option>
+                <option value="Employment">Employment</option>
+                <option value="Social">Social</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-sm font-medium block mb-1">Status</label>
+              <select id="resource_status" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+                <option value="draft">Draft (not visible to the public yet)</option>
+                <option value="published">Published</option>
+              </select>
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="text-sm font-medium block mb-1">Link (optional)</label>
+            <input id="resource_url" type="url" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="https://gov.uk/..." />
+          </div>
+          <div class="flex justify-end pt-4 border-t border-slate-200">
+            <button type="submit" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium">Add resource</button>
+          </div>
+        </form>
       </div>
-      <div class="bg-white border border-slate-200 rounded-xl p-4">
-        <span class="text-xs text-indigo-600 font-medium">Legal</span>
-        <p class="text-sm font-medium mt-1">National Insurance number</p>
-        <p class="text-xs text-slate-500 mt-1">gov.uk guidance</p>
+    </details>
+
       </div>
-    </div>
+    </main>
 
   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/shell.js"></script>
+  <script src="js/resources.js"></script>
 
 </body>
 </html>

@@ -21,6 +21,10 @@ async function loadDashboard() {
     document.getElementById("app-manager-link").classList.remove("hidden");
   }
 
+  if (profile.role === "super_admin") {
+    document.getElementById("super-admin-link")?.classList.remove("hidden");
+  }
+
   // --- SE2L-39: For Your Family section ---
   // Called early and independently of the task-list logic below, since that
   // logic has early returns (no tasks for current phase) that would skip
