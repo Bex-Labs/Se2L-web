@@ -5,62 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Se2L — Super admin</title>
   <link href="css/output.css" rel="stylesheet">
-  <style>
-    .app-shell { display: flex; min-height: 100vh; }
-
-    .app-sidebar {
-      position: fixed;
-      top: 0; bottom: 0; left: 0;
-      z-index: 30;
-      width: 224px;
-      background: #fff;
-      border-right: 1px solid #e2e8f0;
-      padding: 1.5rem 1rem;
-      display: flex;
-      flex-direction: column;
-      transform: translateX(-100%);
-      transition: transform 0.2s ease;
-    }
-    .app-sidebar.open { transform: translateX(0); }
-
-    .app-sidebar-title { display: none; }
-
-    .mobile-topbar {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 20;
-      background: #fff;
-      border-bottom: 1px solid #e2e8f0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.75rem 1rem;
-    }
-
-    .sidebar-backdrop {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.3);
-      z-index: 20;
-    }
-    .sidebar-backdrop.open { display: block; }
-
-    .app-main { flex: 1; width: 100%; padding: 4rem 1.5rem 2.5rem; }
-
-    @media (min-width: 768px) {
-      .mobile-topbar { display: none; }
-      .app-sidebar {
-        position: static;
-        transform: none;
-        flex-shrink: 0;
-      }
-      .app-sidebar-title { display: block; }
-      .sidebar-backdrop { display: none !important; }
-      .app-main { padding: 2.5rem 1.5rem; }
-      .app-sidebar nav { margin-top: 0; }
-    }
-  </style>
+  <link href="css/tokens.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Literata:wght@600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="css/shell.css" rel="stylesheet">
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-900">
 
@@ -74,7 +21,7 @@
   <div class="app-shell">
 
     <aside id="app-sidebar" class="app-sidebar">
-      <p class="app-sidebar-title text-lg font-semibold mb-6 px-2">Se2L</p>
+      <h2 class="app-sidebar-title text-lg font-semibold mb-6 px-2">Se2L</h2>
       <nav class="flex flex-col gap-1" style="margin-top: 3rem;">
         <a href="dashboard.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Dashboard</a>
       </nav>
@@ -109,19 +56,19 @@
     <div class="flex flex-col gap-2">
       <div class="flex justify-between items-center bg-white border border-slate-200 rounded-lg px-4 py-2.5">
         <span class="text-sm">Task content configured</span>
-        <span id="check-task-content" class="text-xs bg-slate-100 text-slate-500 px-3 py-1 rounded-full">Checking...</span>
+        <span id="check-task-content" class="text-xs status-pill">Checking...</span>
       </div>
       <div class="flex justify-between items-center bg-white border border-slate-200 rounded-lg px-4 py-2.5">
         <span class="text-sm">Newcomer onboarding flow</span>
-        <span id="check-onboarding" class="text-xs bg-slate-100 text-slate-500 px-3 py-1 rounded-full">Checking...</span>
+        <span id="check-onboarding" class="text-xs status-pill">Checking...</span>
       </div>
       <div class="flex justify-between items-center bg-white border border-slate-200 rounded-lg px-4 py-2.5">
         <span class="text-sm">Backend connection</span>
-        <span id="check-backend" class="text-xs bg-slate-100 text-slate-500 px-3 py-1 rounded-full">Checking...</span>
+        <span id="check-backend" class="text-xs status-pill">Checking...</span>
       </div>
       <div class="flex justify-between items-center bg-white border border-slate-200 rounded-lg px-4 py-2.5">
         <span class="text-sm">Authentication and roles</span>
-        <span id="check-auth-roles" class="text-xs bg-slate-100 text-slate-500 px-3 py-1 rounded-full">Checking...</span>
+        <span id="check-auth-roles" class="text-xs status-pill">Checking...</span>
       </div>
     </div>
 

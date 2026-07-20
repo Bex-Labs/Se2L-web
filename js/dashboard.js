@@ -33,7 +33,7 @@ async function loadDashboard() {
 
   const welcomeDiv = document.getElementById("welcome-message");
   welcomeDiv.innerHTML = `
-    <p class="text-lg font-semibold">Welcome back!</p>
+    <h2 class="text-lg font-semibold">Welcome back!</h2>
     <p class="text-sm text-slate-500">
       ${profile.visa_type.replace("_", " ")} · ${profile.uk_region} · Arrived ${profile.arrival_date}
     </p>

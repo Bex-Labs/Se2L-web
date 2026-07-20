@@ -63,12 +63,11 @@ function setCheckStatus(elementId, isReady, readyLabel, notReadyLabel) {
   const el = document.getElementById(elementId);
   if (!el) return;
   el.textContent = isReady ? readyLabel : notReadyLabel;
-  // Inline styles, not Tailwind classes — output.css is a compiled build
-  // that may not contain these exact bg/text combinations (same root
-  // cause as the earlier sidebar shell issue), so this guarantees the
-  // color shows up regardless of what was last compiled.
-  el.style.backgroundColor = isReady ? "#f0fdf4" : "#fffbeb";
-  el.style.color = isReady ? "#15803d" : "#b45309";
+  // Uses the .status-pill classes from css/shell.css instead of setting
+  // hex colors directly — same visual result, but now a palette change
+  // only needs to happen in one CSS file instead of here too.
+  el.classList.remove("is-ready", "is-not-ready");
+  el.classList.add("status-pill", isReady ? "is-ready" : "is-not-ready");
 }
 
 // --- SE2L-73: manage App Manager accounts ---

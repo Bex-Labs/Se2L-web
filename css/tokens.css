@@ -1,0 +1,99 @@
+/* Se2L design tokens.
+   Colors and fonts below come from the Stitch-generated dashboard
+   ("Se2L Dashboard", View Code export) — this is the source of truth.
+   Success/green states weren't defined anywhere in that export, so
+   those are left as the original placeholders until a Stitch screen
+   covers them. */
+
+:root {
+  --color-bg: #eaf2fb;            /* Stitch: body background-color */
+  --color-surface: #ffffff;       /* Stitch: surface-container-lowest */
+  --color-text: #151c23;          /* Stitch: on-surface / on-background */
+  --color-text-secondary: #404848;/* Stitch: on-surface-variant */
+  --color-text-muted: #707978;    /* Stitch: outline */
+  --color-border: #bfc8c8;        /* Stitch: outline-variant */
+  --color-backdrop: rgba(21, 28, 35, 0.3);
+
+  --color-accent: #0d4d4d;        /* Stitch: primary-container (route line, active nav, filled cards) */
+  --color-accent-dark: #003535;   /* Stitch: primary (headings, logo, icons) */
+  --color-accent-bg: #b4edec;     /* Stitch: primary-fixed (light tint) */
+
+  --color-critical: #ba1a1a;      /* Stitch: error */
+  --color-warning: #d4a373;       /* Stitch: custom amber used for "current phase" / important */
+
+  --color-success: #16a34a;       /* not defined in the Stitch export — kept as-is */
+  --color-success-dark: #15803d;  /* not defined in the Stitch export — kept as-is */
+  --color-success-bg: #f0fdf4;    /* not defined in the Stitch export — kept as-is */
+  --color-warning-bg: #fdf3e8;    /* light tint of --color-warning, for badge backgrounds */
+  --color-critical-bg: #ffdad6;   /* Stitch: error-container */
+  --color-important: #d4a373;     /* Stitch: same tan as the dashboard's "current phase" marker — kept consistent rather than the admin mockup's separate brown, so "elevated attention" reads the same across pages */
+  --color-accent-light: #d0e7e6;  /* Stitch: tertiary-fixed — for soft accent borders */
+  --color-surface-muted: #e7eff8; /* Stitch: surface-container — for neutral icon/badge backgrounds */
+
+  --color-video-bg: #151c23;      /* aligned to --color-text so video panels match the new ink color */
+  --color-video-text-muted: #707978;
+
+  --font-heading: 'Literata', serif;   /* Stitch used Lora for one greeting only; standardized on Literata throughout */
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'Space Mono', monospace;
+
+  --radius-card: 0.75rem;         /* unchanged — matches Stitch's borderRadius.xl */
+  --radius-control: 0.5rem;       /* unchanged — matches Stitch's borderRadius.lg */
+}
+
+/* Tailwind's utility classes (bg-slate-50, text-slate-900, etc.) still
+   sit directly on <body> in every page and win over a plain "body {}"
+   rule on specificity. These !important overrides are the deliberate
+   exception — this file is the single place color/type changes should
+   happen, so it's allowed to out-rank the old hardcoded utility classes
+   it's replacing. */
+body {
+  background: var(--color-bg) !important;
+  color: var(--color-text) !important;
+  font-family: var(--font-body) !important;
+}
+h1, h2, h3 {
+  font-family: var(--font-heading) !important;
+}
+
+/* Color sweep — recolors the existing Tailwind utility classes already
+   present in every HTML file and JS template string to the Stitch
+   palette. Nothing in the HTML or JS is edited or renamed; this only
+   changes what these class names render as, so JS logic that adds or
+   removes these exact class names (e.g. task-detail.js toggling
+   bg-slate-900 / bg-green-600 on the "mark complete" button) keeps
+   working exactly as before — only the resulting color changes. */
+
+.bg-slate-50 { background-color: var(--color-bg) !important; }
+.bg-slate-100 { background-color: var(--color-surface-muted) !important; }
+.bg-slate-900 { background-color: var(--color-accent-dark) !important; }
+.text-slate-400 { color: var(--color-text-muted) !important; }
+.text-slate-500 { color: var(--color-text-secondary) !important; }
+.text-slate-600 { color: var(--color-text-secondary) !important; }
+.text-slate-700 { color: var(--color-text) !important; }
+.text-slate-900 { color: var(--color-text) !important; }
+.border-slate-200 { border-color: var(--color-border) !important; }
+.border-slate-300 { border-color: var(--color-border) !important; }
+
+.bg-indigo-50 { background-color: var(--color-accent-bg) !important; }
+.text-indigo-600 { color: var(--color-accent) !important; }
+.text-indigo-700 { color: var(--color-accent-dark) !important; }
+.border-indigo-200 { border-color: var(--color-accent-light) !important; }
+.border-indigo-600 { border-color: var(--color-accent) !important; }
+
+.bg-red-50 { background-color: var(--color-critical-bg) !important; }
+.text-red-600 { color: var(--color-critical) !important; }
+.text-red-700 { color: var(--color-critical) !important; }
+.border-red-200 { border-color: var(--color-critical-bg) !important; }
+.border-red-600 { border-color: var(--color-critical) !important; }
+
+.bg-amber-50 { background-color: var(--color-warning-bg) !important; }
+.text-amber-500 { color: var(--color-warning) !important; }
+.text-amber-600 { color: var(--color-warning) !important; }
+.text-amber-700 { color: var(--color-warning) !important; }
+
+.bg-green-50 { background-color: var(--color-success-bg) !important; }
+.bg-green-600 { background-color: var(--color-success) !important; }
+.text-green-600 { color: var(--color-success) !important; }
+.text-green-700 { color: var(--color-success-dark) !important; }
+.border-green-600 { border-color: var(--color-success) !important; }

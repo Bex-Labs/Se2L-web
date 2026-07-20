@@ -1,0 +1,144 @@
+/* Shared shell layout for every authenticated page (sidebar + mobile
+   drawer + topbar). Previously duplicated as an inline <style> block in
+   dashboard.html, app-manager.html, preview.html, resources.html,
+   super-admin.html, and task-detail.html — now lives in one place, so a
+   layout or color change only needs to happen once. Plain CSS, not
+   Tailwind, so it works with no build step regardless of what
+   output.css was last compiled with. */
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.app-sidebar {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 30;
+  width: 224px;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  padding: 2rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(-100%);
+  transition: transform 0.2s ease;
+}
+.app-sidebar.open {
+  transform: translateX(0);
+}
+
+/* More breathing room between nav links, and a bolder, left-accented
+   active state — targets the exact class combinations already in the
+   HTML (e.g. a link with both bg-indigo-50 and text-indigo-700, which
+   the color sweep already recolors to the teal accent), so no HTML
+   needs to change. */
+.app-sidebar nav {
+  gap: 0.5rem !important;
+}
+.app-sidebar nav a {
+  padding: 0.75rem 1rem !important;
+  border-radius: var(--radius-control) !important;
+  transition: background-color 0.15s ease, padding-left 0.15s ease;
+}
+.app-sidebar nav a:hover {
+  background: var(--color-surface-muted);
+}
+.app-sidebar nav a.bg-indigo-50.text-indigo-700 {
+  border-left: 3px solid var(--color-accent);
+  padding-left: calc(1rem - 3px) !important;
+  font-weight: 600;
+}
+
+.app-sidebar-title {
+  display: none;
+}
+
+.mobile-topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+}
+
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: var(--color-backdrop);
+  z-index: 20;
+}
+.sidebar-backdrop.open {
+  display: block;
+}
+
+.app-main {
+  flex: 1;
+  width: 100%;
+  padding: 4rem 1.5rem 2.5rem;
+}
+
+/* System check status pills — was inline el.style.backgroundColor /
+   el.style.color set from super-admin.js. Kept as real CSS classes now
+   so they respond to token changes and don't need JS to know hex values. */
+.status-pill {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  background: var(--color-border);
+  color: var(--color-text-secondary);
+}
+.status-pill.is-ready {
+  background: var(--color-success-bg);
+  color: var(--color-success-dark);
+}
+.status-pill.is-not-ready {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+}
+
+@media (min-width: 768px) {
+  .mobile-topbar {
+    display: none;
+  }
+  .app-sidebar {
+    position: static;
+    transform: none;
+    flex-shrink: 0;
+  }
+  .app-sidebar-title {
+    display: block;
+  }
+  .sidebar-backdrop {
+    display: none !important;
+  }
+  .app-main {
+    padding: 2.5rem 1.5rem;
+  }
+  .app-sidebar nav {
+    margin-top: 0;
+  }
+}
+
+/* resources.html only: nobody's confirmed logged in yet (or never will
+   be) — shell stays fully hidden so the page reads as a plain public
+   page, no flash of sidebar/topbar for anonymous visitors.
+   resources.js removes this class only after a real session is
+   confirmed. */
+body.shell-inactive .mobile-topbar,
+body.shell-inactive .app-sidebar,
+body.shell-inactive .sidebar-backdrop {
+  display: none !important;
+}
+body.shell-inactive .app-main {
+  padding: 2.5rem 1.5rem;
+}

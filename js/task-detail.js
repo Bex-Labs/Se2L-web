@@ -2,7 +2,7 @@ function renderVideoConsentGate(container, videoId) {
   const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 
   container.innerHTML = `
-    <div style="position:relative; width:100%; border-radius:0.75rem; overflow:hidden; background:#0f172a; padding-top:56.25%;">
+    <div style="position:relative; width:100%; border-radius:var(--radius-card); overflow:hidden; background:var(--color-video-bg); padding-top:56.25%;">
       <img
         src="${thumbnailUrl}"
         alt="Video preview"
@@ -10,7 +10,7 @@ function renderVideoConsentGate(container, videoId) {
       />
       <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.75rem; padding:0 1.5rem; text-align:center;">
         <div style="width:3.5rem; height:3.5rem; border-radius:9999px; background:rgba(255,255,255,0.9); display:flex; align-items:center; justify-content:center;">
-          <span style="color:#0f172a; font-size:1.25rem; margin-left:0.25rem;">▶</span>
+          <span style="color:var(--color-video-bg); font-size:1.25rem; margin-left:0.25rem;">▶</span>
         </div>
         <p style="color:#fff; font-size:0.875rem; font-weight:500; margin:0;">This task includes a YouTube video</p>
         <p style="color:rgba(255,255,255,0.8); font-size:0.75rem; max-width:20rem; margin:0;">
@@ -18,7 +18,7 @@ function renderVideoConsentGate(container, videoId) {
         </p>
         <button
           id="video-consent-btn"
-          style="background:#fff; color:#0f172a; font-size:0.875rem; font-weight:500; padding:0.5rem 1rem; border-radius:0.5rem; border:none; cursor:pointer;"
+          style="background:#fff; color:var(--color-video-bg); font-size:0.875rem; font-weight:500; padding:0.5rem 1rem; border-radius:var(--radius-control); border:none; cursor:pointer;"
         >
           Load video
         </button>
@@ -38,7 +38,7 @@ function renderVideoConsentGate(container, videoId) {
           allowfullscreen>
         </iframe>
       </div>
-      <p style="font-size:0.75rem; color:#94a3b8; margin-top:0.25rem;">Video starts muted (browser autoplay policy) — use the volume icon inside the player to unmute.</p>
+      <p style="font-size:0.75rem; color:var(--color-video-text-muted); margin-top:0.25rem;">Video starts muted (browser autoplay policy) — use the volume icon inside the player to unmute.</p>
     `;
   });
 }
