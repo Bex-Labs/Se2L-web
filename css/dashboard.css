@@ -1,0 +1,35 @@
+/* Dashboard-specific visual enhancements — kept out of tokens.css/shell.css
+   since those are meant to stay universal/page-agnostic (per their own
+   header comments). Everything here only reads existing tokens; nothing
+   new is introduced, and no HTML or JS is touched. Link this after
+   tokens.css and shell.css in dashboard.html. */
+
+/* Current-phase pill: was an outline (bg-indigo-50 + border-2
+   border-indigo-600, both already recolored by the tokens.css sweep).
+   Scoped strictly to #phase-timeline so this doesn't affect any other
+   element elsewhere that happens to share those same two classes
+   (e.g. the sidebar's active nav link). */
+#phase-timeline .bg-indigo-50.border-indigo-600 {
+  background-color: var(--color-accent) !important;
+  border-color: var(--color-accent) !important;
+}
+#phase-timeline .bg-indigo-50.border-indigo-600 .text-indigo-700 {
+  color: #ffffff !important;
+}
+
+/* Urgency left-border task cards. dashboard.js already puts a
+   .text-red-600 / .text-amber-600 / .text-slate-500 label on the
+   urgency span inside each card — :has() detects that inner label and
+   colors the outer card's left border accordingly. No JS change: the
+   class names it already writes are the only thing driving this. */
+#task-list > a {
+  border-left-width: 3px;
+  border-left-style: solid;
+  border-left-color: var(--color-border);
+}
+#task-list > a:has(.text-red-600) {
+  border-left-color: var(--color-critical);
+}
+#task-list > a:has(.text-amber-600) {
+  border-left-color: var(--color-warning);
+}

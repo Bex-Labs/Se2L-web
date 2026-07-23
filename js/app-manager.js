@@ -603,9 +603,24 @@ function renderStatusActions(task) {
 }
 
 async function loadExistingTasks() {
+  // Same ordering source as loadPhaseOptions: phases deduped by name,
+  // ordered by sort_order — that's the real day-progression order
+  // (Pre-arrival, Arrival day, First week...), not alphabetical.
+  const { data: allPhases } = await supabaseClient
+    .from("phases")
+    .select("name")
+    .order("sort_order", { ascending: true });
+
+  const seenPhaseNames = new Set();
+  const orderedPhaseNames = (allPhases || []).filter(p => {
+    if (seenPhaseNames.has(p.name)) return false;
+    seenPhaseNames.add(p.name);
+    return true;
+  }).map(p => p.name);
+
   const { data: tasks } = await supabaseClient
     .from("tasks")
-    .select("*")
+    .select("*, task_phases(phases(name))")
     .order("created_at", { ascending: false });
 
   const listDiv = document.getElementById("task-list");
@@ -615,23 +630,53 @@ async function loadExistingTasks() {
     return;
   }
 
-  listDiv.innerHTML = tasks.map(t => `
-    <div class="bg-white border border-slate-200 rounded-lg p-3 flex justify-between items-center ${t.status === "archived" ? "opacity-50" : ""}">
-      <div>
-        <p class="text-sm font-medium">${t.title} ${t.is_minor_task ? "· <span class=\"text-indigo-600\">Minor</span>" : ""}</p>
-        <p class="text-xs text-slate-500 mt-0.5">
-          <span class="${statusBadgeStyles[t.status] || "bg-slate-100 text-slate-500"} px-2 py-0.5 rounded-full">${statusLabels[t.status] || t.status}</span>
-          · ${t.urgency} · ${t.category || "Uncategorised"}
-        </p>
+  const urgencyRank = { Critical: 0, Important: 1, Optional: 2 };
+
+  // Group by phase name — same "same name across journeys" concept the
+  // rest of this file already treats phases by (task creation, reorder).
+  const groups = {};
+  const UNASSIGNED = "No phase assigned";
+
+  tasks.forEach(t => {
+    const phaseName = t.task_phases?.[0]?.phases?.name || UNASSIGNED;
+    if (!groups[phaseName]) groups[phaseName] = [];
+    groups[phaseName].push(t);
+  });
+
+  const orderedGroupNames = [...orderedPhaseNames.filter(n => groups[n]), ...(groups[UNASSIGNED] ? [UNASSIGNED] : [])];
+
+  listDiv.innerHTML = orderedGroupNames.map(phaseName => {
+    const groupTasks = groups[phaseName].slice().sort((a, b) => {
+      const rankA = urgencyRank[a.urgency] ?? 3;
+      const rankB = urgencyRank[b.urgency] ?? 3;
+      return rankA - rankB;
+    });
+
+    const rows = groupTasks.map(t => `
+      <div class="bg-white border border-slate-200 rounded-lg p-3 flex justify-between items-center ${t.status === "archived" ? "opacity-50" : ""}">
+        <div>
+          <p class="text-sm font-medium">${t.title} ${t.is_minor_task ? "· <span class=\"text-indigo-600\">Minor</span>" : ""}</p>
+          <p class="text-xs text-slate-500 mt-0.5">
+            <span class="${statusBadgeStyles[t.status] || "bg-slate-100 text-slate-500"} px-2 py-0.5 rounded-full">${statusLabels[t.status] || t.status}</span>
+            · ${t.urgency} · ${t.category || "Uncategorised"}
+          </p>
+        </div>
+        <div class="flex gap-3 items-center flex-wrap justify-end">
+          ${renderStatusActions(t)}
+          <a href="preview.html?task=${t.id}" target="_blank" class="text-xs text-slate-500 font-medium">Preview</a>
+          ${t.status !== "archived" ? `<button data-edit-id="${t.id}" class="text-xs text-indigo-600 font-medium">Edit</button>` : ""}
+          ${t.status !== "archived" ? `<button data-archive-id="${t.id}" class="text-xs text-red-600 font-medium">Archive</button>` : ""}
+        </div>
       </div>
-      <div class="flex gap-3 items-center flex-wrap justify-end">
-        ${renderStatusActions(t)}
-        <a href="preview.html?task=${t.id}" target="_blank" class="text-xs text-slate-500 font-medium">Preview</a>
-        ${t.status !== "archived" ? `<button data-edit-id="${t.id}" class="text-xs text-indigo-600 font-medium">Edit</button>` : ""}
-        ${t.status !== "archived" ? `<button data-archive-id="${t.id}" class="text-xs text-red-600 font-medium">Archive</button>` : ""}
+    `).join("");
+
+    return `
+      <div class="task-phase-group">
+        <p class="task-phase-group-heading">${phaseName}</p>
+        <div class="flex flex-col gap-2">${rows}</div>
       </div>
-    </div>
-  `).join("");
+    `;
+  }).join("");
 
   listDiv.querySelectorAll("[data-edit-id]").forEach(btn => {
     btn.addEventListener("click", () => loadTaskForEdit(btn.dataset.editId));
