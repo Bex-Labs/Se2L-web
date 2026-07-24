@@ -451,6 +451,20 @@ async function recordTaskVersion(taskId, changeType, snapshot, previousStatus, n
   }
 }
 
+function syncUrgencyPills() {
+  const currentValue = document.getElementById("urgency").value;
+  document.querySelectorAll(".urgency-pill").forEach(btn => {
+    btn.classList.toggle("is-selected", btn.dataset.urgencyValue === currentValue);
+  });
+}
+
+document.querySelectorAll(".urgency-pill").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.getElementById("urgency").value = btn.dataset.urgencyValue;
+    syncUrgencyPills();
+  });
+});
+
 function resetForm() {
   document.getElementById("task-form").reset();
   document.getElementById("task_id").value = "";
@@ -461,6 +475,7 @@ function resetForm() {
   document.getElementById("region_england").checked = true;
   Array.from(document.getElementById("depends_on").options).forEach(opt => opt.selected = false);
   loadDependsOnOptions(null);
+  syncUrgencyPills();
 }
 
 async function loadTaskForEdit(taskId) {
@@ -487,6 +502,7 @@ async function loadTaskForEdit(taskId) {
   document.getElementById("body_html").value = task.body_html || "";
   document.getElementById("category").value = task.category || "Housing";
   document.getElementById("urgency").value = task.urgency;
+  syncUrgencyPills();
   document.getElementById("time_estimate").value = task.time_estimate_minutes || "";
   document.getElementById("is_minor_task").checked = task.is_minor_task || false;
   document.getElementById("status").value = task.status || "draft";
@@ -652,23 +668,26 @@ async function loadExistingTasks() {
       return rankA - rankB;
     });
 
-    const rows = groupTasks.map(t => `
-      <div class="bg-white border border-slate-200 rounded-lg p-3 flex justify-between items-center ${t.status === "archived" ? "opacity-50" : ""}">
-        <div>
-          <p class="text-sm font-medium">${t.title} ${t.is_minor_task ? "· <span class=\"text-indigo-600\">Minor</span>" : ""}</p>
-          <p class="text-xs text-slate-500 mt-0.5">
-            <span class="${statusBadgeStyles[t.status] || "bg-slate-100 text-slate-500"} px-2 py-0.5 rounded-full">${statusLabels[t.status] || t.status}</span>
-            · ${t.urgency} · ${t.category || "Uncategorised"}
-          </p>
+    const rows = groupTasks.map(t => {
+      const urgencyColor = { Critical: "var(--color-critical)", Important: "var(--color-warning)", Optional: "var(--color-text-muted)" };
+      return `
+      <div class="task-row ${t.status === "archived" ? "opacity-50" : ""}" style="border-left-color: ${urgencyColor[t.urgency] || "var(--color-border)"}">
+        <div class="task-row-main">
+          <p class="task-row-title">${t.title}${t.is_minor_task ? ' <span class="task-row-minor-tag">Minor</span>' : ""}</p>
+          <div class="task-row-meta">
+            <span class="task-status-pill ${statusBadgeStyles[t.status] || "bg-slate-100 text-slate-500"}">${statusLabels[t.status] || t.status}</span>
+            <span class="task-row-meta-text">${t.urgency} · ${t.category || "Uncategorised"}</span>
+          </div>
         </div>
-        <div class="flex gap-3 items-center flex-wrap justify-end">
+        <div class="task-row-actions">
           ${renderStatusActions(t)}
-          <a href="preview.html?task=${t.id}" target="_blank" class="text-xs text-slate-500 font-medium">Preview</a>
-          ${t.status !== "archived" ? `<button data-edit-id="${t.id}" class="text-xs text-indigo-600 font-medium">Edit</button>` : ""}
-          ${t.status !== "archived" ? `<button data-archive-id="${t.id}" class="text-xs text-red-600 font-medium">Archive</button>` : ""}
+          <a href="preview.html?task=${t.id}" target="_blank" class="task-row-action-link">Preview</a>
+          ${t.status !== "archived" ? `<button data-edit-id="${t.id}" class="task-row-action-link task-row-action-accent">Edit</button>` : ""}
+          ${t.status !== "archived" ? `<button data-archive-id="${t.id}" class="task-row-action-link task-row-action-danger">Archive</button>` : ""}
         </div>
       </div>
-    `).join("");
+    `;
+    }).join("");
 
     return `
       <div class="task-phase-group">
@@ -930,10 +949,10 @@ function renderReorderGroups() {
   const listDiv = document.getElementById("reorder-task-list");
   const saveBtn = document.getElementById("save-task-order-btn");
 
-  const tierStyles = {
-    Critical: "text-red-600",
-    Important: "text-amber-600",
-    Optional: "text-slate-500"
+  const tierBadgeStyles = {
+    Critical: "bg-red-50 text-red-600",
+    Important: "bg-amber-50 text-amber-700",
+    Optional: "bg-slate-100 text-slate-500"
   };
 
   const tiers = ["Critical", "Important", "Optional"];
@@ -950,19 +969,20 @@ function renderReorderGroups() {
     if (group.length === 0) return "";
 
     const rows = group.map((t, i) => `
-      <div class="bg-slate-50 border border-slate-200 rounded-lg p-2 flex justify-between items-center">
-        <span class="text-sm">${i + 1}. ${t.title}</span>
-        <div class="flex gap-2">
-          <button type="button" data-tier="${tier}" data-move="up" data-index="${i}" class="text-xs text-slate-500 font-medium px-1" ${i === 0 ? "disabled" : ""}>↑</button>
-          <button type="button" data-tier="${tier}" data-move="down" data-index="${i}" class="text-xs text-slate-500 font-medium px-1" ${i === group.length - 1 ? "disabled" : ""}>↓</button>
+      <div class="reorder-row">
+        <span class="reorder-row-index">${i + 1}</span>
+        <span class="reorder-row-title">${t.title}</span>
+        <div class="reorder-row-controls">
+          <button type="button" data-tier="${tier}" data-move="up" data-index="${i}" class="reorder-move-btn" ${i === 0 ? "disabled" : ""}>↑</button>
+          <button type="button" data-tier="${tier}" data-move="down" data-index="${i}" class="reorder-move-btn" ${i === group.length - 1 ? "disabled" : ""}>↓</button>
         </div>
       </div>
     `).join("");
 
     return `
-      <div class="mb-3">
-        <p class="text-xs font-medium ${tierStyles[tier]} mb-1">${tier}</p>
-        <div class="flex flex-col gap-1">${rows}</div>
+      <div class="reorder-tier-group">
+        <span class="reorder-tier-badge ${tierBadgeStyles[tier] || "bg-slate-100 text-slate-500"}">${tier}</span>
+        <div class="flex flex-col gap-1 mt-2">${rows}</div>
       </div>
     `;
   }).join("");
@@ -1022,6 +1042,8 @@ async function init() {
 
   addPhaseRow();
   addPhaseRow();
+
+  syncUrgencyPills();
 
   document.getElementById("task-form").addEventListener("submit", handleFormSubmit);
   document.getElementById("cancel-edit-btn").addEventListener("click", resetForm);

@@ -23,6 +23,13 @@ async function checkSuperAdminAccess() {
     return null;
   }
 
+  // Populates the sidebar identity strip — reuses the role already
+  // fetched above rather than a second query. No app_manager branch
+  // needed: the access check above guarantees only super_admin reaches
+  // this point, so the pill is always "Super Admin" in practice.
+  const emailEl = document.getElementById("sidebar-user-email");
+  if (emailEl) emailEl.textContent = user.email || "Unknown user";
+
   return user;
 }
 
@@ -92,13 +99,13 @@ async function loadAppManagerAccounts() {
   }
 
   listDiv.innerHTML = managers.map(m => `
-    <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 flex justify-between items-center">
+    <div class="admin-account-card">
       <div>
-        <p class="text-sm font-medium">${m.email}</p>
-        <p class="text-xs mt-0.5 ${m.is_active ? "text-green-700" : "text-red-600"}">${m.is_active ? "Active" : "Deactivated"}</p>
+        <p class="admin-account-email">${m.email}</p>
+        <p class="admin-account-status ${m.is_active ? "is-active" : "is-inactive"}">${m.is_active ? "Active" : "Deactivated"}</p>
       </div>
-      <button data-toggle-user-id="${m.id}" data-currently-active="${m.is_active}" class="text-xs font-medium ${m.is_active ? "text-red-600" : "text-green-700"}">
-        ${m.is_active ? "Deactivate" : "Reactivate"}
+      <button data-toggle-user-id="${m.id}" data-currently-active="${m.is_active}" class="admin-toggle-switch ${m.is_active ? "is-on" : ""}" aria-label="${m.is_active ? "Deactivate" : "Reactivate"} this App Manager">
+        <span class="admin-toggle-switch-knob"></span>
       </button>
     </div>
   `).join("");
@@ -154,9 +161,9 @@ async function loadPendingInvites() {
   }
 
   listDiv.innerHTML = invites.map(i => `
-    <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 flex justify-between items-center">
+    <div class="admin-invite-card">
       <p class="text-sm">${i.email}</p>
-      <span class="text-xs text-amber-600">Invite pending</span>
+      <span class="admin-invite-pill">Invite pending</span>
     </div>
   `).join("");
 }

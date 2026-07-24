@@ -56,6 +56,32 @@ async function loadTaskDetail() {
     return;
   }
 
+  // Populates the sidebar identity strip and shows the correct nav
+  // links for whoever is actually viewing this task — same pattern as
+  // dashboard.js, since this page can in principle be reached by any
+  // signed-in role via a shared link.
+  const { data: sidebarProfile } = await supabaseClient
+    .from("users")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  const roleLabels = {
+    app_manager: "App Manager",
+    super_admin: "Super Admin"
+  };
+  const sidebarEmailEl = document.getElementById("sidebar-user-email");
+  const sidebarRolePillEl = document.getElementById("sidebar-role-pill");
+  if (sidebarEmailEl) sidebarEmailEl.textContent = user.email || "Unknown user";
+  if (sidebarRolePillEl) sidebarRolePillEl.textContent = roleLabels[sidebarProfile?.role] || "Newcomer";
+
+  if (sidebarProfile?.role === "app_manager") {
+    document.getElementById("app-manager-link")?.classList.remove("hidden");
+  }
+  if (sidebarProfile?.role === "super_admin") {
+    document.getElementById("super-admin-link")?.classList.remove("hidden");
+  }
+
   const taskId = getTaskIdFromUrl();
 
   if (!taskId) {
@@ -84,6 +110,12 @@ async function loadTaskDetail() {
     banner.style.cssText = "background:#eef2ff; color:#4338ca; font-size:0.8rem; font-weight:500; padding:0.5rem 0.75rem; border-radius:0.5rem; margin-bottom:1rem;";
     banner.textContent = `Preview mode — this is how the task appears to a newcomer. Nothing you do here is saved.` + (task.status !== "published" ? ` (Currently ${task.status.replace("_", " ")}, not live yet.)` : "");
     document.querySelector(".max-w-xl").prepend(banner);
+
+    const backLink = document.getElementById("back-link");
+    if (backLink) {
+      backLink.href = "app-manager.html";
+      backLink.textContent = "← Back to App Manager";
+    }
   }
 
   const minorTag = task.is_minor_task ? ` · <span class="text-indigo-600">For your family</span>` : "";

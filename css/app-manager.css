@@ -40,3 +40,225 @@
   padding-bottom: 0.25rem;
   border-bottom: 1px solid var(--color-border);
 }
+
+/* Urgency pill buttons — replaces the visible <select id="urgency">
+   (kept in the DOM, hidden, still the real form value) with three
+   clickable pills. Colors reuse the same tokens as the task-card
+   urgency accents elsewhere, so the meaning stays consistent app-wide. */
+.urgency-pill {
+  flex: 1;
+  padding: 0.5rem 0.25rem;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+.urgency-pill-critical.is-selected {
+  background: var(--color-critical-bg);
+  border-color: var(--color-critical);
+  color: var(--color-critical);
+  font-weight: 600;
+}
+.urgency-pill-important.is-selected {
+  background: var(--color-warning-bg);
+  border-color: var(--color-warning);
+  color: var(--color-warning);
+  font-weight: 600;
+}
+.urgency-pill-optional.is-selected {
+  background: var(--color-surface-muted);
+  border-color: var(--color-text-muted);
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+/* --- Checkpoint 2: Manage Journeys card ---
+   Additive only. Restyles just the <summary> header (icon + custom
+   chevron, native marker hidden). The existing-journeys list itself
+   was reverted back to its original styling per feedback — only this
+   header treatment stays. */
+
+#journey-section > summary.journey-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  list-style: none;
+}
+#journey-section > summary.journey-summary::-webkit-details-marker {
+  display: none;
+}
+#journey-section > summary.journey-summary::after {
+  content: "▾";
+  margin-left: auto;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  transition: transform 0.15s ease;
+}
+#journey-section[open] > summary.journey-summary::after {
+  transform: rotate(180deg);
+}
+.journey-summary-icon {
+  font-size: 1.1rem;
+}
+
+/* --- Checkpoint 3: Create a task / Existing tasks section ---
+   Additive only. Restyles the task-list rows rendered by
+   loadExistingTasks() and adds a live status pill next to the form
+   heading, synced by syncFormStatusPill() in app-manager.js. All IDs
+   and data-* attributes those functions rely on are unchanged. */
+
+.task-status-pill {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+.task-row {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-border);
+  border-radius: var(--radius-control);
+  padding: 0.75rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.task-row-main {
+  min-width: 0;
+}
+.task-row-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+.task-row-minor-tag {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  margin-left: 0.25rem;
+}
+.task-row-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+  flex-wrap: wrap;
+}
+.task-row-meta-text {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+.task-row-actions {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-border);
+}
+.task-row-action-link {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  padding: 0.2rem 0.4rem;
+  border-radius: var(--radius-control);
+}
+.task-row-action-link:hover {
+  background: var(--color-surface-muted);
+}
+.task-row-action-accent {
+  color: var(--color-accent-dark);
+}
+.task-row-action-danger {
+  color: var(--color-critical);
+}
+
+/* --- Checkpoint 4: Reorder tasks within a phase ---
+   Additive only. Restyles the <summary> header the same way as
+   journey-section, and the tier badges/rows rendered by
+   renderReorderGroups() in app-manager.js. All data-tier/data-move/
+   data-index attributes are unchanged, so the existing move-up/
+   move-down listener still binds correctly. */
+
+#reorder-section > summary.reorder-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  list-style: none;
+}
+#reorder-section > summary.reorder-summary::-webkit-details-marker {
+  display: none;
+}
+#reorder-section > summary.reorder-summary::after {
+  content: "▾";
+  margin-left: auto;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  transition: transform 0.15s ease;
+}
+#reorder-section[open] > summary.reorder-summary::after {
+  transform: rotate(180deg);
+}
+.reorder-summary-icon {
+  font-size: 1.1rem;
+}
+
+.reorder-tier-group {
+  margin-bottom: 1rem;
+}
+.reorder-tier-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+}
+
+.reorder-row {
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  padding: 0.5rem 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.reorder-row-index {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  width: 1.25rem;
+  flex-shrink: 0;
+}
+.reorder-row-title {
+  font-size: 0.85rem;
+  color: var(--color-text);
+  flex: 1;
+}
+.reorder-row-controls {
+  display: flex;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+.reorder-move-btn {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  padding: 0.15rem 0.4rem;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+.reorder-move-btn:hover:not(:disabled) {
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+}
+.reorder-move-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}

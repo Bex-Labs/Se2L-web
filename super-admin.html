@@ -6,8 +6,112 @@
   <title>Se2L — Super admin</title>
   <link href="css/output.css" rel="stylesheet">
   <link href="css/tokens.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Literata:wght@600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Literata:wght@600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link href="css/shell.css" rel="stylesheet">
+  <style>
+    .admin-stat-card {
+      background: var(--color-surface-muted);
+      border-radius: var(--radius-card);
+      padding: 1rem;
+    }
+    .admin-stat-icon {
+      font-size: 1.1rem;
+    }
+    .admin-stat-label {
+      font-size: 0.75rem;
+      color: var(--color-text-secondary);
+      margin-top: 0.35rem;
+    }
+    .admin-stat-value {
+      font-size: 1.25rem;
+      font-weight: 700;
+      font-family: var(--font-heading);
+      color: var(--color-accent-dark);
+      margin-top: 0.15rem;
+    }
+    .admin-stat-value-small {
+      font-size: 1rem;
+    }
+    .admin-section-heading {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-bottom: 0.5rem;
+    }
+    .admin-section-icon {
+      font-size: 1rem;
+    }
+
+    .admin-account-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-control);
+      padding: 0.75rem 0.9rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .admin-account-email {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-text);
+    }
+    .admin-account-status {
+      font-size: 0.75rem;
+      margin-top: 0.15rem;
+    }
+    .admin-account-status.is-active {
+      color: var(--color-success-dark);
+    }
+    .admin-account-status.is-inactive {
+      color: var(--color-critical);
+    }
+
+    .admin-toggle-switch {
+      position: relative;
+      width: 2.5rem;
+      height: 1.4rem;
+      border-radius: 9999px;
+      border: none;
+      background: var(--color-border);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .admin-toggle-switch.is-on {
+      background: var(--color-accent);
+    }
+    .admin-toggle-switch-knob {
+      position: absolute;
+      top: 0.15rem;
+      left: 0.15rem;
+      width: 1.1rem;
+      height: 1.1rem;
+      border-radius: 9999px;
+      background: var(--color-surface);
+      transition: transform 0.15s ease;
+    }
+    .admin-toggle-switch.is-on .admin-toggle-switch-knob {
+      transform: translateX(1.1rem);
+    }
+
+    .admin-invite-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-control);
+      padding: 0.75rem 0.9rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .admin-invite-pill {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.15rem 0.55rem;
+      border-radius: 9999px;
+      background: var(--color-warning-bg);
+      color: var(--color-warning);
+    }
+  </style>
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-900">
 
@@ -21,9 +125,27 @@
   <div class="app-shell">
 
     <aside id="app-sidebar" class="app-sidebar">
-      <h2 class="app-sidebar-title text-lg font-semibold mb-6 px-2">Se2L</h2>
-      <nav class="flex flex-col gap-1" style="margin-top: 3rem;">
+      <div class="sidebar-brand">
+        <svg class="sidebar-brand-mark" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L2 7V12C2 16.97 6.24 21.44 12 22.5C17.76 21.44 22 16.97 22 12V7L12 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M9 12L11 14L15.5 9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="app-sidebar-title">Se2L</span>
+      </div>
+
+      <div class="sidebar-identity">
+        <div class="sidebar-identity-avatar">👤</div>
+        <div class="sidebar-identity-info">
+          <span id="sidebar-user-email" class="sidebar-identity-email">Loading…</span>
+          <span id="sidebar-role-pill" class="status-pill">Super Admin</span>
+        </div>
+      </div>
+
+      <nav class="flex flex-col gap-1" style="margin-top: 1rem;">
         <a href="dashboard.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Dashboard</a>
+        <a href="super-admin.html" class="px-3 py-2 rounded-lg text-sm font-medium bg-indigo-50 text-indigo-700">Platform overview</a>
+        <a href="resources.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Resources</a>
+        <a href="settings.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Settings</a>
       </nav>
       <button id="signout-btn" class="mt-auto text-xs text-slate-400 underline text-left px-3">Sign out</button>
     </aside>
@@ -34,25 +156,32 @@
         <h1 class="text-xl font-semibold mb-6">Platform overview</h1>
 
     <div class="grid grid-cols-4 gap-3 mb-6">
-      <div class="bg-slate-100 rounded-lg p-4">
-        <p class="text-xs text-slate-500">App managers</p>
-        <p id="stat-app-managers" class="text-xl font-semibold mt-1">—</p>
+      <div class="admin-stat-card">
+        <span class="admin-stat-icon">👥</span>
+        <p class="admin-stat-label">App managers</p>
+        <p id="stat-app-managers" class="admin-stat-value">—</p>
       </div>
-      <div class="bg-slate-100 rounded-lg p-4">
-        <p class="text-xs text-slate-500">Visa journeys</p>
-        <p id="stat-journeys" class="text-xl font-semibold mt-1">—</p>
+      <div class="admin-stat-card">
+        <span class="admin-stat-icon">🧭</span>
+        <p class="admin-stat-label">Visa journeys</p>
+        <p id="stat-journeys" class="admin-stat-value">—</p>
       </div>
-      <div class="bg-slate-100 rounded-lg p-4">
-        <p class="text-xs text-slate-500">UK regions</p>
-        <p id="stat-regions" class="text-xl font-semibold mt-1">—</p>
+      <div class="admin-stat-card">
+        <span class="admin-stat-icon">📍</span>
+        <p class="admin-stat-label">UK regions</p>
+        <p id="stat-regions" class="admin-stat-value">—</p>
       </div>
-      <div class="bg-slate-100 rounded-lg p-4">
-        <p class="text-xs text-slate-500">Content status</p>
-        <p id="stat-content-status" class="text-base font-semibold mt-1">Loading...</p>
+      <div class="admin-stat-card">
+        <span class="admin-stat-icon">📄</span>
+        <p class="admin-stat-label">Content status</p>
+        <p id="stat-content-status" class="admin-stat-value admin-stat-value-small">Loading...</p>
       </div>
     </div>
 
-    <p class="text-sm font-medium mb-2">System checks</p>
+    <div class="admin-section-heading">
+      <span class="admin-section-icon">🩺</span>
+      <p class="text-sm font-medium">System checks</p>
+    </div>
     <div class="flex flex-col gap-2">
       <div class="flex justify-between items-center bg-white border border-slate-200 rounded-lg px-4 py-2.5">
         <span class="text-sm">Task content configured</span>
@@ -74,7 +203,10 @@
 
     <!-- SE2L-73: manage App Manager accounts -->
     <div class="mt-8">
-      <h2 class="text-base font-semibold mb-3">App Manager accounts</h2>
+      <div class="admin-section-heading">
+        <span class="admin-section-icon">🔑</span>
+        <h2 class="text-base font-semibold">App Manager accounts</h2>
+      </div>
 
       <form id="invite-form" class="bg-white border border-slate-200 rounded-xl p-4 flex gap-3 items-end mb-4">
         <div class="flex-1">

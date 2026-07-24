@@ -21,6 +21,13 @@ async function checkAccess() {
     return null;
   }
 
+  // Populates the sidebar identity strip — reuses the role already
+  // fetched above rather than a second query. No super_admin branch
+  // here: the access check above already guarantees only app_manager
+  // reaches this point, so the pill is always "App Manager" in practice.
+  const emailEl = document.getElementById("sidebar-user-email");
+  if (emailEl) emailEl.textContent = user.email || "Unknown user";
+
   return user;
 }
 

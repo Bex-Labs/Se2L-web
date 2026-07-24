@@ -3,27 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Se2L — Dashboard</title>
+  <title>Se2L — Settings</title>
   <link href="css/output.css" rel="stylesheet">
   <link href="css/tokens.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Literata:wght@600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link href="css/shell.css" rel="stylesheet">
-    <link href="css/dashboard.css" rel="stylesheet">
+  <link href="css/shell.css" rel="stylesheet">
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-900">
 
-  <!-- Mobile top bar -->
   <div class="mobile-topbar">
     <span class="text-base font-semibold">Se2L</span>
     <button id="mobile-menu-btn" class="text-2xl leading-none text-slate-600" aria-label="Open menu">☰</button>
   </div>
 
-  <!-- Backdrop, mobile only, shown while the drawer is open -->
   <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
 
   <div class="app-shell">
 
-    <!-- Sidebar: persistent panel on desktop, off-canvas drawer on mobile -->
     <aside id="app-sidebar" class="app-sidebar">
       <div class="sidebar-brand">
         <svg class="sidebar-brand-mark" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -42,54 +38,49 @@
       </div>
 
       <nav class="flex flex-col gap-1" style="margin-top: 1rem;">
-        <a href="dashboard.html" class="px-3 py-2 rounded-lg text-sm font-medium bg-indigo-50 text-indigo-700">Dashboard</a>
+        <a href="dashboard.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Dashboard</a>
         <a id="app-manager-link" href="app-manager.html" class="hidden px-3 py-2 rounded-lg text-sm text-slate-600">Manage content</a>
         <a id="super-admin-link" href="super-admin.html" class="hidden px-3 py-2 rounded-lg text-sm text-slate-600">Platform overview</a>
         <a href="resources.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Resources</a>
-        <a href="settings.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Settings</a>
+        <a href="settings.html" class="px-3 py-2 rounded-lg text-sm font-medium bg-indigo-50 text-indigo-700">Settings</a>
       </nav>
-
-      <div class="sidebar-task-jump-wrap">
-        <p class="sidebar-task-jump-heading">Today's tasks</p>
-        <div id="sidebar-task-jump-list"></div>
-      </div>
       <button id="signout-btn" class="mt-auto text-xs text-slate-400 underline text-left px-3">Sign out</button>
     </aside>
 
-    <!-- Main content — same structure/IDs as before, just inside the shell now -->
     <main class="app-main">
-      <div class="max-w-2xl mx-auto">
+      <div class="max-w-md mx-auto">
 
-        <div id="welcome-message" class="mb-6">
-          <p class="text-sm text-slate-500">Loading your journey...</p>
+        <a href="dashboard.html" class="text-sm text-slate-500 flex items-center gap-1 mb-4">
+          ← Back to dashboard
+        </a>
+
+        <h1 class="text-xl font-semibold mb-1">Settings</h1>
+        <p class="text-sm text-slate-500 mb-6">Manage your account security.</p>
+
+        <div class="bg-white border border-slate-200 rounded-xl p-6">
+          <h2 class="text-base font-medium mb-1">Change password</h2>
+          <p class="text-sm text-slate-500 mb-4">Choose a new password for your account. You'll stay signed in on this device.</p>
+
+          <form id="change-password-form">
+
+            <div class="mb-4">
+              <label class="text-sm font-medium block mb-1">New password</label>
+              <input id="new_password" type="password" required minlength="6" placeholder="At least 6 characters" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+            </div>
+
+            <div class="mb-4">
+              <label class="text-sm font-medium block mb-1">Confirm new password</label>
+              <input id="confirm_password" type="password" required minlength="6" placeholder="Re-enter your new password" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+            </div>
+
+            <p id="change-password-message" class="text-sm mb-4 hidden"></p>
+
+            <div class="flex justify-end pt-4 border-t border-slate-200">
+              <button type="submit" id="change-password-btn" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium">Update password</button>
+            </div>
+
+          </form>
         </div>
-
-        <div id="progress-strip" class="hidden mb-6"></div>
-
-        <div id="phase-timeline" class="flex gap-2 mb-8 overflow-x-auto">
-          <div class="flex-1 text-center py-2 px-1 rounded-lg bg-slate-100 text-slate-400">
-            <div class="text-xs mt-1">Loading...</div>
-          </div>
-        </div>
-
-        <div id="phase-review-section" class="hidden bg-white border border-slate-200 rounded-xl p-4 mb-6">
-          <div class="flex justify-between items-center mb-3">
-            <h3 id="phase-review-heading" class="text-sm font-medium"></h3>
-            <button type="button" id="phase-review-close-btn" class="text-xs text-slate-500 font-medium">Close</button>
-          </div>
-          <div id="phase-review-tasks" class="flex flex-col gap-2"></div>
-        </div>
-
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-base font-medium">Today's tasks</h2>
-          <span id="task-count" class="text-sm text-slate-500"></span>
-        </div>
-
-        <div id="task-list" class="flex flex-col gap-3">
-          <p class="text-sm text-slate-400">Loading tasks...</p>
-        </div>
-        <div id="upcoming-phase-teaser" class="mt-6"></div>
-        <div id="family-section"></div>
 
       </div>
     </main>
@@ -99,7 +90,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
   <script src="js/shell.js"></script>
-  <script src="js/dashboard.js"></script>
+  <script src="js/settings.js"></script>
 
 </body>
 </html>

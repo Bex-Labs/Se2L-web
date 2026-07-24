@@ -6,37 +6,91 @@
   <title>Se2L — Onboarding</title>
   <link href="css/output.css" rel="stylesheet">
   <link href="css/tokens.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Literata:wght@600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  </head>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Literata:wght@600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* New hero header for this page only — same lockup as login.html's
+       header, kept local here since only these two pages use it so far. */
+    .onboarding-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 1rem 1.5rem 0;
+    }
+    .onboarding-header-mark {
+      width: 1.4rem;
+      height: 1.4rem;
+      color: var(--color-accent-dark);
+      flex-shrink: 0;
+    }
+    .onboarding-header-title {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 1.15rem;
+      color: var(--color-accent-dark);
+    }
+
+    .onboarding-hero {
+      text-align: center;
+      max-width: 32rem;
+      margin: 0.5rem auto 0;
+      padding: 0 1.5rem;
+    }
+    .onboarding-hero h2 {
+      font-family: var(--font-heading);
+      font-size: 1.05rem;
+      color: var(--color-text);
+      margin-bottom: 0.25rem;
+    }
+    .onboarding-hero p {
+      font-size: 0.75rem;
+      color: var(--color-text-secondary);
+      line-height: 1.4;
+    }
+  </style>
+</head>
 <body class="min-h-screen bg-slate-50 text-slate-900">
 
-  <div class="max-w-xl mx-auto py-16 px-6">
+  <div class="onboarding-header">
+    <svg class="onboarding-header-mark" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2L2 7V12C2 16.97 6.24 21.44 12 22.5C17.76 21.44 22 16.97 22 12V7L12 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M9 12L11 14L15.5 9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="onboarding-header-title">Se2L Settlement</span>
+  </div>
 
-    <span class="inline-flex items-center bg-indigo-50 text-indigo-700 text-sm px-4 py-1.5 rounded-full mb-4">
+  <div class="onboarding-hero">
+    <h2>Your guided journey to life in the UK</h2>
+    <p>A few details now means a checklist built around your visa, your region, and your household — from day one.</p>
+  </div>
+
+  <div class="max-w-xl mx-auto py-4 px-6">
+
+    <span class="inline-flex items-center bg-indigo-50 text-indigo-700 text-xs px-3 py-1 rounded-full mb-2">
       Start your settlement journey
     </span>
 
-    <h1 class="text-2xl font-semibold mb-1">Tell us about your move to the UK</h1>
-    <p class="text-slate-600 text-sm mb-6">We use this to build a personalised checklist for you.</p>
+    <h1 class="text-lg font-semibold mb-0.5">Tell us about your move to the UK</h1>
+    <p class="text-slate-600 text-xs mb-3">We use this to build a personalised checklist for you.</p>
 
-    <form id="onboarding-form" class="bg-white border border-slate-200 rounded-xl p-6">
+    <form id="onboarding-form" class="bg-white border border-slate-200 rounded-xl p-4">
 
-      <div class="grid grid-cols-2 gap-4">
+      <div class="grid grid-cols-2 gap-3">
         <div>
           <label class="text-sm font-medium block mb-1">Visa type</label>
-          <select id="visa_type" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+          <select id="visa_type" class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm">
             <option value="skilled_worker">Skilled Worker</option>
             <option value="student">Student</option>
           </select>
         </div>
         <div>
           <label class="text-sm font-medium block mb-1">Arrival date</label>
-         <input id="arrival_date" type="date" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+         <input id="arrival_date" type="date" required class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm" />
          <p class="text-xs text-slate-400 mt-1">Already in the UK? Enter your arrival date. Not yet arrived? Enter your planned arrival date — we'll get you ready in advance.</p>
         </div>
         <div>
           <label class="text-sm font-medium block mb-1">UK region</label>
-          <select id="uk_region" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+          <select id="uk_region" class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm">
             <option value="england">England</option>
             <option value="scotland">Scotland</option>
             <option value="wales">Wales</option>
@@ -45,15 +99,15 @@
         </div>
         <div>
           <label class="text-sm font-medium block mb-1">Preferred language</label>
-          <select id="language" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+          <select id="language" class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm">
             <option value="english">English</option>
           </select>
         </div>
       </div>
 
-      <div class="mt-4">
+      <div class="mt-3">
         <label class="text-sm font-medium block mb-1">Settling with dependants?</label>
-        <select id="has_dependants" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+        <select id="has_dependants" class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm">
           <option value="">Select an option</option>
           <option value="no">No</option>
           <option value="yes">Yes</option>
@@ -61,7 +115,7 @@
       </div>
 
       <!-- SE2L-23: household members section, shown only when has_dependants = yes -->
-      <div id="dependants-section" class="mt-4 pt-4 border-t border-slate-200 hidden">
+      <div id="dependants-section" class="mt-3 pt-3 border-t border-slate-200 hidden">
         <div class="flex items-center justify-between mb-3">
           <label class="text-sm font-medium">Household members</label>
           <button type="button" id="add-dependant-btn" class="text-indigo-700 text-xs font-medium border border-indigo-200 bg-indigo-50 px-3 py-1.5 rounded-lg">
@@ -72,18 +126,18 @@
         <div id="dependants-container"></div>
       </div>
 
-      <div class="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-slate-200">
+      <div class="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-slate-200">
         <div>
           <label class="text-sm font-medium block mb-1">Email</label>
-          <input id="email" type="email" required placeholder="you@example.com" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+          <input id="email" type="email" required placeholder="you@example.com" class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm" />
         </div>
         <div>
           <label class="text-sm font-medium block mb-1">Password</label>
-          <input id="password" type="password" required minlength="6" placeholder="At least 6 characters" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+          <input id="password" type="password" required minlength="6" placeholder="At least 6 characters" class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm" />
         </div>
       </div>
 
-      <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-200">
+      <div class="flex justify-end gap-3 mt-4 pt-3 border-t border-slate-200">
         <a href="index.html" class="border border-slate-300 px-4 py-2 rounded-lg text-sm font-medium">Back</a>
         <button type="submit" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium">Create my journey</button>
       </div>

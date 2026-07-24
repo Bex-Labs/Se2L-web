@@ -6,7 +6,7 @@
   <title>Se2L — Task detail</title>
   <link href="css/output.css" rel="stylesheet">
   <link href="css/tokens.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Literata:wght@600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Literata:wght@600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link href="css/shell.css" rel="stylesheet">
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-900">
@@ -21,9 +21,28 @@
   <div class="app-shell">
 
     <aside id="app-sidebar" class="app-sidebar">
-      <h2 class="app-sidebar-title text-lg font-semibold mb-6 px-2">Se2L</h2>
-      <nav class="flex flex-col gap-1" style="margin-top: 3rem;">
+      <div class="sidebar-brand">
+        <svg class="sidebar-brand-mark" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L2 7V12C2 16.97 6.24 21.44 12 22.5C17.76 21.44 22 16.97 22 12V7L12 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M9 12L11 14L15.5 9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="app-sidebar-title">Se2L</span>
+      </div>
+
+      <div class="sidebar-identity">
+        <div class="sidebar-identity-avatar">👤</div>
+        <div class="sidebar-identity-info">
+          <span id="sidebar-user-email" class="sidebar-identity-email">Loading…</span>
+          <span id="sidebar-role-pill" class="status-pill">Newcomer</span>
+        </div>
+      </div>
+
+      <nav class="flex flex-col gap-1" style="margin-top: 1rem;">
         <a href="dashboard.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Dashboard</a>
+        <a id="app-manager-link" href="app-manager.html" class="hidden px-3 py-2 rounded-lg text-sm text-slate-600">Manage content</a>
+        <a id="super-admin-link" href="super-admin.html" class="hidden px-3 py-2 rounded-lg text-sm text-slate-600">Platform overview</a>
+        <a href="resources.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Resources</a>
+        <a href="settings.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Settings</a>
       </nav>
       <button id="signout-btn" class="mt-auto text-xs text-slate-400 underline text-left px-3">Sign out</button>
     </aside>
@@ -31,7 +50,7 @@
     <main class="app-main">
       <div class="max-w-xl mx-auto">
 
-        <a href="dashboard.html" class="text-sm text-slate-500 flex items-center gap-1 mb-4">
+        <a id="back-link" href="dashboard.html" class="text-sm text-slate-500 flex items-center gap-1 mb-4">
           ← Back to dashboard
         </a>
 

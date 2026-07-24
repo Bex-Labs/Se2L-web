@@ -16,5 +16,18 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
+  // Route App Managers straight to their dashboard instead of the
+  // regular newcomer dashboard.
+  const { data: profile, error: profileError } = await supabaseClient
+    .from("users")
+    .select("role")
+    .eq("id", data.user.id)
+    .single();
+
+  if (!profileError && profile?.role === "app_manager") {
+    window.location.href = "app-manager.html";
+    return;
+  }
+
   window.location.href = "dashboard.html";
 });

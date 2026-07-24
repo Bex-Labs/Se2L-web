@@ -91,9 +91,36 @@ async function checkAuthAndActivateShell() {
     .eq("id", user.id)
     .maybeSingle();
 
+  const backLink = document.getElementById("back-link");
+
+  const roleLabels = {
+    app_manager: "App Manager",
+    super_admin: "Super Admin"
+  };
+  const emailEl = document.getElementById("sidebar-user-email");
+  const rolePillEl = document.getElementById("sidebar-role-pill");
+  if (emailEl) emailEl.textContent = user.email || "Unknown user";
+  if (rolePillEl) rolePillEl.textContent = roleLabels[profile?.role] || "Newcomer";
+
+  if (profile?.role === "super_admin") {
+    document.getElementById("super-admin-link")?.classList.remove("hidden");
+  }
+
   if (profile?.role === "app_manager") {
     document.getElementById("app-manager-link")?.classList.remove("hidden");
     document.getElementById("add-resource-section").classList.remove("hidden");
+
+    // App Managers land here from their own dashboard — send them back
+    // there instead of the public landing page.
+    if (backLink) {
+      backLink.href = "app-manager.html";
+      backLink.textContent = "← Back to app manager dashboard";
+    }
+  } else if (backLink) {
+    // Any other logged-in (non-app_manager) user gets their real
+    // dashboard instead of the public landing page.
+    backLink.href = "dashboard.html";
+    backLink.textContent = "← Back to dashboard";
   }
 }
 
