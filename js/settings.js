@@ -25,11 +25,23 @@ async function loadSidebarIdentity() {
   if (emailEl) emailEl.textContent = user.email || "Unknown user";
   if (rolePillEl) rolePillEl.textContent = roleLabels[profile?.role] || "Newcomer";
 
+  const backLink = document.getElementById("back-link");
+  const dashboardNavLink = document.getElementById("dashboard-nav-link");
+
   if (profile?.role === "app_manager") {
     document.getElementById("app-manager-link")?.classList.remove("hidden");
-  }
-  if (profile?.role === "super_admin") {
+    dashboardNavLink?.classList.add("hidden");
+    if (backLink) {
+      backLink.href = "app-manager.html";
+      backLink.textContent = "← Back to app manager dashboard";
+    }
+  } else if (profile?.role === "super_admin") {
     document.getElementById("super-admin-link")?.classList.remove("hidden");
+    dashboardNavLink?.classList.add("hidden");
+    if (backLink) {
+      backLink.href = "super-admin.html";
+      backLink.textContent = "← Back to platform overview";
+    }
   }
 }
 

@@ -92,6 +92,7 @@ async function checkAuthAndActivateShell() {
     .maybeSingle();
 
   const backLink = document.getElementById("back-link");
+  const dashboardNavLink = document.getElementById("dashboard-nav-link");
 
   const roleLabels = {
     app_manager: "App Manager",
@@ -104,11 +105,20 @@ async function checkAuthAndActivateShell() {
 
   if (profile?.role === "super_admin") {
     document.getElementById("super-admin-link")?.classList.remove("hidden");
+    dashboardNavLink?.classList.add("hidden");
+
+    // Super Admins land here from their own dashboard — send them back
+    // there instead of the newcomer dashboard.
+    if (backLink) {
+      backLink.href = "super-admin.html";
+      backLink.textContent = "← Back to platform overview";
+    }
   }
 
   if (profile?.role === "app_manager") {
     document.getElementById("app-manager-link")?.classList.remove("hidden");
     document.getElementById("add-resource-section").classList.remove("hidden");
+    dashboardNavLink?.classList.add("hidden");
 
     // App Managers land here from their own dashboard — send them back
     // there instead of the public landing page.
@@ -116,9 +126,9 @@ async function checkAuthAndActivateShell() {
       backLink.href = "app-manager.html";
       backLink.textContent = "← Back to app manager dashboard";
     }
-  } else if (backLink) {
-    // Any other logged-in (non-app_manager) user gets their real
-    // dashboard instead of the public landing page.
+  } else if (backLink && profile?.role !== "super_admin") {
+    // Any other logged-in (non-app_manager, non-super_admin) user gets
+    // their real dashboard instead of the public landing page.
     backLink.href = "dashboard.html";
     backLink.textContent = "← Back to dashboard";
   }
