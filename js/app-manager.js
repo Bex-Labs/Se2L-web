@@ -4,7 +4,7 @@ async function checkAppManagerAccess() {
   const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
 
   if (authError || !user) {
-    window.location.href = "onboarding.html";
+    window.location.href = "login.html";
     return null;
   }
 
@@ -465,12 +465,22 @@ document.querySelectorAll(".urgency-pill").forEach(btn => {
   });
 });
 
+function syncSubmitButtonLabel() {
+  const status = document.getElementById("status").value;
+  const labels = {
+    draft: "Save as draft",
+    in_review: "Submit for review",
+    published: "Publish task"
+  };
+  document.getElementById("submit-btn").textContent = labels[status] || "Save";
+}
+
 function resetForm() {
   document.getElementById("task-form").reset();
   document.getElementById("task_id").value = "";
   document.getElementById("form-heading").textContent = "Create a task";
-  document.getElementById("submit-btn").textContent = "Save as draft";
   document.getElementById("status").value = "draft";
+  syncSubmitButtonLabel();
   document.getElementById("cancel-edit-btn").classList.add("hidden");
   document.getElementById("region_england").checked = true;
   Array.from(document.getElementById("depends_on").options).forEach(opt => opt.selected = false);
@@ -507,6 +517,15 @@ async function loadTaskForEdit(taskId) {
   document.getElementById("is_minor_task").checked = task.is_minor_task || false;
   document.getElementById("status").value = task.status || "draft";
 
+  const scheduleInput = document.getElementById("scheduled_publish_at");
+  if (task.scheduled_publish_at) {
+    const dt = new Date(task.scheduled_publish_at);
+    const pad = n => String(n).padStart(2, "0");
+    scheduleInput.value = `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}T${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
+  } else {
+    scheduleInput.value = "";
+  }
+
   const phaseName = task.task_phases?.[0]?.phases?.name;
   if (phaseName) document.getElementById("phase_id").value = phaseName;
 
@@ -526,7 +545,7 @@ async function loadTaskForEdit(taskId) {
     : "";
 
   document.getElementById("form-heading").textContent = "Edit task";
-  document.getElementById("submit-btn").textContent = "Save changes";
+  syncSubmitButtonLabel();
   document.getElementById("cancel-edit-btn").classList.remove("hidden");
 
   await loadDependsOnOptions(task.id);
@@ -677,6 +696,7 @@ async function loadExistingTasks() {
           <div class="task-row-meta">
             <span class="task-status-pill ${statusBadgeStyles[t.status] || "bg-slate-100 text-slate-500"}">${statusLabels[t.status] || t.status}</span>
             <span class="task-row-meta-text">${t.urgency} · ${t.category || "Uncategorised"}</span>
+            ${t.scheduled_publish_at && t.status !== "published" ? `<span class="task-row-meta-text">· Scheduled ${new Date(t.scheduled_publish_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</span>` : ""}
           </div>
         </div>
         <div class="task-row-actions">
@@ -722,6 +742,8 @@ async function handleFormSubmit(e) {
   const phaseName = document.getElementById("phase_id").value;
   const isMinorTask = document.getElementById("is_minor_task").checked;
   const status = document.getElementById("status").value;
+  const scheduledPublishAtValue = document.getElementById("scheduled_publish_at").value;
+  const scheduledPublishAt = scheduledPublishAtValue ? new Date(scheduledPublishAtValue).toISOString() : null;
   const linkUrl = document.getElementById("link_url").value;
   const youtubeUrl = document.getElementById("youtube_url").value;
   const youtubeId = extractYouTubeId(youtubeUrl);
@@ -764,7 +786,8 @@ async function handleFormSubmit(e) {
         urgency,
         time_estimate_minutes: timeEstimate,
         is_minor_task: isMinorTask,
-        status
+        status,
+        scheduled_publish_at: scheduledPublishAt
       })
       .eq("id", taskId);
 
@@ -790,6 +813,7 @@ async function handleFormSubmit(e) {
         time_estimate_minutes: timeEstimate,
         is_minor_task: isMinorTask,
         status: status || "draft",
+        scheduled_publish_at: scheduledPublishAt,
         created_by: currentUser.id
       })
       .select()
@@ -1030,11 +1054,51 @@ async function saveTaskOrder() {
 }
 
 
+// --- SE2L-74: load active visa types and UK regions for the journey form ---
+async function loadJourneyVisaTypeAndRegionOptions() {
+  const [visaTypesResult, regionsResult] = await Promise.all([
+    supabaseClient.from("available_visa_types").select("value, label").eq("is_active", true).order("sort_order", { ascending: true }),
+    supabaseClient.from("available_uk_regions").select("value, label").eq("is_active", true).order("sort_order", { ascending: true })
+  ]);
+
+  const visaSelect = document.getElementById("journey_visa_type");
+  const regionSelect = document.getElementById("journey_uk_region");
+
+  const visaOptionsHtml = (visaTypesResult.data || []).map(v => `<option value="${v.value}">${v.label}</option>`).join("");
+  visaSelect.innerHTML = visaOptionsHtml + `<option value="other">Other (specify)</option>`;
+
+  regionSelect.innerHTML = (regionsResult.data || []).map(r => `<option value="${r.value}">${r.label}</option>`).join("")
+    || `<option value="">No regions configured yet</option>`;
+}
+
+// Sidebar section-switching — shows one of Journeys/Tasks/Reorder at a
+// time instead of stacking all three on one long page. Purely a display
+// toggle; every section's data still loads on page load same as before.
+function setupPanelSwitching() {
+  const subnavLinks = document.querySelectorAll(".sidebar-subnav [data-panel-target]");
+
+  subnavLinks.forEach(link => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      const targetId = link.dataset.panelTarget;
+
+      document.querySelectorAll(".app-manager-panel").forEach(panel => {
+        panel.classList.toggle("is-active-panel", panel.id === targetId);
+      });
+
+      subnavLinks.forEach(l => l.classList.toggle("is-active-subnav", l === link));
+    });
+  });
+}
+
 async function init() {
   const user = await checkAppManagerAccess();
   if (!user) return;
   currentUser = user;
 
+  setupPanelSwitching();
+
+  await loadJourneyVisaTypeAndRegionOptions();
   await loadPhaseOptions();
   await loadDependsOnOptions(null);
   await loadExistingTasks();
@@ -1044,6 +1108,8 @@ async function init() {
   addPhaseRow();
 
   syncUrgencyPills();
+  syncSubmitButtonLabel();
+  document.getElementById("status").addEventListener("change", syncSubmitButtonLabel);
 
   document.getElementById("task-form").addEventListener("submit", handleFormSubmit);
   document.getElementById("cancel-edit-btn").addEventListener("click", resetForm);

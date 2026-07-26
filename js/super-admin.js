@@ -6,7 +6,7 @@ async function checkSuperAdminAccess() {
   const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
 
   if (authError || !user) {
-    window.location.href = "onboarding.html";
+    window.location.href = "login.html";
     return null;
   }
 
@@ -204,13 +204,260 @@ document.getElementById("invite-form").addEventListener("submit", async (e) => {
 });
 
 
+// --- SE2L-74: configure available visa types and UK regions ---
+
+async function loadVisaTypesAndRegions() {
+  await Promise.all([loadOptionList("available_visa_types", "visa-type-list"), loadOptionList("available_uk_regions", "uk-region-list")]);
+}
+
+async function loadOptionList(tableName, listElementId) {
+  const listDiv = document.getElementById(listElementId);
+
+  const { data: rows, error } = await supabaseClient
+    .from(tableName)
+    .select("id, value, label, is_active")
+    .order("sort_order", { ascending: true });
+
+  if (error) {
+    listDiv.innerHTML = `<p class="text-sm text-red-600">Could not load this list.</p>`;
+    return;
+  }
+
+  if (!rows || rows.length === 0) {
+    listDiv.innerHTML = `<p class="text-sm text-slate-400">Nothing configured yet.</p>`;
+    return;
+  }
+
+  listDiv.innerHTML = rows.map(r => `
+    <div class="admin-account-card">
+      <div>
+        <p class="admin-account-email">${r.label}</p>
+        <p class="admin-account-status ${r.is_active ? "is-active" : "is-inactive"}">${r.is_active ? "Active" : "Hidden"} · ${r.value}</p>
+      </div>
+      <button data-toggle-option-id="${r.id}" data-option-table="${tableName}" data-currently-active="${r.is_active}" class="admin-toggle-switch ${r.is_active ? "is-on" : ""}" aria-label="${r.is_active ? "Hide" : "Activate"} ${r.label}">
+        <span class="admin-toggle-switch-knob"></span>
+      </button>
+    </div>
+  `).join("");
+
+  listDiv.querySelectorAll("[data-toggle-option-id]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const optionId = btn.dataset.toggleOptionId;
+      const table = btn.dataset.optionTable;
+      const currentlyActive = btn.dataset.currentlyActive === "true";
+      toggleOptionActive(table, optionId, !currentlyActive, listElementId);
+    });
+  });
+}
+
+async function toggleOptionActive(tableName, optionId, makeActive, listElementId) {
+  const { error } = await supabaseClient
+    .from(tableName)
+    .update({ is_active: makeActive })
+    .eq("id", optionId);
+
+  if (error) {
+    alert("Could not update: " + error.message);
+    return;
+  }
+
+  await loadOptionList(tableName, listElementId);
+}
+
+document.getElementById("add-visa-type-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const value = document.getElementById("new_visa_type_value").value.trim().toLowerCase().replace(/\s+/g, "_");
+  const label = document.getElementById("new_visa_type_label").value.trim();
+  if (!value || !label) return;
+
+  const { error } = await supabaseClient
+    .from("available_visa_types")
+    .insert({ value, label });
+
+  if (error) {
+    alert("Could not add visa type: " + error.message);
+    return;
+  }
+
+  document.getElementById("add-visa-type-form").reset();
+  await loadOptionList("available_visa_types", "visa-type-list");
+});
+
+document.getElementById("add-uk-region-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const value = document.getElementById("new_uk_region_value").value.trim().toLowerCase().replace(/\s+/g, "_");
+  const label = document.getElementById("new_uk_region_label").value.trim();
+  if (!value || !label) return;
+
+  const { error } = await supabaseClient
+    .from("available_uk_regions")
+    .insert({ value, label });
+
+  if (error) {
+    alert("Could not add UK region: " + error.message);
+    return;
+  }
+
+  document.getElementById("add-uk-region-form").reset();
+  await loadOptionList("available_uk_regions", "uk-region-list");
+});
+
+// --- SE2L-75: override or unpublish any content, regardless of author ---
+
+let allModerationTasks = [];
+let allModerationResources = [];
+
+async function loadModerationTasks() {
+  const { data, error } = await supabaseClient
+    .from("tasks")
+    .select("id, title, status, category, urgency")
+    .order("title", { ascending: true });
+
+  if (error) {
+    document.getElementById("moderation-task-list").innerHTML = `<p class="text-sm text-red-600">Could not load tasks.</p>`;
+    return;
+  }
+
+  allModerationTasks = data || [];
+  renderModerationTasks();
+}
+
+function renderModerationTasks() {
+  const listDiv = document.getElementById("moderation-task-list");
+  const term = document.getElementById("moderation-task-search").value.toLowerCase();
+  const filtered = allModerationTasks.filter(t => t.title.toLowerCase().includes(term));
+
+  if (filtered.length === 0) {
+    listDiv.innerHTML = `<p class="text-sm text-slate-400">No matching tasks.</p>`;
+    return;
+  }
+
+  listDiv.innerHTML = filtered.map(t => `
+    <div class="admin-account-card">
+      <div>
+        <p class="admin-account-email">${t.title}</p>
+        <p class="moderation-status is-${t.status}">${t.status.replace("_", " ")} · ${t.urgency} · ${t.category || "Uncategorised"}</p>
+      </div>
+      <div class="flex gap-2">
+        ${t.status !== "draft" && t.status !== "archived" ? `<button data-task-id="${t.id}" data-new-status="draft" class="moderation-action-btn moderation-task-btn">Unpublish</button>` : ""}
+        ${t.status !== "archived" ? `<button data-task-id="${t.id}" data-new-status="archived" class="moderation-action-btn is-danger moderation-task-btn">Archive</button>` : ""}
+      </div>
+    </div>
+  `).join("");
+
+  listDiv.querySelectorAll(".moderation-task-btn").forEach(btn => {
+    btn.addEventListener("click", () => updateModerationTaskStatus(btn.dataset.taskId, btn.dataset.newStatus));
+  });
+}
+
+async function updateModerationTaskStatus(taskId, newStatus) {
+  if (!confirm(`Change this task's status to "${newStatus}"? This overrides it regardless of who created it.`)) return;
+
+  const { error } = await supabaseClient
+    .from("tasks")
+    .update({ status: newStatus })
+    .eq("id", taskId);
+
+  if (error) {
+    alert("Could not update task: " + error.message);
+    return;
+  }
+
+  await loadModerationTasks();
+}
+
+document.getElementById("moderation-task-search").addEventListener("input", renderModerationTasks);
+
+async function loadModerationResources() {
+  const { data, error } = await supabaseClient
+    .from("resources")
+    .select("id, title, status, category")
+    .order("title", { ascending: true });
+
+  if (error) {
+    document.getElementById("moderation-resource-list").innerHTML = `<p class="text-sm text-red-600">Could not load resources.</p>`;
+    return;
+  }
+
+  allModerationResources = data || [];
+  renderModerationResources();
+}
+
+function renderModerationResources() {
+  const listDiv = document.getElementById("moderation-resource-list");
+  const term = document.getElementById("moderation-resource-search").value.toLowerCase();
+  const filtered = allModerationResources.filter(r => r.title.toLowerCase().includes(term));
+
+  if (filtered.length === 0) {
+    listDiv.innerHTML = `<p class="text-sm text-slate-400">No matching resources.</p>`;
+    return;
+  }
+
+  listDiv.innerHTML = filtered.map(r => `
+    <div class="admin-account-card">
+      <div>
+        <p class="admin-account-email">${r.title}</p>
+        <p class="moderation-status is-${r.status}">${r.status} · ${r.category || "Uncategorised"}</p>
+      </div>
+      ${r.status === "published" ? `<button data-resource-id="${r.id}" class="moderation-action-btn moderation-resource-btn">Unpublish</button>` : ""}
+    </div>
+  `).join("");
+
+  listDiv.querySelectorAll(".moderation-resource-btn").forEach(btn => {
+    btn.addEventListener("click", () => updateModerationResourceStatus(btn.dataset.resourceId));
+  });
+}
+
+async function updateModerationResourceStatus(resourceId) {
+  if (!confirm("Unpublish this resource? This overrides it regardless of who created it.")) return;
+
+  const { error } = await supabaseClient
+    .from("resources")
+    .update({ status: "draft" })
+    .eq("id", resourceId);
+
+  if (error) {
+    alert("Could not update resource: " + error.message);
+    return;
+  }
+
+  await loadModerationResources();
+}
+
+document.getElementById("moderation-resource-search").addEventListener("input", renderModerationResources);
+
+// Sidebar section-switching — same pattern as app-manager.html. Shows one
+// of Overview/App Managers/Visa & Regions/Moderation at a time; all data
+// still loads on page load exactly as before, this only toggles display.
+function setupPanelSwitching() {
+  const subnavLinks = document.querySelectorAll(".sidebar-subnav [data-panel-target]");
+
+  subnavLinks.forEach(link => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      const targetId = link.dataset.panelTarget;
+
+      document.querySelectorAll(".admin-panel").forEach(panel => {
+        panel.classList.toggle("is-active-panel", panel.id === targetId);
+      });
+
+      subnavLinks.forEach(l => l.classList.toggle("is-active-subnav", l === link));
+    });
+  });
+}
+
 async function init() {
   const user = await checkSuperAdminAccess();
   if (!user) return;
 
+  setupPanelSwitching();
+
   await loadPlatformStats();
   await loadAppManagerAccounts();
   await loadPendingInvites();
+  await loadVisaTypesAndRegions();
+  await loadModerationTasks();
+  await loadModerationResources();
 }
 
 init();

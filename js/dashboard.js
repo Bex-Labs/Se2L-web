@@ -2,7 +2,7 @@ async function loadDashboard() {
   const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
 
   if (authError || !user) {
-    window.location.href = "onboarding.html";
+    window.location.href = "login.html";
     return;
   }
 

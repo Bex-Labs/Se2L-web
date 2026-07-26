@@ -111,6 +111,61 @@
       background: var(--color-warning-bg);
       color: var(--color-warning);
     }
+
+    .visa-region-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+    @media (min-width: 700px) {
+      .visa-region-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    .visa-region-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      padding: 1rem;
+    }
+    .visa-region-add-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .visa-region-add-form input {
+      min-width: 0;
+    }
+    .visa-region-add-form button {
+      grid-column: 1 / -1;
+    }
+
+    .moderation-status {
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-top: 0.15rem;
+    }
+    .moderation-status.is-draft { color: var(--color-text-secondary); }
+    .moderation-status.is-in_review { color: var(--color-warning); }
+    .moderation-status.is-published { color: var(--color-success-dark); }
+    .moderation-status.is-archived { color: var(--color-critical); }
+
+    .moderation-action-btn {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.3rem 0.6rem;
+      border-radius: var(--radius-control);
+      border: 1px solid var(--color-border);
+      background: var(--color-surface);
+      color: var(--color-text-secondary);
+    }
+    .moderation-action-btn:hover {
+      background: var(--color-surface-muted);
+    }
+    .moderation-action-btn.is-danger {
+      color: var(--color-critical);
+    }
   </style>
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-900">
@@ -143,6 +198,12 @@
 
       <nav class="flex flex-col gap-1" style="margin-top: 1rem;">
         <a href="super-admin.html" class="px-3 py-2 rounded-lg text-sm font-medium bg-indigo-50 text-indigo-700">Platform overview</a>
+        <div class="sidebar-subnav">
+          <a href="#" data-panel-target="panel-overview" class="is-active-subnav">Overview</a>
+          <a href="#" data-panel-target="panel-app-managers">App Managers</a>
+          <a href="#" data-panel-target="panel-visa-regions">Visa & Regions</a>
+          <a href="#" data-panel-target="panel-moderation">Moderation</a>
+        </div>
         <a href="resources.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Resources</a>
         <a href="settings.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Settings</a>
       </nav>
@@ -152,7 +213,8 @@
     <main class="app-main">
       <div class="max-w-2xl mx-auto">
 
-        <h1 class="text-xl font-semibold mb-6">Platform overview</h1>
+        <div id="panel-overview" class="admin-panel is-active-panel">
+        <h1 id="overview-section" class="text-xl font-semibold mb-6">Platform overview</h1>
 
     <div class="grid grid-cols-4 gap-3 mb-6">
       <div class="admin-stat-card">
@@ -199,9 +261,11 @@
         <span id="check-auth-roles" class="text-xs status-pill">Checking...</span>
       </div>
     </div>
+    </div>
 
+    <div id="panel-app-managers" class="admin-panel">
     <!-- SE2L-73: manage App Manager accounts -->
-    <div class="mt-8">
+    <div id="app-manager-accounts-section" class="mt-8">
       <div class="admin-section-heading">
         <span class="admin-section-icon">🔑</span>
         <h2 class="text-base font-semibold">App Manager accounts</h2>
@@ -219,6 +283,63 @@
 
       <h3 class="text-sm font-medium mb-2">Pending invites</h3>
       <div id="pending-invite-list" class="flex flex-col gap-2"></div>
+    </div>
+    </div>
+
+    <div id="panel-visa-regions" class="admin-panel">
+    <!-- SE2L-74: configure available visa types and UK regions -->
+    <div id="visa-region-section" class="mt-8">
+      <div class="admin-section-heading">
+        <span class="admin-section-icon">🌍</span>
+        <h2 class="text-base font-semibold">Visa types & UK regions</h2>
+      </div>
+      <p class="text-sm text-slate-500 mb-4">
+        These lists control what's offered platform-wide — in newcomer sign-up and in the App Manager's journey builder. Toggling one off hides it from those forms without deleting any existing journeys or accounts already using it.
+      </p>
+
+      <div class="visa-region-grid">
+        <div class="visa-region-card">
+          <h3 class="text-sm font-medium mb-3">Visa types</h3>
+          <form id="add-visa-type-form" class="visa-region-add-form">
+            <input id="new_visa_type_value" type="text" required class="border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="value, e.g. bno" />
+            <input id="new_visa_type_label" type="text" required class="border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="label, e.g. BN(O)" />
+            <button type="submit" class="bg-slate-900 text-white px-3 py-2 rounded-lg text-sm font-medium">Add</button>
+          </form>
+          <div id="visa-type-list" class="flex flex-col gap-2"></div>
+        </div>
+
+        <div class="visa-region-card">
+          <h3 class="text-sm font-medium mb-3">UK regions</h3>
+          <form id="add-uk-region-form" class="visa-region-add-form">
+            <input id="new_uk_region_value" type="text" required class="border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="value, e.g. wales" />
+            <input id="new_uk_region_label" type="text" required class="border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="label, e.g. Wales" />
+            <button type="submit" class="bg-slate-900 text-white px-3 py-2 rounded-lg text-sm font-medium">Add</button>
+          </form>
+          <div id="uk-region-list" class="flex flex-col gap-2"></div>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <div id="panel-moderation" class="admin-panel">
+    <!-- SE2L-75: override or unpublish any content, regardless of author -->
+    <div id="moderation-section" class="mt-8">
+      <div class="admin-section-heading">
+        <span class="admin-section-icon">🛡️</span>
+        <h2 class="text-base font-semibold">Content moderation</h2>
+      </div>
+      <p class="text-sm text-slate-500 mb-4">
+        See and override any task or resource platform-wide, regardless of which App Manager created it. For routine editing, use the App Manager tools — this is for emergency takedowns.
+      </p>
+
+      <h3 class="text-sm font-medium mb-2">Tasks</h3>
+      <input id="moderation-task-search" type="search" placeholder="Search tasks by title" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mb-3" />
+      <div id="moderation-task-list" class="flex flex-col gap-2 mb-6"></div>
+
+      <h3 class="text-sm font-medium mb-2">Resources</h3>
+      <input id="moderation-resource-search" type="search" placeholder="Search resources by title" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mb-3" />
+      <div id="moderation-resource-list" class="flex flex-col gap-2"></div>
+    </div>
     </div>
 
       </div>

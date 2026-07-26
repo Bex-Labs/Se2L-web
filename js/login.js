@@ -29,5 +29,10 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
+  if (!profileError && profile?.role === "super_admin") {
+    window.location.href = "super-admin.html";
+    return;
+  }
+
   window.location.href = "dashboard.html";
 });

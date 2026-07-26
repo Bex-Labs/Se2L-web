@@ -1,5 +1,32 @@
 const form = document.getElementById("onboarding-form");
 
+// --- SE2L-74: load active visa types and UK regions dynamically ---
+// Readable by anyone (including this pre-signup page) since these tables'
+// RLS policies grant SELECT to public — only Super Admin can write to them.
+async function loadVisaTypeAndRegionOptions() {
+  const [visaTypesResult, regionsResult] = await Promise.all([
+    supabaseClient.from("available_visa_types").select("value, label").eq("is_active", true).order("sort_order", { ascending: true }),
+    supabaseClient.from("available_uk_regions").select("value, label").eq("is_active", true).order("sort_order", { ascending: true })
+  ]);
+
+  const visaTypeSelect = document.getElementById("visa_type");
+  const regionSelect = document.getElementById("uk_region");
+
+  if (visaTypesResult.data && visaTypesResult.data.length > 0) {
+    visaTypeSelect.innerHTML = visaTypesResult.data.map(v => `<option value="${v.value}">${v.label}</option>`).join("");
+  } else {
+    visaTypeSelect.innerHTML = `<option value="">No visa types configured yet</option>`;
+  }
+
+  if (regionsResult.data && regionsResult.data.length > 0) {
+    regionSelect.innerHTML = regionsResult.data.map(r => `<option value="${r.value}">${r.label}</option>`).join("");
+  } else {
+    regionSelect.innerHTML = `<option value="">No regions configured yet</option>`;
+  }
+}
+
+loadVisaTypeAndRegionOptions();
+
 // --- SE2L-23: household members section ---
 const hasDependantsSelect = document.getElementById("has_dependants");
 const dependantsSection = document.getElementById("dependants-section");

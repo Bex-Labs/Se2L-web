@@ -196,6 +196,24 @@
   background: var(--color-surface-muted);
   color: var(--color-text);
 }
+.sidebar-subnav a.is-active-subnav {
+  background: var(--color-accent-bg);
+  color: var(--color-accent-dark);
+  font-weight: 600;
+}
+
+/* Section-switching panels — used on app-manager.html and super-admin.html
+   so only one major section shows at a time instead of everything stacked
+   on one long page. Panels are shown/hidden by app-manager.js/super-admin.js
+   toggling this class; the markup itself never changes. */
+.app-manager-panel,
+.admin-panel {
+  display: none;
+}
+.app-manager-panel.is-active-panel,
+.admin-panel.is-active-panel {
+  display: block;
+}
 
 .sidebar-task-jump-wrap {
   margin-top: 1.25rem;
