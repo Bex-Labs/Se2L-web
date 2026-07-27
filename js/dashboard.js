@@ -28,13 +28,13 @@ async function loadDashboard() {
   // Populates the sidebar identity strip. Reuses the profile already
   // fetched above rather than a separate query — purely presentational.
   const roleLabels = {
-    app_manager: "App Manager",
-    super_admin: "Super Admin"
+    app_manager: t("roles.app_manager"),
+    super_admin: t("roles.super_admin")
   };
   const emailEl = document.getElementById("sidebar-user-email");
   const rolePillEl = document.getElementById("sidebar-role-pill");
-  if (emailEl) emailEl.textContent = user.email || "Unknown user";
-  if (rolePillEl) rolePillEl.textContent = roleLabels[profile.role] || "Newcomer";
+  if (emailEl) emailEl.textContent = user.email || t("common.unknown_user");
+  if (rolePillEl) rolePillEl.textContent = roleLabels[profile.role] || t("roles.newcomer");
 
   // --- SE2L-39: For Your Family section ---
   // Called early and independently of the task-list logic below, since that
@@ -44,9 +44,9 @@ async function loadDashboard() {
 
   const welcomeDiv = document.getElementById("welcome-message");
   welcomeDiv.innerHTML = `
-    <h2 class="text-lg font-semibold">Welcome back!</h2>
+    <h2 class="text-lg font-semibold">${t("dashboard.welcome_heading")}</h2>
     <p class="text-sm text-slate-500">
-      ${profile.visa_type.replace("_", " ")} · ${profile.uk_region} · Arrived ${profile.arrival_date}
+      ${profile.visa_type.replace("_", " ")} · ${profile.uk_region} · ${t("dashboard.arrived_prefix")} ${profile.arrival_date}
     </p>
   `;
 
@@ -119,7 +119,7 @@ async function loadDashboard() {
   const taskCountSpan = document.getElementById("task-count");
 
   if (!currentPhase) {
-    taskListDiv.innerHTML = `<p class="text-sm text-slate-500">No active phase yet.</p>`;
+    taskListDiv.innerHTML = `<p class="text-sm text-slate-500">${t("dashboard.no_active_phase")}</p>`;
     taskCountSpan.textContent = "";
     return;
   }
@@ -134,12 +134,12 @@ async function loadDashboard() {
 
   if (tasksError) {
     console.error(tasksError);
-    taskListDiv.innerHTML = `<p class="text-sm text-red-600">Could not load tasks.</p>`;
+    taskListDiv.innerHTML = `<p class="text-sm text-red-600">${t("dashboard.tasks_load_error")}</p>`;
     return;
   }
 
   if (!tasks || tasks.length === 0) {
-    taskListDiv.innerHTML = `<p class="text-sm text-slate-500">No tasks for this phase yet.</p>`;
+    taskListDiv.innerHTML = `<p class="text-sm text-slate-500">${t("dashboard.no_tasks_phase")}</p>`;
     taskCountSpan.textContent = "";
     return;
   }
@@ -174,16 +174,16 @@ async function loadDashboard() {
   });
 
   const completedCount = tasks.filter(t => completedIds.has(t.id)).length;
-  taskCountSpan.textContent = `${completedCount} of ${tasks.length} complete`;
+  taskCountSpan.textContent = t("dashboard.task_count", { completed: completedCount, total: tasks.length });
 
-  taskListDiv.innerHTML = tasks.map(t => {
-    const isDone = completedIds.has(t.id);
+  taskListDiv.innerHTML = tasks.map(task => {
+    const isDone = completedIds.has(task.id);
     return `
-    <a href="task-detail.html?id=${t.id}" class="bg-white border border-slate-200 rounded-xl p-4 flex justify-between items-center ${isDone ? "opacity-60" : ""}">
+    <a href="task-detail.html?id=${task.id}" class="bg-white border border-slate-200 rounded-xl p-4 flex justify-between items-center ${isDone ? "opacity-60" : ""}">
       <div>
-        <span class="text-xs ${urgencyColor[t.urgency] || "text-slate-500"} font-medium">${t.urgency}</span>
-        <span class="text-xs text-slate-400">· ${t.category || "General"}</span>
-        <p class="text-sm font-medium mt-0.5 ${isDone ? "line-through" : ""}">${t.title}</p>
+        <span class="text-xs ${urgencyColor[task.urgency] || "text-slate-500"} font-medium">${task.urgency}</span>
+        <span class="text-xs text-slate-400">· ${task.category || t("common.general")}</span>
+        <p class="text-sm font-medium mt-0.5 ${isDone ? "line-through" : ""}">${task.title}</p>
       </div>
       <span>${isDone ? "✓" : "›"}</span>
     </a>
@@ -197,8 +197,8 @@ async function loadDashboard() {
     progressStrip.classList.remove("hidden");
     progressStrip.innerHTML = `
       <div class="bg-white border border-slate-200 rounded-xl p-3 flex items-center justify-between text-sm">
-        <span class="text-slate-600">Day ${daysSinceArrival + 1} of your journey · ${currentPhase.name}</span>
-        <span class="font-medium">${completedCount} of ${tasks.length} tasks complete</span>
+        <span class="text-slate-600">${t("dashboard.progress_day", { day: daysSinceArrival + 1, phase: currentPhase.name })}</span>
+        <span class="font-medium">${t("dashboard.progress_complete", { completed: completedCount, total: tasks.length })}</span>
       </div>
     `;
   }
@@ -237,8 +237,8 @@ async function loadDashboard() {
 
     teaserDiv.innerHTML = `
       <div class="bg-slate-100 rounded-xl p-4">
-        <p class="text-xs text-slate-500 mb-1">Coming up next</p>
-        <p class="text-sm font-medium">${nextPhase.name} · ${count || 0} task${count === 1 ? "" : "s"}</p>
+        <p class="text-xs text-slate-500 mb-1">${t("dashboard.coming_up_next")}</p>
+        <p class="text-sm font-medium">${nextPhase.name} · ${count || 0} ${count === 1 ? t("common.task_singular") : t("common.task_plural")}</p>
       </div>
     `;
   } else {
@@ -293,25 +293,25 @@ async function loadFamilySection(userId) {
 
   const minorRows = minors.map(m => {
     const count = pendingCounts[m.id] || 0;
-    const relationshipLabel = m.relationship ? m.relationship : "Child";
+    const relationshipLabel = m.relationship ? m.relationship : t("dashboard.relationship_child");
     return `
       <div class="family-member-card">
         <div class="family-member-avatar">${initialsFor(m.name)}</div>
         <div>
           <p class="family-member-name">${m.name} <span class="family-member-relationship">· ${relationshipLabel}</span></p>
-          <p class="family-member-status">${count} task${count === 1 ? "" : "s"} pending</p>
+          <p class="family-member-status">${t("dashboard.tasks_pending", { count, taskword: count === 1 ? t("common.task_singular") : t("common.task_plural") })}</p>
         </div>
       </div>
     `;
   }).join("");
 
   const adultStatusLabel = {
-    pending: "Invite sent",
-    accepted: "Account set up"
+    pending: t("dashboard.invite_sent"),
+    accepted: t("dashboard.account_set_up")
   };
 
   const adultRows = adults.map(a => {
-    const relationshipLabel = a.relationship ? a.relationship : "Adult";
+    const relationshipLabel = a.relationship ? a.relationship : t("dashboard.relationship_adult");
     const statusLabel = adultStatusLabel[a.invite_status] || a.invite_status || "—";
     return `
       <div class="family-member-card">
@@ -326,7 +326,7 @@ async function loadFamilySection(userId) {
 
   familyDiv.innerHTML = `
     <div class="mt-6 bg-indigo-50 rounded-xl p-4">
-      <p class="text-sm font-medium text-indigo-700 mb-3">For your family</p>
+      <p class="text-sm font-medium text-indigo-700 mb-3">${t("dashboard.family_heading")}</p>
       <div class="flex flex-col gap-2">
         ${minorRows}
         ${adultRows}
@@ -347,8 +347,8 @@ async function loadPhaseReview(phaseId, phaseName, userId, visaType, ukRegion) {
   const listDiv = document.getElementById("phase-review-tasks");
 
   section.classList.remove("hidden");
-  heading.textContent = `Reviewing: ${phaseName}`;
-  listDiv.innerHTML = `<p class="text-sm text-slate-400">Loading...</p>`;
+  heading.textContent = `${t("dashboard.reviewing_prefix")} ${phaseName}`;
+  listDiv.innerHTML = `<p class="text-sm text-slate-400">${t("common.loading")}</p>`;
   section.scrollIntoView({ behavior: "smooth", block: "nearest" });
 
   const { data: tasks, error } = await supabaseClient
@@ -360,31 +360,31 @@ async function loadPhaseReview(phaseId, phaseName, userId, visaType, ukRegion) {
     .eq("status", "published");
 
   if (error) {
-    listDiv.innerHTML = `<p class="text-sm text-red-600">Could not load this phase's tasks.</p>`;
+    listDiv.innerHTML = `<p class="text-sm text-red-600">${t("dashboard.phase_tasks_load_error")}</p>`;
     return;
   }
 
   if (!tasks || tasks.length === 0) {
-    listDiv.innerHTML = `<p class="text-sm text-slate-400">No tasks were assigned to this phase.</p>`;
+    listDiv.innerHTML = `<p class="text-sm text-slate-400">${t("dashboard.phase_no_tasks")}</p>`;
     return;
   }
 
   const shareBase = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, "");
 
-  listDiv.innerHTML = tasks.map(t => {
-    const shareUrl = `${shareBase}/task-detail.html?id=${t.id}`;
-    const linkRow = t.task_links?.[0]?.url
-      ? `<a href="${t.task_links[0].url}" target="_blank" rel="noopener" class="text-xs text-indigo-600 font-medium">Guidance link ↗</a>`
+  listDiv.innerHTML = tasks.map(task => {
+    const shareUrl = `${shareBase}/task-detail.html?id=${task.id}`;
+    const linkRow = task.task_links?.[0]?.url
+      ? `<a href="${task.task_links[0].url}" target="_blank" rel="noopener" class="text-xs text-indigo-600 font-medium">${t("dashboard.guidance_link")}</a>`
       : "";
     return `
       <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 flex justify-between items-center">
         <div>
-          <p class="text-sm font-medium">${t.title}</p>
+          <p class="text-sm font-medium">${task.title}</p>
           <div class="flex gap-2 items-center mt-1">
             ${linkRow}
           </div>
         </div>
-        <button type="button" data-share-url="${shareUrl}" data-share-title="${t.title}" class="share-task-btn text-xs text-slate-500 font-medium border border-slate-300 rounded-lg px-2 py-1">Share</button>
+        <button type="button" data-share-url="${shareUrl}" data-share-title="${task.title}" class="share-task-btn text-xs text-slate-500 font-medium border border-slate-300 rounded-lg px-2 py-1">${t("common.share")}</button>
       </div>
     `;
   }).join("");
@@ -410,10 +410,10 @@ async function shareLink(url, title, btn) {
   try {
     await navigator.clipboard.writeText(url);
     const original = btn.textContent;
-    btn.textContent = "Copied!";
+    btn.textContent = t("common.copied");
     setTimeout(() => { btn.textContent = original; }, 1500);
   } catch (err) {
-    alert("Could not copy link. You can copy it manually: " + url);
+    alert(t("dashboard.copy_link_failed_prefix") + url);
   }
 }
 

@@ -50,6 +50,12 @@ hasDependantsSelect.addEventListener("change", () => {
 function addDependantEntry() {
   const clone = dependantTemplate.content.cloneNode(true);
   dependantsContainer.appendChild(clone);
+  // The cloned entry didn't exist when i18n.js ran its initial pass on
+  // page load, so translate it now — safe to re-run on the whole
+  // container each time, since it's idempotent for already-translated entries.
+  if (window.se2lTranslateElement) {
+    window.se2lTranslateElement(dependantsContainer);
+  }
 }
 
 addDependantBtn.addEventListener("click", addDependantEntry);
@@ -119,7 +125,7 @@ form.addEventListener("submit", async (e) => {
   });
 
   if (error) {
-    alert("Sign up failed: " + error.message);
+    alert(window.t("onboarding.signup_failed_prefix") + error.message);
     return;
   }
 
@@ -137,7 +143,7 @@ form.addEventListener("submit", async (e) => {
     });
 
   if (profileError) {
-    alert("Profile creation failed: " + profileError.message);
+    alert(window.t("onboarding.profile_failed_prefix") + profileError.message);
     return;
   }
 
@@ -168,7 +174,7 @@ form.addEventListener("submit", async (e) => {
         // Don't block the whole signup over this — the account and journey are
         // already created successfully at this point. Surface it and move on.
         console.error("Failed to save household members:", dependantsError.message);
-        alert("Your journey was created, but we couldn't save your household members. You can add them later from your dashboard.");
+        alert(window.t("onboarding.dependants_save_failed"));
         window.location.href = "dashboard.html";
         return;
       }
@@ -218,6 +224,6 @@ form.addEventListener("submit", async (e) => {
     }
   }
 
-  alert("Journey created! Redirecting to your dashboard...");
+  alert(window.t("onboarding.success_message"));
   window.location.href = "dashboard.html";
 });

@@ -34,28 +34,28 @@
         <div class="sidebar-identity-avatar">👤</div>
         <div class="sidebar-identity-info">
           <span id="sidebar-user-email" class="sidebar-identity-email">Loading…</span>
-          <span class="status-pill">App Manager</span>
+          <span class="status-pill" data-i18n="roles.app_manager">App Manager</span>
         </div>
       </div>
 
       <nav class="flex flex-col gap-1" style="margin-top: 1rem;">
-        <a href="app-manager.html" class="px-3 py-2 rounded-lg text-sm font-medium bg-indigo-50 text-indigo-700">Manage content</a>
+        <a href="app-manager.html" class="px-3 py-2 rounded-lg text-sm font-medium bg-indigo-50 text-indigo-700" data-i18n="nav.manage_content">Manage content</a>
         <div class="sidebar-subnav">
-          <a href="#" data-panel-target="panel-journeys">Journeys</a>
-          <a href="#" data-panel-target="panel-tasks" class="is-active-subnav">Tasks</a>
-          <a href="#" data-panel-target="panel-reorder">Reorder</a>
+          <a href="#" data-panel-target="panel-journeys" data-i18n="appmgr.nav_journeys">Journeys</a>
+          <a href="#" data-panel-target="panel-tasks" class="is-active-subnav" data-i18n="appmgr.nav_tasks">Tasks</a>
+          <a href="#" data-panel-target="panel-reorder" data-i18n="appmgr.nav_reorder">Reorder</a>
         </div>
-        <a href="resources.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Resources</a>
-        <a href="preview.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Preview as newcomer</a>
-        <a href="settings.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Settings</a>
+        <a href="resources.html" class="px-3 py-2 rounded-lg text-sm text-slate-600" data-i18n="nav.resources">Resources</a>
+        <a href="preview.html" class="px-3 py-2 rounded-lg text-sm text-slate-600" data-i18n="appmgr.nav_preview">Preview as newcomer</a>
+        <a href="settings.html" class="px-3 py-2 rounded-lg text-sm text-slate-600" data-i18n="nav.settings">Settings</a>
       </nav>
-      <button id="signout-btn" class="mt-auto text-xs text-slate-400 underline text-left px-3">Sign out</button>
+      <button id="signout-btn" class="mt-auto text-xs text-slate-400 underline text-left px-3" data-i18n="common.sign_out">Sign out</button>
     </aside>
 
     <main class="app-main">
       <div class="max-w-2xl mx-auto">
 
-    <span class="inline-flex bg-indigo-50 text-indigo-700 text-sm px-4 py-1.5 rounded-full mb-4">
+    <span class="inline-flex bg-indigo-50 text-indigo-700 text-sm px-4 py-1.5 rounded-full mb-4" data-i18n="appmgr.badge">
       App manager
     </span>
 
@@ -64,10 +64,10 @@
     <details id="journey-section" open class="bg-white border border-slate-200 rounded-xl mb-8">
       <summary class="cursor-pointer p-6 font-semibold text-lg journey-summary">
         <span class="journey-summary-icon">🗺️</span>
-        Manage journeys
+        <span data-i18n="appmgr.manage_journeys_heading">Manage journeys</span>
       </summary>
       <div class="px-6 pb-6">
-        <p class="text-sm text-slate-500 mb-4">
+        <p class="text-sm text-slate-500 mb-4" data-i18n="appmgr.manage_journeys_desc">
           A journey is the full settlement path for one visa type in one UK region. Create it here first — a journey needs at least one phase before tasks can be assigned to it.
         </p>
 
@@ -75,40 +75,40 @@
 
           <div class="grid grid-cols-2 gap-4 mb-4">
             <div>
-              <label class="text-sm font-medium block mb-1">Visa type</label>
+              <label class="text-sm font-medium block mb-1" data-i18n="appmgr.visa_type_label">Visa type</label>
               <select id="journey_visa_type" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
-                <option value="">Loading visa types...</option>
+                <option value="" data-i18n="appmgr.loading_visa_types">Loading visa types...</option>
               </select>
               <input id="journey_visa_type_other" type="text" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mt-2 hidden" placeholder="e.g. health_care_worker" />
             </div>
             <div>
-              <label class="text-sm font-medium block mb-1">UK region</label>
+              <label class="text-sm font-medium block mb-1" data-i18n="appmgr.uk_region_label">UK region</label>
               <select id="journey_uk_region" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
-                <option value="">Loading regions...</option>
+                <option value="" data-i18n="appmgr.loading_regions">Loading regions...</option>
               </select>
             </div>
           </div>
 
           <div class="mb-4">
-            <label class="text-sm font-medium block mb-1">Journey name</label>
+            <label class="text-sm font-medium block mb-1" data-i18n="appmgr.journey_name_label">Journey name</label>
             <input id="journey_name" type="text" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="e.g. Skilled Worker — England" />
           </div>
 
           <div class="mb-4">
-            <label class="text-sm font-medium block mb-2">Phases</label>
+            <label class="text-sm font-medium block mb-2" data-i18n="appmgr.phases_label">Phases</label>
             <div id="phase-rows" class="flex flex-col gap-2 mb-2"></div>
-            <button type="button" id="add-phase-row-btn" class="text-xs text-indigo-600 font-medium">+ Add phase</button>
-            <p class="text-xs text-slate-400 mt-1">
+            <button type="button" id="add-phase-row-btn" class="text-xs text-indigo-600 font-medium" data-i18n="appmgr.add_phase">+ Add phase</button>
+            <p class="text-xs text-slate-400 mt-1" data-i18n="appmgr.phases_hint">
               Days are counted from the newcomer's arrival date, e.g. 0–7 for "First week".
             </p>
           </div>
 
           <div class="flex justify-end pt-4 border-t border-slate-200">
-            <button type="submit" id="journey-submit-btn" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium">Create journey</button>
+            <button type="submit" id="journey-submit-btn" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium" data-i18n="appmgr.create_journey">Create journey</button>
           </div>
         </form>
 
-        <h3 class="text-sm font-medium mt-6 mb-3">Existing journeys</h3>
+        <h3 class="text-sm font-medium mt-6 mb-3" data-i18n="appmgr.existing_journeys">Existing journeys</h3>
         <div id="journey-list" class="flex flex-col gap-2"></div>
       </div>
     </details>
@@ -117,26 +117,26 @@
     <div id="panel-tasks" class="app-manager-panel is-active-panel">
     <div class="task-manager-grid">
       <div>
-        <h1 id="form-heading" class="text-xl font-semibold mb-1">Create a task</h1>
-        <p class="text-sm text-slate-500 mb-6">Add a new settlement task and assign it to a phase and visa type.</p>
+        <h1 id="form-heading" class="text-xl font-semibold mb-1" data-i18n="appmgr.create_task_heading">Create a task</h1>
+        <p class="text-sm text-slate-500 mb-6" data-i18n="appmgr.create_task_desc">Add a new settlement task and assign it to a phase and visa type.</p>
 
         <form id="task-form" class="bg-white border border-slate-200 rounded-xl p-6 mb-8">
 
           <input type="hidden" id="task_id" value="" />
 
           <div class="mb-4">
-            <label class="text-sm font-medium block mb-1">Title</label>
-            <input id="title" type="text" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="e.g. Register for council tax" />
+            <label class="text-sm font-medium block mb-1" data-i18n="appmgr.title_label">Title</label>
+            <input id="title" type="text" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="e.g. Register for council tax" data-i18n-placeholder="appmgr.title_placeholder" />
           </div>
 
           <div class="mb-4">
-            <label class="text-sm font-medium block mb-1">Description / guidance</label>
-            <textarea id="body_html" rows="4" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="Explain why it matters and what to do. Use lines starting with '- ' for a bullet list."></textarea>
+            <label class="text-sm font-medium block mb-1" data-i18n="appmgr.description_label">Description / guidance</label>
+            <textarea id="body_html" rows="4" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="Explain why it matters and what to do. Use lines starting with '- ' for a bullet list." data-i18n-placeholder="appmgr.description_placeholder"></textarea>
           </div>
 
           <div class="grid grid-cols-2 gap-4 mb-4">
             <div>
-              <label class="text-sm font-medium block mb-1">Category</label>
+              <label class="text-sm font-medium block mb-1" data-i18n="appmgr.category_label">Category</label>
               <select id="category" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
                 <option value="Housing">Housing</option>
                 <option value="Legal">Legal</option>
@@ -148,7 +148,7 @@
               </select>
             </div>
             <div>
-              <label class="text-sm font-medium block mb-1">Urgency</label>
+              <label class="text-sm font-medium block mb-1" data-i18n="appmgr.urgency_label">Urgency</label>
               <div id="urgency-pills" class="flex gap-2">
                 <button type="button" data-urgency-value="Critical" class="urgency-pill urgency-pill-critical">Critical</button>
                 <button type="button" data-urgency-value="Important" class="urgency-pill urgency-pill-important">Important</button>
@@ -164,51 +164,51 @@
 
           <div class="grid grid-cols-2 gap-4 mb-4">
             <div>
-              <label class="text-sm font-medium block mb-1">Time estimate (minutes)</label>
+              <label class="text-sm font-medium block mb-1" data-i18n="appmgr.time_estimate_label">Time estimate (minutes)</label>
               <input id="time_estimate" type="number" min="1" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="20" />
             </div>
             <div>
-              <label class="text-sm font-medium block mb-1">Phase</label>
+              <label class="text-sm font-medium block mb-1" data-i18n="appmgr.phase_label">Phase</label>
               <select id="phase_id" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
-                <option value="">Loading phases...</option>
+                <option value="" data-i18n="appmgr.loading_phases">Loading phases...</option>
               </select>
             </div>
           </div>
 
           <div class="mb-4">
-            <label class="text-sm font-medium block mb-1">Applies to visa type(s)</label>
+            <label class="text-sm font-medium block mb-1" data-i18n="appmgr.visa_types_label">Applies to visa type(s)</label>
             <div class="flex gap-4 text-sm">
-              <label class="flex items-center gap-1"><input type="checkbox" id="visa_skilled_worker" checked /> Skilled Worker</label>
-              <label class="flex items-center gap-1"><input type="checkbox" id="visa_student" checked /> Student</label>
+              <label class="flex items-center gap-1"><input type="checkbox" id="visa_skilled_worker" checked /> <span data-i18n="appmgr.skilled_worker">Skilled Worker</span></label>
+              <label class="flex items-center gap-1"><input type="checkbox" id="visa_student" checked /> <span data-i18n="appmgr.student">Student</span></label>
             </div>
           </div>
 
           <div class="mb-4">
-            <label class="text-sm font-medium block mb-1">Applies to UK region(s)</label>
+            <label class="text-sm font-medium block mb-1" data-i18n="appmgr.uk_regions_label">Applies to UK region(s)</label>
             <div class="flex gap-4 text-sm flex-wrap">
-              <label class="flex items-center gap-1"><input type="checkbox" id="region_england" checked /> England</label>
-              <label class="flex items-center gap-1"><input type="checkbox" id="region_scotland" /> Scotland</label>
-              <label class="flex items-center gap-1"><input type="checkbox" id="region_wales" /> Wales</label>
-              <label class="flex items-center gap-1"><input type="checkbox" id="region_northern_ireland" /> Northern Ireland</label>
+              <label class="flex items-center gap-1"><input type="checkbox" id="region_england" checked /> <span data-i18n="appmgr.region_england">England</span></label>
+              <label class="flex items-center gap-1"><input type="checkbox" id="region_scotland" /> <span data-i18n="appmgr.region_scotland">Scotland</span></label>
+              <label class="flex items-center gap-1"><input type="checkbox" id="region_wales" /> <span data-i18n="appmgr.region_wales">Wales</span></label>
+              <label class="flex items-center gap-1"><input type="checkbox" id="region_northern_ireland" /> <span data-i18n="appmgr.region_ni">Northern Ireland</span></label>
             </div>
           </div>
 
           <div class="mb-4">
-            <label class="text-sm font-medium block mb-1">External link (optional)</label>
+            <label class="text-sm font-medium block mb-1" data-i18n="appmgr.link_label">External link (optional)</label>
             <input id="link_url" type="url" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="https://gov.uk/..." />
           </div>
 
           <div class="mb-4">
-            <label class="text-sm font-medium block mb-1">YouTube video URL (optional)</label>
+            <label class="text-sm font-medium block mb-1" data-i18n="appmgr.youtube_label">YouTube video URL (optional)</label>
             <input id="youtube_url" type="url" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="https://youtube.com/watch?v=..." />
           </div>
 
           <div class="mb-4">
-            <label class="text-sm font-medium block mb-1">Depends on (optional)</label>
+            <label class="text-sm font-medium block mb-1" data-i18n="appmgr.depends_on_label">Depends on (optional)</label>
             <select id="depends_on" multiple class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm h-28">
-              <option value="">Loading tasks...</option>
+              <option value="" data-i18n="appmgr.loading_tasks_option">Loading tasks...</option>
             </select>
-            <p class="text-xs text-slate-400 mt-1">
+            <p class="text-xs text-slate-400 mt-1" data-i18n="appmgr.depends_on_hint">
               Hold Ctrl (Cmd on Mac) to select more than one. This task stays hidden from newcomers until every selected task is marked complete.
             </p>
           </div>
@@ -216,40 +216,40 @@
           <div class="mb-4">
             <label class="flex items-center gap-2 text-sm">
               <input type="checkbox" id="is_minor_task" />
-              This task is for children / minors (shows under "For Your Family")
+              <span data-i18n="appmgr.minor_task_label">This task is for children / minors (shows under "For Your Family")</span>
             </label>
           </div>
 
           <div class="mb-4">
-            <label class="text-sm font-medium block mb-1">Status</label>
+            <label class="text-sm font-medium block mb-1" data-i18n="appmgr.status_label">Status</label>
             <select id="status" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
-              <option value="draft">Draft (only visible to App Managers)</option>
-              <option value="in_review">In review</option>
-              <option value="published">Published (visible to newcomers)</option>
+              <option value="draft" data-i18n="appmgr.status_draft">Draft (only visible to App Managers)</option>
+              <option value="in_review" data-i18n="appmgr.status_in_review">In review</option>
+              <option value="published" data-i18n="appmgr.status_published">Published (visible to newcomers)</option>
             </select>
-            <p class="text-xs text-slate-400 mt-1">
+            <p class="text-xs text-slate-400 mt-1" data-i18n="appmgr.status_hint">
               New tasks start as drafts. Use "Submit for review" and "Publish" in the list below to move a task through the workflow, or set it directly here.
             </p>
           </div>
 
           <div class="mb-4">
-            <label class="text-sm font-medium block mb-1">Schedule for later (optional)</label>
+            <label class="text-sm font-medium block mb-1" data-i18n="appmgr.schedule_label">Schedule for later (optional)</label>
             <input id="scheduled_publish_at" type="datetime-local" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
-            <p class="text-xs text-slate-400 mt-1">
+            <p class="text-xs text-slate-400 mt-1" data-i18n="appmgr.schedule_hint">
               If set, this task automatically switches to Published at this date and time — no need to come back and publish it manually. Only applies while the task is Draft or In review.
             </p>
           </div>
 
           <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
-            <button type="button" id="cancel-edit-btn" class="border border-slate-300 px-4 py-2 rounded-lg text-sm font-medium hidden">Cancel edit</button>
-            <button type="submit" id="submit-btn" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium">Save as draft</button>
+            <button type="button" id="cancel-edit-btn" class="border border-slate-300 px-4 py-2 rounded-lg text-sm font-medium hidden" data-i18n="appmgr.cancel_edit">Cancel edit</button>
+            <button type="submit" id="submit-btn" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium" data-i18n="appmgr.save_as_draft">Save as draft</button>
           </div>
 
         </form>
       </div>
 
       <div>
-        <h2 class="text-base font-medium mb-3">Existing tasks</h2>
+        <h2 class="text-base font-medium mb-3" data-i18n="appmgr.existing_tasks">Existing tasks</h2>
         <div id="task-list" class="flex flex-col gap-2"></div>
       </div>
     </div>
@@ -260,22 +260,22 @@
     <details id="reorder-section" open class="bg-white border border-slate-200 rounded-xl mt-8">
       <summary class="cursor-pointer p-6 font-semibold text-lg reorder-summary">
         <span class="reorder-summary-icon">↕️</span>
-        Reorder tasks within a phase
+        <span data-i18n="appmgr.reorder_heading">Reorder tasks within a phase</span>
       </summary>
       <div class="px-6 pb-6">
-        <p class="text-sm text-slate-500 mb-4">
+        <p class="text-sm text-slate-500 mb-4" data-i18n="appmgr.reorder_desc">
           This controls the order newcomers see tasks of the <strong>same urgency</strong> in a phase. Critical always shows before Important, and Important before Optional — reordering here only breaks ties within one urgency tier, so it can't bury a Critical task under Optional ones.
         </p>
 
-        <label class="text-sm font-medium block mb-1">Phase</label>
+        <label class="text-sm font-medium block mb-1" data-i18n="appmgr.phase_label">Phase</label>
         <select id="reorder_phase_select" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mb-4">
-          <option value="">Loading phases...</option>
+          <option value="" data-i18n="appmgr.loading_phases">Loading phases...</option>
         </select>
 
         <div id="reorder-task-list" class="flex flex-col gap-2 mb-4"></div>
 
         <div class="flex justify-end">
-          <button type="button" id="save-task-order-btn" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium hidden">Save order</button>
+          <button type="button" id="save-task-order-btn" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium hidden" data-i18n="appmgr.save_order">Save order</button>
         </div>
       </div>
     </details>
@@ -288,6 +288,9 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
+  <script src="js/branding.js"></script>
+  <script src="js/lang/en.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/shell.js"></script>
   <script src="js/app-manager.js"></script>
 
@@ -298,7 +301,7 @@
       const emailEl = document.getElementById("sidebar-user-email");
       if (!emailEl) return;
       const { data } = await supabaseClient.auth.getUser();
-      emailEl.textContent = data?.user?.email || "Unknown user";
+      emailEl.textContent = data?.user?.email || window.t("common.unknown_user");
     })();
   </script>
 

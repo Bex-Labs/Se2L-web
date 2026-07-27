@@ -6,14 +6,25 @@
 // onboarding.js calls this directly via fetch() right after inserting the
 // dependant row.
 //
+// SE2L-77: the subject/body now come from email_templates (template_key =
+// 'dependant_invite') so a Super Admin can edit the copy without a
+// redeploy. If that lookup fails for any reason, falls back to the
+// original hardcoded copy below so this never breaks silently.
+//
 // Deploy with:
 //   supabase functions deploy send-dependant-invite
 //
 // Required secrets (already set):
-//   RESEND_API_KEY, RESEND_FROM_EMAIL
+//   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY, RESEND_FROM_EMAIL
 
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const resendApiKey = Deno.env.get("RESEND_API_KEY")!;
 const resendFromEmail = Deno.env.get("RESEND_FROM_EMAIL")!;
+
+const supabase = createClient(supabaseUrl, serviceRoleKey);
 
 // This function is called directly from the browser (onboarding.js), unlike
 // the scheduled functions which are only ever triggered server-side/from the
@@ -31,6 +42,33 @@ interface InvitePayload {
   dependantName: string;
   inviterName?: string;
   appOrigin: string; // e.g. "http://127.0.0.1:5500/se2l-web" or the deployed Vercel URL
+}
+
+const FALLBACK_SUBJECT = `You've been invited to join Se2L`;
+const FALLBACK_HTML = `
+  <p>Hi {{dependant_name}},</p>
+  <p>{{inviter_name}} has added you as part of their household on Se2L, a settlement guidance platform for newcomers to the UK.</p>
+  <p>To set up your own account and see your personalised checklist, click the link below:</p>
+  <p><a href="{{invite_link}}">{{invite_link}}</a></p>
+  <p>If you weren't expecting this invite, you can safely ignore this email.</p>
+  <p>— The Se2L team</p>
+`;
+
+function fillTemplate(template: string, vars: Record<string, string>): string {
+  return template.replace(/\{\{(\w+)\}\}/g, (match, key) => (key in vars ? vars[key] : match));
+}
+
+async function getTemplate(): Promise<{ subject: string; html: string }> {
+  const { data } = await supabase
+    .from("email_templates")
+    .select("subject, body_html")
+    .eq("template_key", "dependant_invite")
+    .maybeSingle();
+
+  return {
+    subject: data?.subject || FALLBACK_SUBJECT,
+    html: data?.body_html || FALLBACK_HTML,
+  };
 }
 
 async function sendEmail(to: string, subject: string, html: string) {
@@ -85,15 +123,14 @@ Deno.serve(async (req) => {
   const inviteLink = `${appOrigin}/accept-invite.html?token=${inviteToken}`;
   const inviter = inviterName ? inviterName : "a family member";
 
-  const subject = `You've been invited to join Se2L`;
-  const html = `
-    <p>Hi ${dependantName},</p>
-    <p>${inviter} has added you as part of their household on Se2L, a settlement guidance platform for newcomers to the UK.</p>
-    <p>To set up your own account and see your personalised checklist, click the link below:</p>
-    <p><a href="${inviteLink}">${inviteLink}</a></p>
-    <p>If you weren't expecting this invite, you can safely ignore this email.</p>
-    <p>— The Se2L team</p>
-  `;
+  const { subject: subjectTemplate, html: htmlTemplate } = await getTemplate();
+  const vars = {
+    dependant_name: dependantName,
+    inviter_name: inviter,
+    invite_link: inviteLink,
+  };
+  const subject = fillTemplate(subjectTemplate, vars);
+  const html = fillTemplate(htmlTemplate, vars);
 
   try {
     await sendEmail(email, subject, html);

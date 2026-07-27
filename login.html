@@ -194,27 +194,27 @@
     <div class="login-main">
       <div class="login-card">
 
-        <p class="login-eyebrow">Official entry portal</p>
-        <h1>Welcome back</h1>
-        <p class="login-sub">Log in to pick up your settlement journey where you left off.</p>
+        <p class="login-eyebrow" data-i18n="login.eyebrow">Official entry portal</p>
+        <h1 data-i18n="login.heading">Welcome back</h1>
+        <p class="login-sub" data-i18n="login.subtext">Log in to pick up your settlement journey where you left off.</p>
 
         <form id="login-form">
 
           <div class="mb-4">
             <div class="login-field-row">
-              <label class="login-label" for="email">Email address</label>
+              <label class="login-label" for="email" data-i18n="login.email_label">Email address</label>
             </div>
-            <input id="email" type="email" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="e.g. name@domain.gov.uk" />
+            <input id="email" type="email" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="e.g. name@domain.gov.uk" data-i18n-placeholder="login.email_placeholder" />
           </div>
 
           <div class="mb-4">
             <div class="login-field-row">
-              <label class="login-label" for="password">Password</label>
-              <a href="#" class="login-forgot">Forgot?</a>
+              <label class="login-label" for="password" data-i18n="login.password_label">Password</label>
+              <a href="#" class="login-forgot" data-i18n="login.forgot">Forgot?</a>
             </div>
             <div class="login-password-wrap">
-              <input id="password" type="password" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="Your password" />
-              <button type="button" class="login-toggle-password" id="toggle-password" aria-label="Show password">
+              <input id="password" type="password" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="Your password" data-i18n-placeholder="login.password_placeholder" />
+              <button type="button" class="login-toggle-password" id="toggle-password" aria-label="Show password" data-i18n-aria-label="login.show_password">
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
                   <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/>
@@ -223,25 +223,25 @@
             </div>
           </div>
 
-          <button type="submit" class="w-full bg-slate-900 text-white rounded-lg py-2.5 text-sm font-medium">Sign in &rarr;</button>
+          <button type="submit" class="w-full bg-slate-900 text-white rounded-lg py-2.5 text-sm font-medium" data-i18n="login.submit">Sign in &rarr;</button>
 
         </form>
 
         <div class="login-divider-row">
-          <span class="login-divider-text">New to Se2L</span>
+          <span class="login-divider-text" data-i18n="login.divider">New to Se2L</span>
         </div>
 
-        <a href="onboarding.html" class="login-register-btn">Register account</a>
+        <a href="onboarding.html" class="login-register-btn" data-i18n="login.register">Register account</a>
 
       </div>
     </div>
 
     <div class="login-footer">
-      <span>Se2L UK &copy; 2026 Se2L UK Settlement Service. All rights reserved.</span>
-      <a href="#">Privacy Policy</a>
-      <a href="#">Terms of Service</a>
-      <a href="#">Contact Support</a>
-      <a href="#">Accessibility</a>
+      <span data-i18n="footer.copyright">Se2L UK &copy; 2026 Se2L UK Settlement Service. All rights reserved.</span>
+      <a href="#" data-i18n="footer.privacy">Privacy Policy</a>
+      <a href="terms.html" data-i18n="footer.terms">Terms of Service</a>
+      <a id="footer-support-link" href="#" data-i18n="footer.contact">Contact Support</a>
+      <a href="#" data-i18n="footer.accessibility">Accessibility</a>
     </div>
 
   </div>
@@ -254,12 +254,15 @@
       const pw = document.getElementById("password");
       const isHidden = pw.type === "password";
       pw.type = isHidden ? "text" : "password";
-      this.setAttribute("aria-label", isHidden ? "Hide password" : "Show password");
+      this.setAttribute("aria-label", isHidden ? window.t("login.hide_password") : window.t("login.show_password"));
     });
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
+  <script src="js/branding.js"></script>
+  <script src="js/lang/en.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/login.js"></script>
 
 </body>

@@ -112,6 +112,15 @@
       color: var(--color-warning);
     }
 
+    /* Nested sub-panels within Platform Settings — same show/hide idea as
+       the top-level .admin-panel switching, one level deeper. */
+    .settings-subpanel {
+      display: none;
+    }
+    .settings-subpanel.is-active-subpanel {
+      display: block;
+    }
+
     .visa-region-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -197,12 +206,17 @@
       </div>
 
       <nav class="flex flex-col gap-1" style="margin-top: 1rem;">
-        <a href="super-admin.html" class="px-3 py-2 rounded-lg text-sm font-medium bg-indigo-50 text-indigo-700">Platform overview</a>
+        <a href="#" data-panel-target="panel-overview" class="px-3 py-2 rounded-lg text-sm font-medium is-active-subnav">Platform overview</a>
         <div class="sidebar-subnav">
-          <a href="#" data-panel-target="panel-overview" class="is-active-subnav">Overview</a>
           <a href="#" data-panel-target="panel-app-managers">App Managers</a>
           <a href="#" data-panel-target="panel-visa-regions">Visa & Regions</a>
           <a href="#" data-panel-target="panel-moderation">Moderation</a>
+          <a href="#" data-panel-target="panel-settings">Platform Settings</a>
+          <div class="sidebar-subnav">
+            <a href="#" data-subpanel-target="subpanel-email-templates" class="is-active-subnav">Email Templates</a>
+            <a href="#" data-subpanel-target="subpanel-branding">Branding</a>
+            <a href="#" data-subpanel-target="subpanel-terms">Terms of Service</a>
+          </div>
         </div>
         <a href="resources.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Resources</a>
         <a href="settings.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Settings</a>
@@ -342,6 +356,93 @@
     </div>
     </div>
 
+    <div id="panel-settings" class="admin-panel">
+      <!-- SE2L-77: manage platform settings -->
+      <div class="admin-section-heading">
+        <span class="admin-section-icon">⚙️</span>
+        <h2 class="text-base font-semibold">Platform settings</h2>
+      </div>
+
+      <div id="subpanel-branding" class="settings-subpanel">
+      <h3 class="text-sm font-medium mb-2">Branding</h3>
+      <p class="text-sm text-slate-500 mb-3">
+        Applied platform-wide, immediately — the site name updates in every page's header, and the accent color updates every button and highlight.
+      </p>
+      <div class="bg-white border border-slate-200 rounded-xl p-4 mb-6">
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="text-sm font-medium block mb-1">Site name</label>
+            <input id="branding_site_name" type="text" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="Se2L" />
+          </div>
+          <div>
+            <label class="text-sm font-medium block mb-1">Accent color</label>
+            <div class="flex gap-2 items-center">
+              <input id="branding_accent_color" type="color" class="border border-slate-300 rounded-lg h-10 w-14" />
+              <input id="branding_accent_color_text" type="text" class="flex-1 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="#0d4d4d" />
+            </div>
+          </div>
+        </div>
+        <label class="text-sm font-medium block mb-1">Support email</label>
+        <input id="branding_support_email" type="email" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mb-3" placeholder="support@example.com" />
+
+        <p id="branding-save-message" class="text-sm mb-3 hidden"></p>
+
+        <div class="flex justify-end">
+          <button type="button" id="save-branding-btn" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium">Save changes</button>
+        </div>
+      </div>
+      </div>
+
+      <div id="subpanel-email-templates" class="settings-subpanel is-active-subpanel">
+      <h3 class="text-sm font-medium mb-2">Email templates</h3>
+      <p class="text-sm text-slate-500 mb-3">
+        Edit the subject and content sent for each automated email. Text like <code>{{invite_link}}</code> gets replaced with the real value when an email actually sends — don't remove those unless you mean to.
+      </p>
+      <div class="bg-white border border-slate-200 rounded-xl p-4 mb-6">
+        <label class="text-sm font-medium block mb-1">Which email</label>
+        <select id="email_template_select" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mb-3">
+          <option value="app_manager_invite">App Manager invite</option>
+          <option value="dependant_invite">Household member invite</option>
+          <option value="phase_activation">New phase started</option>
+          <option value="phase_end_warning">Phase ending soon</option>
+          <option value="weekly_digest">Weekly digest</option>
+          <option value="milestone">Milestone reached</option>
+        </select>
+        <p id="email-template-placeholders" class="text-xs text-slate-400 mb-3"></p>
+
+        <label class="text-sm font-medium block mb-1">Subject</label>
+        <input id="email_template_subject" type="text" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mb-4" />
+
+        <label class="text-sm font-medium block mb-1">Content (HTML)</label>
+        <textarea id="email_template_body" rows="8" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mb-2 font-mono"></textarea>
+        <p id="email-template-save-message" class="text-sm mb-3 hidden"></p>
+
+        <div class="flex justify-end">
+          <button type="button" id="save-email-template-btn" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium">Save changes</button>
+        </div>
+      </div>
+      </div>
+
+      <div id="subpanel-terms" class="settings-subpanel">
+      <h3 class="text-sm font-medium mb-2">Terms of Service</h3>
+      <p class="text-sm text-slate-500 mb-3">
+        This content is shown on the public Terms of Service page, linked from every page's footer.
+      </p>
+      <div class="bg-white border border-slate-200 rounded-xl p-4">
+        <label class="text-sm font-medium block mb-1">Page title</label>
+        <input id="terms_title" type="text" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mb-4" />
+
+        <label class="text-sm font-medium block mb-1">Content</label>
+        <textarea id="terms_body" rows="10" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mb-2" placeholder="Use lines starting with '- ' for a bullet list."></textarea>
+        <p id="terms-save-message" class="text-sm mb-3 hidden"></p>
+
+        <div class="flex justify-end">
+          <button type="button" id="save-terms-btn" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium">Save changes</button>
+        </div>
+      </div>
+      </div>
+    </div>
+
       </div>
     </main>
 
@@ -349,6 +450,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
+  <script src="js/branding.js"></script>
   <script src="js/shell.js"></script>
   <script src="js/super-admin.js"></script>
 

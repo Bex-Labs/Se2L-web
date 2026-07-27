@@ -37,23 +37,23 @@
         <div class="sidebar-identity-avatar">👤</div>
         <div class="sidebar-identity-info">
           <span id="sidebar-user-email" class="sidebar-identity-email">Loading…</span>
-          <span id="sidebar-role-pill" class="status-pill">Newcomer</span>
+          <span id="sidebar-role-pill" class="status-pill" data-i18n="roles.newcomer">Newcomer</span>
         </div>
       </div>
 
       <nav class="flex flex-col gap-1" style="margin-top: 1rem;">
-        <a href="dashboard.html" class="px-3 py-2 rounded-lg text-sm font-medium bg-indigo-50 text-indigo-700">Dashboard</a>
-        <a id="app-manager-link" href="app-manager.html" class="hidden px-3 py-2 rounded-lg text-sm text-slate-600">Manage content</a>
-        <a id="super-admin-link" href="super-admin.html" class="hidden px-3 py-2 rounded-lg text-sm text-slate-600">Platform overview</a>
-        <a href="resources.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Resources</a>
-        <a href="settings.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Settings</a>
+        <a href="dashboard.html" class="px-3 py-2 rounded-lg text-sm font-medium bg-indigo-50 text-indigo-700" data-i18n="nav.dashboard">Dashboard</a>
+        <a id="app-manager-link" href="app-manager.html" class="hidden px-3 py-2 rounded-lg text-sm text-slate-600" data-i18n="nav.manage_content">Manage content</a>
+        <a id="super-admin-link" href="super-admin.html" class="hidden px-3 py-2 rounded-lg text-sm text-slate-600" data-i18n="nav.platform_overview">Platform overview</a>
+        <a href="resources.html" class="px-3 py-2 rounded-lg text-sm text-slate-600" data-i18n="nav.resources">Resources</a>
+        <a href="settings.html" class="px-3 py-2 rounded-lg text-sm text-slate-600" data-i18n="nav.settings">Settings</a>
       </nav>
 
       <div class="sidebar-task-jump-wrap">
-        <p class="sidebar-task-jump-heading">Today's tasks</p>
+        <p class="sidebar-task-jump-heading" data-i18n="dashboard.todays_tasks">Today's tasks</p>
         <div id="sidebar-task-jump-list"></div>
       </div>
-      <button id="signout-btn" class="mt-auto text-xs text-slate-400 underline text-left px-3">Sign out</button>
+      <button id="signout-btn" class="mt-auto text-xs text-slate-400 underline text-left px-3" data-i18n="common.sign_out">Sign out</button>
     </aside>
 
     <!-- Main content — same structure/IDs as before, just inside the shell now -->
@@ -61,32 +61,32 @@
       <div class="max-w-2xl mx-auto">
 
         <div id="welcome-message" class="mb-6">
-          <p class="text-sm text-slate-500">Loading your journey...</p>
+          <p class="text-sm text-slate-500" data-i18n="dashboard.loading_journey">Loading your journey...</p>
         </div>
 
         <div id="progress-strip" class="hidden mb-6"></div>
 
         <div id="phase-timeline" class="flex gap-2 mb-8 overflow-x-auto">
           <div class="flex-1 text-center py-2 px-1 rounded-lg bg-slate-100 text-slate-400">
-            <div class="text-xs mt-1">Loading...</div>
+            <div class="text-xs mt-1" data-i18n="common.loading">Loading...</div>
           </div>
         </div>
 
         <div id="phase-review-section" class="hidden bg-white border border-slate-200 rounded-xl p-4 mb-6">
           <div class="flex justify-between items-center mb-3">
             <h3 id="phase-review-heading" class="text-sm font-medium"></h3>
-            <button type="button" id="phase-review-close-btn" class="text-xs text-slate-500 font-medium">Close</button>
+            <button type="button" id="phase-review-close-btn" class="text-xs text-slate-500 font-medium" data-i18n="common.close">Close</button>
           </div>
           <div id="phase-review-tasks" class="flex flex-col gap-2"></div>
         </div>
 
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-base font-medium">Today's tasks</h2>
+          <h2 class="text-base font-medium" data-i18n="dashboard.todays_tasks">Today's tasks</h2>
           <span id="task-count" class="text-sm text-slate-500"></span>
         </div>
 
         <div id="task-list" class="flex flex-col gap-3">
-          <p class="text-sm text-slate-400">Loading tasks...</p>
+          <p class="text-sm text-slate-400" data-i18n="dashboard.loading_tasks">Loading tasks...</p>
         </div>
         <div id="upcoming-phase-teaser" class="mt-6"></div>
         <div id="family-section"></div>
@@ -98,6 +98,9 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
+  <script src="js/branding.js"></script>
+  <script src="js/lang/en.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/shell.js"></script>
   <script src="js/dashboard.js"></script>
 

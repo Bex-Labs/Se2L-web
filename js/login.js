@@ -12,7 +12,7 @@ form.addEventListener("submit", async (e) => {
   });
 
   if (error) {
-    alert("Log in failed: " + error.message);
+    alert(window.t("login.failed_prefix") + error.message);
     return;
   }
 

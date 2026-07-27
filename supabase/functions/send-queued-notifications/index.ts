@@ -13,6 +13,12 @@
 //     15-30 min) to retry anything left "pending" or "failed" without
 //     waiting for tomorrow's scheduler run.
 //
+// SE2L-77: all four templates below now come from email_templates
+// (template_key = 'phase_activation' / 'phase_end_warning' /
+// 'weekly_digest' / 'milestone') so a Super Admin can edit the copy
+// without a redeploy. If a lookup fails for any reason, falls back to
+// the original hardcoded copy so sending never breaks silently.
+//
 // Deploy with:
 //   supabase functions deploy send-queued-notifications
 // Schedule via Supabase Cron Jobs (Dashboard -> Edge Functions -> Cron) or
@@ -44,6 +50,63 @@ interface EmailContent {
   html: string;
 }
 
+const FALLBACK_TEMPLATES: Record<string, { subject: string; html: string }> = {
+  phase_activation: {
+    subject: `You've entered a new phase: {{phase_name}}`,
+    html: `
+      <p>Hi there,</p>
+      <p>Your Se2L journey has moved into a new phase: <strong>{{phase_name}}</strong>.</p>
+      <p>Log in to see what's now unlocked and what to tackle next.</p>
+      <p>— The Se2L team</p>
+    `,
+  },
+  phase_end_warning: {
+    subject: `Heads up: "{{phase_name}}" is wrapping up soon`,
+    html: `
+      <p>Hi there,</p>
+      <p>Your <strong>{{phase_name}}</strong> phase window closes in a couple of days. Log in to make sure nothing's left outstanding.</p>
+      <p>— The Se2L team</p>
+    `,
+  },
+  weekly_digest: {
+    subject: `Your weekly Se2L digest`,
+    html: `
+      <p>Hi there,</p>
+      <p>Here's your weekly check-in — log in to see your remaining tasks for this phase.</p>
+      <p>— The Se2L team</p>
+    `,
+  },
+  milestone: {
+    subject: `Nice work — you've hit a milestone!`,
+    html: `
+      <p>Hi there,</p>
+      <p>You've completed another milestone in your Se2L journey. Keep it up!</p>
+      <p>— The Se2L team</p>
+    `,
+  },
+};
+
+function fillTemplate(template: string, vars: Record<string, string>): string {
+  return template.replace(/\{\{(\w+)\}\}/g, (match, key) => (key in vars ? vars[key] : match));
+}
+
+async function getEmailContent(templateKey: string, vars: Record<string, string>): Promise<EmailContent> {
+  const { data } = await supabase
+    .from("email_templates")
+    .select("subject, body_html")
+    .eq("template_key", templateKey)
+    .maybeSingle();
+
+  const fallback = FALLBACK_TEMPLATES[templateKey];
+  const subjectTemplate = data?.subject || fallback.subject;
+  const htmlTemplate = data?.body_html || fallback.html;
+
+  return {
+    subject: fillTemplate(subjectTemplate, vars),
+    html: fillTemplate(htmlTemplate, vars),
+  };
+}
+
 async function sendEmail(to: string, subject: string, html: string) {
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -58,55 +121,6 @@ async function sendEmail(to: string, subject: string, html: string) {
     const body = await res.text();
     throw new Error(`Resend API error ${res.status}: ${body}`);
   }
-}
-
-// --- SE2L-46: new phase activation ---
-function phaseActivationEmail(phaseName: string): EmailContent {
-  return {
-    subject: `You've entered a new phase: ${phaseName}`,
-    html: `
-      <p>Hi there,</p>
-      <p>Your Se2L journey has moved into a new phase: <strong>${phaseName}</strong>.</p>
-      <p>Log in to see what's now unlocked and what to tackle next.</p>
-      <p>— The Se2L team</p>
-    `,
-  };
-}
-
-// --- SE2L-47: phase-end warning (placeholder, to refine when we build this story) ---
-function phaseEndWarningEmail(phaseName: string): EmailContent {
-  return {
-    subject: `Heads up: "${phaseName}" is wrapping up soon`,
-    html: `
-      <p>Hi there,</p>
-      <p>Your <strong>${phaseName}</strong> phase window closes in a couple of days. Log in to make sure nothing's left outstanding.</p>
-      <p>— The Se2L team</p>
-    `,
-  };
-}
-
-// --- SE2L-48: weekly digest (placeholder, to refine when we build this story) ---
-function weeklyDigestEmail(): EmailContent {
-  return {
-    subject: `Your weekly Se2L digest`,
-    html: `
-      <p>Hi there,</p>
-      <p>Here's your weekly check-in — log in to see your remaining tasks for this phase.</p>
-      <p>— The Se2L team</p>
-    `,
-  };
-}
-
-// --- SE2L-49: milestone acknowledgement (placeholder, to refine when we build this story) ---
-function milestoneEmail(): EmailContent {
-  return {
-    subject: `Nice work — you've hit a milestone!`,
-    html: `
-      <p>Hi there,</p>
-      <p>You've completed another milestone in your Se2L journey. Keep it up!</p>
-      <p>— The Se2L team</p>
-    `,
-  };
 }
 
 Deno.serve(async () => {
@@ -150,23 +164,11 @@ Deno.serve(async () => {
         if (phase?.name) phaseName = phase.name;
       }
 
-      let content: EmailContent;
-      switch (row.notification_type) {
-        case "phase_activation":
-          content = phaseActivationEmail(phaseName);
-          break;
-        case "phase_end_warning":
-          content = phaseEndWarningEmail(phaseName);
-          break;
-        case "weekly_digest":
-          content = weeklyDigestEmail();
-          break;
-        case "milestone":
-          content = milestoneEmail();
-          break;
-        default:
-          throw new Error(`Unknown notification_type: ${row.notification_type}`);
+      if (!FALLBACK_TEMPLATES[row.notification_type]) {
+        throw new Error(`Unknown notification_type: ${row.notification_type}`);
       }
+
+      const content = await getEmailContent(row.notification_type, { phase_name: phaseName });
 
       await sendEmail(user.email, content.subject, content.html);
 

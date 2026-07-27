@@ -430,7 +430,7 @@ document.getElementById("moderation-resource-search").addEventListener("input", 
 // of Overview/App Managers/Visa & Regions/Moderation at a time; all data
 // still loads on page load exactly as before, this only toggles display.
 function setupPanelSwitching() {
-  const subnavLinks = document.querySelectorAll(".sidebar-subnav [data-panel-target]");
+  const subnavLinks = document.querySelectorAll("#app-sidebar [data-panel-target]");
 
   subnavLinks.forEach(link => {
     link.addEventListener("click", (e) => {
@@ -442,15 +442,233 @@ function setupPanelSwitching() {
       });
 
       subnavLinks.forEach(l => l.classList.toggle("is-active-subnav", l === link));
+
+      // Clear any nested Email Templates/Branding/Terms highlighting when
+      // navigating away from Platform Settings — otherwise whichever one
+      // was last active stays stuck highlighted on an unrelated panel.
+      if (targetId !== "panel-settings") {
+        document.querySelectorAll(".sidebar-subnav [data-subpanel-target]").forEach(l => {
+          l.classList.remove("is-active-subnav");
+        });
+      } else {
+        // Re-entering Platform Settings — re-highlight whichever nested
+        // link matches the sub-panel that's actually showing.
+        const activeSubpanel = document.querySelector(".settings-subpanel.is-active-subpanel");
+        if (activeSubpanel) {
+          document.querySelectorAll(".sidebar-subnav [data-subpanel-target]").forEach(l => {
+            l.classList.toggle("is-active-subnav", l.dataset.subpanelTarget === activeSubpanel.id);
+          });
+        }
+      }
     });
   });
 }
+
+// Nested switching within Platform Settings — same idea one level deeper,
+// separate data attribute (data-subpanel-target) so it doesn't collide
+// with the top-level panel switching above. Also activates the parent
+// "Platform Settings" panel itself, since clicking a nested link should
+// work regardless of which top-level panel is currently showing.
+function setupSettingsSubpanelSwitching() {
+  const subpanelLinks = document.querySelectorAll(".sidebar-subnav [data-subpanel-target]");
+  const topLevelLinks = document.querySelectorAll("#app-sidebar [data-panel-target]");
+
+  subpanelLinks.forEach(link => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      const targetId = link.dataset.subpanelTarget;
+
+      document.querySelectorAll(".settings-subpanel").forEach(panel => {
+        panel.classList.toggle("is-active-subpanel", panel.id === targetId);
+      });
+
+      subpanelLinks.forEach(l => l.classList.toggle("is-active-subnav", l === link));
+
+      // Activate the parent Platform Settings panel, whichever top-level
+      // panel was showing before this click.
+      document.querySelectorAll(".admin-panel").forEach(panel => {
+        panel.classList.toggle("is-active-panel", panel.id === "panel-settings");
+      });
+      topLevelLinks.forEach(l => l.classList.toggle("is-active-subnav", l.dataset.panelTarget === "panel-settings"));
+    });
+  });
+}
+
+// --- SE2L-77: manage platform settings (Terms of Service) ---
+
+async function loadTermsOfService() {
+  const { data: page, error } = await supabaseClient
+    .from("legal_pages")
+    .select("*")
+    .eq("slug", "terms")
+    .maybeSingle();
+
+  if (error || !page) {
+    document.getElementById("terms_title").value = "Terms of Service";
+    document.getElementById("terms_body").value = "";
+    return;
+  }
+
+  document.getElementById("terms_title").value = page.title;
+  document.getElementById("terms_body").value = page.body_html;
+}
+
+document.getElementById("save-terms-btn").addEventListener("click", async () => {
+  const title = document.getElementById("terms_title").value.trim();
+  const bodyHtml = document.getElementById("terms_body").value;
+  const messageEl = document.getElementById("terms-save-message");
+
+  const { error } = await supabaseClient
+    .from("legal_pages")
+    .update({
+      title: title || "Terms of Service",
+      body_html: bodyHtml,
+      updated_at: new Date().toISOString()
+    })
+    .eq("slug", "terms");
+
+  messageEl.classList.remove("hidden", "text-red-600", "text-green-600");
+
+  if (error) {
+    messageEl.textContent = "Could not save: " + error.message;
+    messageEl.classList.add("text-red-600");
+    return;
+  }
+
+  messageEl.textContent = "Saved successfully.";
+  messageEl.classList.add("text-green-600");
+});
+
+// --- SE2L-77: manage platform settings (Branding) ---
+
+async function loadBrandingSettings() {
+  const { data: settings, error } = await supabaseClient
+    .from("platform_settings")
+    .select("*")
+    .limit(1)
+    .maybeSingle();
+
+  if (error || !settings) return;
+
+  document.getElementById("branding_site_name").value = settings.site_name || "";
+  document.getElementById("branding_support_email").value = settings.support_email || "";
+  document.getElementById("branding_accent_color").value = settings.accent_color || "#0d4d4d";
+  document.getElementById("branding_accent_color_text").value = settings.accent_color || "#0d4d4d";
+}
+
+// Keep the color picker and its text field in sync, whichever one changes
+document.getElementById("branding_accent_color").addEventListener("input", (e) => {
+  document.getElementById("branding_accent_color_text").value = e.target.value;
+});
+document.getElementById("branding_accent_color_text").addEventListener("input", (e) => {
+  if (/^#[0-9a-fA-F]{6}$/.test(e.target.value)) {
+    document.getElementById("branding_accent_color").value = e.target.value;
+  }
+});
+
+document.getElementById("save-branding-btn").addEventListener("click", async () => {
+  const siteName = document.getElementById("branding_site_name").value.trim();
+  const supportEmail = document.getElementById("branding_support_email").value.trim();
+  const accentColor = document.getElementById("branding_accent_color_text").value.trim();
+  const messageEl = document.getElementById("branding-save-message");
+
+  const { data: existing } = await supabaseClient
+    .from("platform_settings")
+    .select("id")
+    .limit(1)
+    .maybeSingle();
+
+  const { error } = await supabaseClient
+    .from("platform_settings")
+    .update({
+      site_name: siteName || "Se2L",
+      support_email: supportEmail,
+      accent_color: accentColor || "#0d4d4d",
+      updated_at: new Date().toISOString()
+    })
+    .eq("id", existing.id);
+
+  messageEl.classList.remove("hidden", "text-red-600", "text-green-600");
+
+  if (error) {
+    messageEl.textContent = "Could not save: " + error.message;
+    messageEl.classList.add("text-red-600");
+    return;
+  }
+
+  messageEl.textContent = "Saved. Changes are already live across the site.";
+  messageEl.classList.add("text-green-600");
+});
+
+// --- SE2L-77: manage platform settings (Email templates) ---
+
+const EMAIL_TEMPLATE_PLACEHOLDERS = {
+  app_manager_invite: "Available: {{invite_link}}",
+  dependant_invite: "Available: {{dependant_name}}, {{inviter_name}}, {{invite_link}}",
+  phase_activation: "Available: {{phase_name}}",
+  phase_end_warning: "Available: {{phase_name}}",
+  weekly_digest: "No placeholders for this one.",
+  milestone: "No placeholders for this one."
+};
+
+async function loadSelectedEmailTemplate() {
+  const templateKey = document.getElementById("email_template_select").value;
+  const placeholdersEl = document.getElementById("email-template-placeholders");
+  placeholdersEl.textContent = EMAIL_TEMPLATE_PLACEHOLDERS[templateKey] || "";
+
+  const { data: template, error } = await supabaseClient
+    .from("email_templates")
+    .select("subject, body_html")
+    .eq("template_key", templateKey)
+    .maybeSingle();
+
+  document.getElementById("email-template-save-message").classList.add("hidden");
+
+  if (error || !template) {
+    document.getElementById("email_template_subject").value = "";
+    document.getElementById("email_template_body").value = "";
+    return;
+  }
+
+  document.getElementById("email_template_subject").value = template.subject;
+  document.getElementById("email_template_body").value = template.body_html;
+}
+
+document.getElementById("email_template_select").addEventListener("change", loadSelectedEmailTemplate);
+
+document.getElementById("save-email-template-btn").addEventListener("click", async () => {
+  const templateKey = document.getElementById("email_template_select").value;
+  const subject = document.getElementById("email_template_subject").value.trim();
+  const bodyHtml = document.getElementById("email_template_body").value;
+  const messageEl = document.getElementById("email-template-save-message");
+
+  const { error } = await supabaseClient
+    .from("email_templates")
+    .update({
+      subject,
+      body_html: bodyHtml,
+      updated_at: new Date().toISOString()
+    })
+    .eq("template_key", templateKey);
+
+  messageEl.classList.remove("hidden", "text-red-600", "text-green-600");
+
+  if (error) {
+    messageEl.textContent = "Could not save: " + error.message;
+    messageEl.classList.add("text-red-600");
+    return;
+  }
+
+  messageEl.textContent = "Saved. New emails of this type will use this content immediately.";
+  messageEl.classList.add("text-green-600");
+});
 
 async function init() {
   const user = await checkSuperAdminAccess();
   if (!user) return;
 
   setupPanelSwitching();
+  setupSettingsSubpanelSwitching();
 
   await loadPlatformStats();
   await loadAppManagerAccounts();
@@ -458,6 +676,9 @@ async function init() {
   await loadVisaTypesAndRegions();
   await loadModerationTasks();
   await loadModerationResources();
+  await loadTermsOfService();
+  await loadBrandingSettings();
+  await loadSelectedEmailTemplate();
 }
 
 init();

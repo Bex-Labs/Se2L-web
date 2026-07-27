@@ -16,7 +16,7 @@ async function checkAppManagerAccess() {
 
   if (!profile || profile.role !== "app_manager") {
     document.querySelector(".max-w-2xl").innerHTML = `
-      <p class="text-sm text-red-600 mt-10">You don't have access to this page.</p>
+      <p class="text-sm text-red-600 mt-10">${t("common.access_denied")}</p>
     `;
     return null;
   }
@@ -34,10 +34,10 @@ function addPhaseRow(prefill) {
   row.id = rowId;
   row.className = "flex gap-2 items-start";
   row.innerHTML = `
-    <input type="text" class="phase-name flex-1 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="e.g. First week" value="${prefill?.name || ""}" />
-    <input type="number" class="phase-start w-20 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="From" value="${prefill?.start ?? ""}" />
-    <input type="number" class="phase-end w-20 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="To" value="${prefill?.end ?? ""}" />
-    <button type="button" class="remove-phase-row-btn text-xs text-red-600 font-medium px-2 py-2" data-row-id="${rowId}">Remove</button>
+    <input type="text" class="phase-name flex-1 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="${t("appmgr.phase_name_placeholder")}" value="${prefill?.name || ""}" />
+    <input type="number" class="phase-start w-20 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="${t("appmgr.phase_from_placeholder")}" value="${prefill?.start ?? ""}" />
+    <input type="number" class="phase-end w-20 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="${t("appmgr.phase_to_placeholder")}" value="${prefill?.end ?? ""}" />
+    <button type="button" class="remove-phase-row-btn text-xs text-red-600 font-medium px-2 py-2" data-row-id="${rowId}">${t("common.remove")}</button>
   `;
   document.getElementById("phase-rows").appendChild(row);
 
@@ -73,7 +73,7 @@ async function loadExistingJourneys() {
   const listDiv = document.getElementById("journey-list");
 
   if (error || !journeys || journeys.length === 0) {
-    listDiv.innerHTML = `<p class="text-sm text-slate-400">No journeys created yet.</p>`;
+    listDiv.innerHTML = `<p class="text-sm text-slate-400">${t("appmgr.no_journeys")}</p>`;
     return;
   }
 
@@ -83,12 +83,12 @@ async function loadExistingJourneys() {
         <div>
           <p class="text-sm font-medium">${j.name}</p>
           <p class="text-xs text-slate-500 mt-0.5">
-            ${j.visa_type.replace("_", " ")} · ${j.uk_region.replace("_", " ")} · ${j.phases?.length || 0} phase${j.phases?.length === 1 ? "" : "s"}
+            ${j.visa_type.replace("_", " ")} · ${j.uk_region.replace("_", " ")} · ${j.phases?.length || 0} ${j.phases?.length === 1 ? t("common.phase_singular") : t("common.phase_plural")}
           </p>
         </div>
         <div class="flex gap-3 items-center">
-          <button data-clone-journey-id="${j.id}" class="text-xs text-slate-500 font-medium">Clone</button>
-          <button data-edit-journey-id="${j.id}" class="text-xs text-indigo-600 font-medium">Edit phases</button>
+          <button data-clone-journey-id="${j.id}" class="text-xs text-slate-500 font-medium">${t("common.clone")}</button>
+          <button data-edit-journey-id="${j.id}" class="text-xs text-indigo-600 font-medium">${t("appmgr.edit_phases")}</button>
         </div>
       </div>
       <div id="phase-editor-${j.id}" class="hidden mt-3 pt-3 border-t border-slate-200"></div>
@@ -118,7 +118,7 @@ async function cloneJourneyIntoForm(journeyId) {
     .single();
 
   if (error || !journey) {
-    alert("Could not load journey to clone: " + (error?.message || "not found"));
+    alert(t("appmgr.clone_load_error_prefix") + (error?.message || t("common.not_found")));
     return;
   }
 
@@ -155,7 +155,7 @@ async function cloneJourneyIntoForm(journeyId) {
   document.getElementById("journey-section").scrollIntoView({ behavior: "smooth", block: "start" });
   document.getElementById("journey_uk_region").focus();
 
-  alert(`Loaded "${journey.name}" as a starting point with its ${sortedPhases.length} phase(s). Change the visa type and/or UK region below, then click "Create journey" to save it as a new journey.`);
+  alert(t("appmgr.clone_success", { name: journey.name, count: sortedPhases.length }));
 }
 
 // --- SE2L-65: configure Phase time windows on an existing journey ---
@@ -165,10 +165,10 @@ function addPhaseEditRow(rowsDiv, phase) {
   row.className = "flex gap-2 items-start";
   row.dataset.phaseId = phase?.id || "";
   row.innerHTML = `
-    <input type="text" class="edit-phase-name flex-1 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="e.g. First week" value="${phase?.name || ""}" />
-    <input type="number" class="edit-phase-start w-20 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="From" value="${phase?.days_after_arrival_start ?? ""}" />
-    <input type="number" class="edit-phase-end w-20 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="To" value="${phase?.days_after_arrival_end ?? ""}" />
-    <button type="button" class="remove-edit-phase-row-btn text-xs text-red-600 font-medium px-2 py-2">Remove</button>
+    <input type="text" class="edit-phase-name flex-1 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="${t("appmgr.phase_name_placeholder")}" value="${phase?.name || ""}" />
+    <input type="number" class="edit-phase-start w-20 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="${t("appmgr.phase_from_placeholder")}" value="${phase?.days_after_arrival_start ?? ""}" />
+    <input type="number" class="edit-phase-end w-20 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="${t("appmgr.phase_to_placeholder")}" value="${phase?.days_after_arrival_end ?? ""}" />
+    <button type="button" class="remove-edit-phase-row-btn text-xs text-red-600 font-medium px-2 py-2">${t("common.remove")}</button>
   `;
   rowsDiv.appendChild(row);
   row.querySelector(".remove-edit-phase-row-btn").addEventListener("click", () => row.remove());
@@ -192,16 +192,16 @@ async function toggleJourneyPhaseEditor(journeyId) {
     .order("sort_order", { ascending: true });
 
   if (error) {
-    alert("Could not load phases for this journey: " + error.message);
+    alert(t("appmgr.phase_load_error_prefix") + error.message);
     return;
   }
 
   container.innerHTML = `
     <div class="edit-phase-rows flex flex-col gap-2 mb-2"></div>
-    <button type="button" class="add-edit-phase-row-btn text-xs text-indigo-600 font-medium">+ Add phase</button>
+    <button type="button" class="add-edit-phase-row-btn text-xs text-indigo-600 font-medium">${t("appmgr.add_phase")}</button>
     <div class="flex justify-end gap-2 mt-3">
-      <button type="button" class="cancel-phase-edit-btn border border-slate-300 px-3 py-1.5 rounded-lg text-xs font-medium">Cancel</button>
-      <button type="button" class="save-phase-edit-btn bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-medium">Save phases</button>
+      <button type="button" class="cancel-phase-edit-btn border border-slate-300 px-3 py-1.5 rounded-lg text-xs font-medium">${t("common.cancel")}</button>
+      <button type="button" class="save-phase-edit-btn bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-medium">${t("appmgr.save_phases")}</button>
     </div>
   `;
   container.classList.remove("hidden");
@@ -222,7 +222,7 @@ async function savePhaseEdits(journeyId, rowsDiv) {
   const rows = Array.from(rowsDiv.children);
 
   if (rows.length === 0) {
-    alert("A journey needs at least one phase — add one before saving.");
+    alert(t("appmgr.needs_one_phase"));
     return;
   }
 
@@ -236,11 +236,11 @@ async function savePhaseEdits(journeyId, rowsDiv) {
 
   for (const p of parsed) {
     if (!p.name || p.start === "" || p.end === "") {
-      alert("Every phase needs a name, a start day, and an end day.");
+      alert(t("appmgr.phase_needs_fields"));
       return;
     }
     if (Number(p.start) > Number(p.end)) {
-      alert(`Phase "${p.name}" has a start day after its end day.`);
+      alert(t("appmgr.phase_start_after_end", { name: p.name }));
       return;
     }
   }
@@ -250,10 +250,7 @@ async function savePhaseEdits(journeyId, rowsDiv) {
   const byStart = [...parsed].sort((a, b) => Number(a.start) - Number(b.start));
   for (let i = 1; i < byStart.length; i++) {
     if (Number(byStart[i].start) <= Number(byStart[i - 1].end)) {
-      const proceed = confirm(
-        `"${byStart[i - 1].name}" and "${byStart[i].name}" have overlapping day ranges. ` +
-        `Newcomers may not see the phase you expect on those days. Save anyway?`
-      );
+      const proceed = confirm(t("appmgr.phase_overlap_warning", { name1: byStart[i - 1].name, name2: byStart[i].name }));
       if (!proceed) return;
       break;
     }
@@ -294,12 +291,9 @@ async function savePhaseEdits(journeyId, rowsDiv) {
   }
 
   if (blockedDeletions.length > 0) {
-    alert(
-      `Phases saved, but ${blockedDeletions.length} phase(s) couldn't be removed because they still have tasks assigned. ` +
-      `Reassign or archive those tasks first, then remove the phase.`
-    );
+    alert(t("appmgr.phases_saved_blocked", { count: blockedDeletions.length }));
   } else {
-    alert("Phases updated.");
+    alert(t("appmgr.phases_updated"));
   }
 
   document.getElementById(`phase-editor-${journeyId}`).classList.add("hidden");
@@ -320,22 +314,22 @@ async function handleJourneyFormSubmit(e) {
   const phaseRows = collectPhaseRows();
 
   if (!visaType) {
-    alert("Please specify a visa type.");
+    alert(t("appmgr.specify_visa_type"));
     return;
   }
 
   if (phaseRows.length === 0) {
-    alert("Add at least one phase — a journey with no phases has nowhere to attach tasks.");
+    alert(t("appmgr.needs_one_phase_journey"));
     return;
   }
 
   for (const phase of phaseRows) {
     if (!phase.name || phase.days_after_arrival_start === "" || phase.days_after_arrival_end === "") {
-      alert("Every phase needs a name, a start day, and an end day.");
+      alert(t("appmgr.phase_needs_fields"));
       return;
     }
     if (Number(phase.days_after_arrival_start) > Number(phase.days_after_arrival_end)) {
-      alert(`Phase "${phase.name}" has a start day after its end day.`);
+      alert(t("appmgr.phase_start_after_end", { name: phase.name }));
       return;
     }
   }
@@ -350,7 +344,7 @@ async function handleJourneyFormSubmit(e) {
     .maybeSingle();
 
   if (existingJourney) {
-    alert(`A journey already exists for ${visaType.replace("_", " ")} · ${ukRegion.replace("_", " ")}. Edit or clone that one instead of creating a duplicate.`);
+    alert(t("appmgr.duplicate_journey", { visaType: visaType.replace("_", " "), region: ukRegion.replace("_", " ") }));
     return;
   }
 
@@ -361,7 +355,7 @@ async function handleJourneyFormSubmit(e) {
     .single();
 
   if (journeyError || !newJourney) {
-    alert("Could not create journey: " + (journeyError?.message || "unknown error"));
+    alert(t("appmgr.journey_create_error_prefix") + (journeyError?.message || t("common.unknown_error")));
     return;
   }
 
@@ -376,9 +370,9 @@ async function handleJourneyFormSubmit(e) {
   const { error: phaseError } = await supabaseClient.from("phases").insert(phaseInserts);
 
   if (phaseError) {
-    alert("Journey was created, but its phases failed to save: " + phaseError.message + "\nYou can add phases for it separately.");
+    alert(t("appmgr.journey_phases_failed_prefix") + phaseError.message + "\n" + t("appmgr.journey_phases_failed_suffix"));
   } else {
-    alert("Journey created with " + phaseInserts.length + " phase(s).");
+    alert(t("appmgr.journey_created_with_phases", { count: phaseInserts.length }));
   }
 
   resetJourneyForm();
@@ -417,7 +411,7 @@ async function loadDependsOnOptions(excludeTaskId) {
   const available = (tasks || []).filter(t => t.id !== excludeTaskId);
 
   if (available.length === 0) {
-    dependsSelect.innerHTML = `<option value="" disabled>No other tasks yet</option>`;
+    dependsSelect.innerHTML = `<option value="" disabled>${t("appmgr.no_other_tasks")}</option>`;
     return;
   }
 
@@ -468,17 +462,17 @@ document.querySelectorAll(".urgency-pill").forEach(btn => {
 function syncSubmitButtonLabel() {
   const status = document.getElementById("status").value;
   const labels = {
-    draft: "Save as draft",
-    in_review: "Submit for review",
-    published: "Publish task"
+    draft: t("appmgr.save_as_draft"),
+    in_review: t("appmgr.submit_for_review"),
+    published: t("appmgr.publish_task")
   };
-  document.getElementById("submit-btn").textContent = labels[status] || "Save";
+  document.getElementById("submit-btn").textContent = labels[status] || t("common.save");
 }
 
 function resetForm() {
   document.getElementById("task-form").reset();
   document.getElementById("task_id").value = "";
-  document.getElementById("form-heading").textContent = "Create a task";
+  document.getElementById("form-heading").textContent = t("appmgr.create_task_heading");
   document.getElementById("status").value = "draft";
   syncSubmitButtonLabel();
   document.getElementById("cancel-edit-btn").classList.add("hidden");
@@ -503,7 +497,7 @@ async function loadTaskForEdit(taskId) {
     .single();
 
   if (error || !task) {
-    alert("Could not load task for editing.");
+    alert(t("appmgr.task_load_error"));
     return;
   }
 
@@ -544,7 +538,7 @@ async function loadTaskForEdit(taskId) {
     ? `https://youtube.com/watch?v=${task.task_youtube_videos[0].youtube_video_id}`
     : "";
 
-  document.getElementById("form-heading").textContent = "Edit task";
+  document.getElementById("form-heading").textContent = t("appmgr.edit_task_heading");
   syncSubmitButtonLabel();
   document.getElementById("cancel-edit-btn").classList.remove("hidden");
 
@@ -564,7 +558,7 @@ async function loadTaskForEdit(taskId) {
 }
 
 async function archiveTask(taskId) {
-  if (!confirm("Archive this task? It will no longer show to newcomers.")) return;
+  if (!confirm(t("appmgr.archive_confirm"))) return;
   await changeTaskStatus(taskId, "archived");
 }
 
@@ -579,7 +573,7 @@ async function changeTaskStatus(taskId, newStatus) {
     .single();
 
   if (fetchError || !existingTask) {
-    alert("Could not load task to change its status.");
+    alert(t("appmgr.task_status_load_error"));
     return;
   }
 
@@ -591,7 +585,7 @@ async function changeTaskStatus(taskId, newStatus) {
     .eq("id", taskId);
 
   if (updateError) {
-    alert("Could not update task status: " + updateError.message);
+    alert(t("appmgr.task_status_update_error_prefix") + updateError.message);
     return;
   }
 
@@ -614,24 +608,24 @@ const statusBadgeStyles = {
 };
 
 const statusLabels = {
-  draft: "Draft",
-  in_review: "In review",
-  published: "Published",
-  archived: "Archived"
+  draft: t("appmgr.status_draft_short"),
+  in_review: t("appmgr.status_in_review"),
+  published: t("appmgr.status_published_short"),
+  archived: t("appmgr.status_archived")
 };
 
 function renderStatusActions(task) {
   const buttons = [];
 
   if (task.status === "draft") {
-    buttons.push(`<button data-status-action="in_review" data-task-id="${task.id}" class="text-xs text-amber-700 font-medium">Submit for review</button>`);
+    buttons.push(`<button data-status-action="in_review" data-task-id="${task.id}" class="text-xs text-amber-700 font-medium">${t("appmgr.submit_for_review")}</button>`);
   }
   if (task.status === "in_review") {
-    buttons.push(`<button data-status-action="published" data-task-id="${task.id}" class="text-xs text-green-700 font-medium">Publish</button>`);
-    buttons.push(`<button data-status-action="draft" data-task-id="${task.id}" class="text-xs text-slate-500 font-medium">Send back to draft</button>`);
+    buttons.push(`<button data-status-action="published" data-task-id="${task.id}" class="text-xs text-green-700 font-medium">${t("appmgr.publish")}</button>`);
+    buttons.push(`<button data-status-action="draft" data-task-id="${task.id}" class="text-xs text-slate-500 font-medium">${t("appmgr.send_back_to_draft")}</button>`);
   }
   if (task.status === "published") {
-    buttons.push(`<button data-status-action="draft" data-task-id="${task.id}" class="text-xs text-slate-500 font-medium">Unpublish to draft</button>`);
+    buttons.push(`<button data-status-action="draft" data-task-id="${task.id}" class="text-xs text-slate-500 font-medium">${t("appmgr.unpublish_to_draft")}</button>`);
   }
 
   return buttons.join("");
@@ -661,7 +655,7 @@ async function loadExistingTasks() {
   const listDiv = document.getElementById("task-list");
 
   if (!tasks || tasks.length === 0) {
-    listDiv.innerHTML = `<p class="text-sm text-slate-400">No tasks created yet.</p>`;
+    listDiv.innerHTML = `<p class="text-sm text-slate-400">${t("appmgr.no_tasks_yet")}</p>`;
     return;
   }
 
@@ -670,7 +664,7 @@ async function loadExistingTasks() {
   // Group by phase name — same "same name across journeys" concept the
   // rest of this file already treats phases by (task creation, reorder).
   const groups = {};
-  const UNASSIGNED = "No phase assigned";
+  const UNASSIGNED = t("appmgr.no_phase_assigned");
 
   tasks.forEach(t => {
     const phaseName = t.task_phases?.[0]?.phases?.name || UNASSIGNED;
@@ -687,23 +681,23 @@ async function loadExistingTasks() {
       return rankA - rankB;
     });
 
-    const rows = groupTasks.map(t => {
+    const rows = groupTasks.map(task => {
       const urgencyColor = { Critical: "var(--color-critical)", Important: "var(--color-warning)", Optional: "var(--color-text-muted)" };
       return `
-      <div class="task-row ${t.status === "archived" ? "opacity-50" : ""}" style="border-left-color: ${urgencyColor[t.urgency] || "var(--color-border)"}">
+      <div class="task-row ${task.status === "archived" ? "opacity-50" : ""}" style="border-left-color: ${urgencyColor[task.urgency] || "var(--color-border)"}">
         <div class="task-row-main">
-          <p class="task-row-title">${t.title}${t.is_minor_task ? ' <span class="task-row-minor-tag">Minor</span>' : ""}</p>
+          <p class="task-row-title">${task.title}${task.is_minor_task ? ` <span class="task-row-minor-tag">${t("appmgr.minor_tag")}</span>` : ""}</p>
           <div class="task-row-meta">
-            <span class="task-status-pill ${statusBadgeStyles[t.status] || "bg-slate-100 text-slate-500"}">${statusLabels[t.status] || t.status}</span>
-            <span class="task-row-meta-text">${t.urgency} · ${t.category || "Uncategorised"}</span>
-            ${t.scheduled_publish_at && t.status !== "published" ? `<span class="task-row-meta-text">· Scheduled ${new Date(t.scheduled_publish_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</span>` : ""}
+            <span class="task-status-pill ${statusBadgeStyles[task.status] || "bg-slate-100 text-slate-500"}">${statusLabels[task.status] || task.status}</span>
+            <span class="task-row-meta-text">${task.urgency} · ${task.category || t("appmgr.uncategorised")}</span>
+            ${task.scheduled_publish_at && task.status !== "published" ? `<span class="task-row-meta-text">· ${t("appmgr.scheduled_prefix")} ${new Date(task.scheduled_publish_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</span>` : ""}
           </div>
         </div>
         <div class="task-row-actions">
-          ${renderStatusActions(t)}
-          <a href="preview.html?task=${t.id}" target="_blank" class="task-row-action-link">Preview</a>
-          ${t.status !== "archived" ? `<button data-edit-id="${t.id}" class="task-row-action-link task-row-action-accent">Edit</button>` : ""}
-          ${t.status !== "archived" ? `<button data-archive-id="${t.id}" class="task-row-action-link task-row-action-danger">Archive</button>` : ""}
+          ${renderStatusActions(task)}
+          <a href="preview.html?task=${task.id}" target="_blank" class="task-row-action-link">${t("appmgr.preview")}</a>
+          ${task.status !== "archived" ? `<button data-edit-id="${task.id}" class="task-row-action-link task-row-action-accent">${t("common.edit")}</button>` : ""}
+          ${task.status !== "archived" ? `<button data-archive-id="${task.id}" class="task-row-action-link task-row-action-danger">${t("common.archive")}</button>` : ""}
         </div>
       </div>
     `;
@@ -762,7 +756,7 @@ async function handleFormSubmit(e) {
   if (document.getElementById("region_northern_ireland").checked) regions.push("northern_ireland");
 
   if (!phaseName || visaTypes.length === 0 || regions.length === 0) {
-    alert("Please select a phase, at least one visa type, and at least one UK region.");
+    alert(t("appmgr.select_phase_visa_region"));
     return;
   }
 
@@ -792,7 +786,7 @@ async function handleFormSubmit(e) {
       .eq("id", taskId);
 
     if (updateError) {
-      alert("Could not update task: " + updateError.message);
+      alert(t("appmgr.task_update_error_prefix") + updateError.message);
       return;
     }
 
@@ -820,7 +814,7 @@ async function handleFormSubmit(e) {
       .single();
 
     if (taskError) {
-      alert("Could not create task: " + taskError.message);
+      alert(t("appmgr.task_create_error_prefix") + taskError.message);
       return;
     }
 
@@ -871,7 +865,7 @@ async function handleFormSubmit(e) {
     status
   );
 
-  alert(taskId ? "Task saved." : "Task created as " + statusLabels[status || "draft"] + ".");
+  alert(taskId ? t("appmgr.task_saved") : t("appmgr.task_created_as", { status: statusLabels[status || "draft"] }));
   resetForm();
   loadExistingTasks();
 }
@@ -903,11 +897,11 @@ async function loadReorderPhaseOptions() {
   const select = document.getElementById("reorder_phase_select");
 
   if (uniqueNames.length === 0) {
-    select.innerHTML = `<option value="">No phases yet</option>`;
+    select.innerHTML = `<option value="">${t("appmgr.no_phases_yet")}</option>`;
     return;
   }
 
-  select.innerHTML = `<option value="">Select a phase...</option>` +
+  select.innerHTML = `<option value="">${t("appmgr.select_a_phase")}</option>` +
     uniqueNames.map(n => `<option value="${n}">${n}</option>`).join("");
 }
 
@@ -919,7 +913,7 @@ async function loadTasksForReorder(phaseName) {
   currentReorderPhaseIds = [];
 
   if (!phaseName) {
-    listDiv.innerHTML = `<p class="text-sm text-slate-400">Select a phase.</p>`;
+    listDiv.innerHTML = `<p class="text-sm text-slate-400">${t("appmgr.select_a_phase_prompt")}</p>`;
     saveBtn.classList.add("hidden");
     return;
   }
@@ -932,7 +926,7 @@ async function loadTasksForReorder(phaseName) {
   currentReorderPhaseIds = (phaseRows || []).map(p => p.id);
 
   if (currentReorderPhaseIds.length === 0) {
-    listDiv.innerHTML = `<p class="text-sm text-slate-400">No phases found with that name.</p>`;
+    listDiv.innerHTML = `<p class="text-sm text-slate-400">${t("appmgr.no_phases_found")}</p>`;
     saveBtn.classList.add("hidden");
     return;
   }
@@ -947,15 +941,15 @@ async function loadTasksForReorder(phaseName) {
     .order("sort_order", { ascending: true });
 
   if (error) {
-    listDiv.innerHTML = `<p class="text-sm text-red-600">Could not load tasks: ${error.message}</p>`;
+    listDiv.innerHTML = `<p class="text-sm text-red-600">${t("appmgr.reorder_load_error_prefix")}${error.message}</p>`;
     saveBtn.classList.add("hidden");
     return;
   }
 
-  const tasks = (taskLinks || []).map(l => l.tasks).filter(t => t && t.status !== "archived");
+  const tasks = (taskLinks || []).map(l => l.tasks).filter(task => task && task.status !== "archived");
 
   if (tasks.length === 0) {
-    listDiv.innerHTML = `<p class="text-sm text-slate-400">No tasks assigned to this phase yet.</p>`;
+    listDiv.innerHTML = `<p class="text-sm text-slate-400">${t("appmgr.no_tasks_in_phase")}</p>`;
     saveBtn.classList.add("hidden");
     return;
   }
@@ -983,7 +977,7 @@ function renderReorderGroups() {
   const hasAnyTasks = tiers.some(t => currentReorderGroups[t].length > 0);
 
   if (!hasAnyTasks) {
-    listDiv.innerHTML = `<p class="text-sm text-slate-400">No tasks assigned to this phase yet.</p>`;
+    listDiv.innerHTML = `<p class="text-sm text-slate-400">${t("appmgr.no_tasks_in_phase")}</p>`;
     saveBtn.classList.add("hidden");
     return;
   }
@@ -1049,8 +1043,8 @@ async function saveTaskOrder() {
   const failed = results.filter(r => r.error);
 
   alert(failed.length > 0
-    ? `Order saved, but ${failed.length} update(s) failed. Try again.`
-    : "Task order saved.");
+    ? t("appmgr.order_save_partial_fail", { count: failed.length })
+    : t("appmgr.order_saved"));
 }
 
 
@@ -1065,10 +1059,10 @@ async function loadJourneyVisaTypeAndRegionOptions() {
   const regionSelect = document.getElementById("journey_uk_region");
 
   const visaOptionsHtml = (visaTypesResult.data || []).map(v => `<option value="${v.value}">${v.label}</option>`).join("");
-  visaSelect.innerHTML = visaOptionsHtml + `<option value="other">Other (specify)</option>`;
+  visaSelect.innerHTML = visaOptionsHtml + `<option value="other">${t("appmgr.other_specify")}</option>`;
 
   regionSelect.innerHTML = (regionsResult.data || []).map(r => `<option value="${r.value}">${r.label}</option>`).join("")
-    || `<option value="">No regions configured yet</option>`;
+    || `<option value="">${t("appmgr.no_regions_configured")}</option>`;
 }
 
 // Sidebar section-switching — shows one of Journeys/Tasks/Reorder at a

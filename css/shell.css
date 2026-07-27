@@ -201,6 +201,11 @@
   color: var(--color-accent-dark);
   font-weight: 600;
 }
+.app-sidebar nav > a.is-active-subnav {
+  background: var(--color-accent-bg);
+  color: var(--color-accent-dark);
+  font-weight: 600;
+}
 
 /* Section-switching panels — used on app-manager.html and super-admin.html
    so only one major section shows at a time instead of everything stacked

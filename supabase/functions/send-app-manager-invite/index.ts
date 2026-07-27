@@ -5,14 +5,25 @@
 // not through notifications_queue" principle as send-dependant-invite,
 // since an invite should go out the moment it's created.
 //
+// SE2L-77: the subject/body now come from email_templates (template_key =
+// 'app_manager_invite') so a Super Admin can edit the copy without a
+// redeploy. If that lookup fails for any reason, falls back to the
+// original hardcoded copy below so this never breaks silently.
+//
 // Deploy with:
 //   supabase functions deploy send-app-manager-invite
 //
 // Required secrets (already set):
-//   RESEND_API_KEY, RESEND_FROM_EMAIL
+//   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY, RESEND_FROM_EMAIL
 
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const resendApiKey = Deno.env.get("RESEND_API_KEY")!;
 const resendFromEmail = Deno.env.get("RESEND_FROM_EMAIL")!;
+
+const supabase = createClient(supabaseUrl, serviceRoleKey);
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -23,6 +34,36 @@ interface InvitePayload {
   email: string;
   inviteToken: string;
   appOrigin: string; // e.g. "http://127.0.0.1:5500/se2l-web" or the deployed Vercel URL
+}
+
+const FALLBACK_SUBJECT = `You've been invited to manage content on Se2L`;
+const FALLBACK_HTML = `
+  <p>Hi,</p>
+  <p>You've been invited to join Se2L as an App Manager — you'll be able to create and publish settlement guidance content for newcomers.</p>
+  <p>To set up your account, click the link below:</p>
+  <p><a href="{{invite_link}}">{{invite_link}}</a></p>
+  <p>If you weren't expecting this invite, you can safely ignore this email.</p>
+  <p>— The Se2L team</p>
+`;
+
+// Replaces every {{key}} placeholder with its value. Unknown placeholders
+// are left as-is rather than silently blanked, so a typo in the admin's
+// edited template is visible/debuggable instead of disappearing.
+function fillTemplate(template: string, vars: Record<string, string>): string {
+  return template.replace(/\{\{(\w+)\}\}/g, (match, key) => (key in vars ? vars[key] : match));
+}
+
+async function getTemplate(): Promise<{ subject: string; html: string }> {
+  const { data } = await supabase
+    .from("email_templates")
+    .select("subject, body_html")
+    .eq("template_key", "app_manager_invite")
+    .maybeSingle();
+
+  return {
+    subject: data?.subject || FALLBACK_SUBJECT,
+    html: data?.body_html || FALLBACK_HTML,
+  };
 }
 
 async function sendEmail(to: string, subject: string, html: string) {
@@ -74,15 +115,10 @@ Deno.serve(async (req) => {
 
   const inviteLink = `${appOrigin}/accept-app-manager-invite.html?token=${inviteToken}`;
 
-  const subject = `You've been invited to manage content on Se2L`;
-  const html = `
-    <p>Hi,</p>
-    <p>You've been invited to join Se2L as an App Manager — you'll be able to create and publish settlement guidance content for newcomers.</p>
-    <p>To set up your account, click the link below:</p>
-    <p><a href="${inviteLink}">${inviteLink}</a></p>
-    <p>If you weren't expecting this invite, you can safely ignore this email.</p>
-    <p>— The Se2L team</p>
-  `;
+  const { subject: subjectTemplate, html: htmlTemplate } = await getTemplate();
+  const vars = { invite_link: inviteLink };
+  const subject = fillTemplate(subjectTemplate, vars);
+  const html = fillTemplate(htmlTemplate, vars);
 
   try {
     await sendEmail(email, subject, html);
