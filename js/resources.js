@@ -10,7 +10,8 @@ function renderCategoryPills() {
 
   container.innerHTML = pills.map(cat => {
     const isActive = cat === currentCategory;
-    return `<button type="button" data-category="${cat}" class="text-xs px-3 py-1.5 rounded-full ${isActive ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-600"}">${cat}</button>`;
+    const label = cat === "All" ? t("common.all") : cat;
+    return `<button type="button" data-category="${cat}" class="text-xs px-3 py-1.5 rounded-full ${isActive ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-600"}">${label}</button>`;
   }).join("");
 
   container.querySelectorAll("[data-category]").forEach(btn => {
@@ -35,14 +36,14 @@ function renderFilteredResources() {
   });
 
   if (filtered.length === 0) {
-    listDiv.innerHTML = `<p class="text-sm text-slate-400 col-span-2">No resources match your search.</p>`;
+    listDiv.innerHTML = `<p class="text-sm text-slate-400 col-span-2">${t("resources.no_match")}</p>`;
     return;
   }
 
   listDiv.innerHTML = filtered.map(r => {
-    const draftTag = r.status === "draft" ? ` <span class="text-amber-600">(Draft)</span>` : "";
+    const draftTag = r.status === "draft" ? ` <span class="text-amber-600">(${t("resources.draft_tag")})</span>` : "";
     const linkRow = r.url
-      ? `<a href="${r.url}" target="_blank" rel="noopener" class="text-xs text-indigo-600 font-medium mt-1 block">More info ↗</a>`
+      ? `<a href="${r.url}" target="_blank" rel="noopener" class="text-xs text-indigo-600 font-medium mt-1 block">${t("resources.more_info")}</a>`
       : "";
     return `
       <div class="bg-white border border-slate-200 rounded-xl p-4">
@@ -66,7 +67,7 @@ async function loadResources() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    listDiv.innerHTML = `<p class="text-sm text-red-600 col-span-2">Could not load resources.</p>`;
+    listDiv.innerHTML = `<p class="text-sm text-red-600 col-span-2">${t("resources.load_error")}</p>`;
     console.error(error);
     return;
   }
@@ -95,13 +96,13 @@ async function checkAuthAndActivateShell() {
   const dashboardNavLink = document.getElementById("dashboard-nav-link");
 
   const roleLabels = {
-    app_manager: "App Manager",
-    super_admin: "Super Admin"
+    app_manager: t("roles.app_manager"),
+    super_admin: t("roles.super_admin")
   };
   const emailEl = document.getElementById("sidebar-user-email");
   const rolePillEl = document.getElementById("sidebar-role-pill");
-  if (emailEl) emailEl.textContent = user.email || "Unknown user";
-  if (rolePillEl) rolePillEl.textContent = roleLabels[profile?.role] || "Newcomer";
+  if (emailEl) emailEl.textContent = user.email || t("common.unknown_user");
+  if (rolePillEl) rolePillEl.textContent = roleLabels[profile?.role] || t("roles.newcomer");
 
   if (profile?.role === "super_admin") {
     document.getElementById("super-admin-link")?.classList.remove("hidden");
@@ -111,7 +112,7 @@ async function checkAuthAndActivateShell() {
     // there instead of the newcomer dashboard.
     if (backLink) {
       backLink.href = "super-admin.html";
-      backLink.textContent = "← Back to platform overview";
+      backLink.textContent = t("resources.back_to_platform_overview");
     }
   }
 
@@ -124,13 +125,13 @@ async function checkAuthAndActivateShell() {
     // there instead of the public landing page.
     if (backLink) {
       backLink.href = "app-manager.html";
-      backLink.textContent = "← Back to app manager dashboard";
+      backLink.textContent = t("resources.back_to_app_manager");
     }
   } else if (backLink && profile?.role !== "super_admin") {
     // Any other logged-in (non-app_manager, non-super_admin) user gets
     // their real dashboard instead of the public landing page.
     backLink.href = "dashboard.html";
-    backLink.textContent = "← Back to dashboard";
+    backLink.textContent = t("resources.back_to_dashboard");
   }
 }
 
@@ -149,7 +150,7 @@ document.getElementById("resource-form").addEventListener("submit", async (e) =>
   const url = document.getElementById("resource_url").value.trim();
 
   if (!title) {
-    alert("Please enter a title.");
+    alert(t("resources.title_required"));
     return;
   }
 
@@ -164,11 +165,11 @@ document.getElementById("resource-form").addEventListener("submit", async (e) =>
     });
 
   if (error) {
-    alert("Could not save resource: " + error.message);
+    alert(t("resources.save_error_prefix") + error.message);
     return;
   }
 
-  alert("Resource saved.");
+  alert(t("resources.saved"));
   document.getElementById("resource-form").reset();
   await loadResources();
 });

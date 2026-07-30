@@ -6,11 +6,13 @@
   <title>Se2L — Log in</title>
   <link href="css/output.css" rel="stylesheet">
   <link href="css/tokens.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Literata:wght@600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="css/components.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    /* Page-specific styles for the Stitch login layout — kept local to
-       this file since this exact structure (logo lockup, eyebrow label,
-       password toggle, footer bar) doesn't exist on any other page yet. */
+    /* Page-specific layout only — buttons, inputs, badges, and dividers
+       now come from components.css. Kept local: the overall page frame
+       (header/main/footer split), the login card wrapper, and the
+       password-visibility toggle, none of which exist on any other page. */
 
     .login-page-wrap {
       min-height: 100vh;
@@ -28,14 +30,14 @@
     .login-header-mark {
       width: 1.85rem;
       height: 1.85rem;
-      color: var(--color-accent-dark);
+      color: var(--color-accent);
       flex-shrink: 0;
     }
     .login-header-title {
       font-family: var(--font-heading);
-      font-weight: 800;
-      font-size: 1.5rem;
-      color: var(--color-accent-dark);
+      font-weight: 700;
+      font-size: 1.4rem;
+      color: var(--color-text);
     }
 
     .login-main {
@@ -49,27 +51,15 @@
     .login-card {
       width: 100%;
       max-width: 24rem;
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-card);
-      padding: 2rem;
-      box-shadow: 0 1px 3px rgba(21, 28, 35, 0.06);
     }
-
-    .login-eyebrow {
-      font-family: var(--font-mono);
-      font-size: 0.65rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--color-text-muted);
-      margin-bottom: 0.5rem;
-    }
-
+    .login-card .badge { margin-bottom: 0.75rem; }
     .login-card h1 {
-      font-size: 1.375rem;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 1.5rem;
       margin-bottom: 0.375rem;
+      color: var(--color-text);
     }
-
     .login-card p.login-sub {
       font-size: 0.8rem;
       color: var(--color-text-secondary);
@@ -81,30 +71,18 @@
       display: flex;
       align-items: baseline;
       justify-content: space-between;
-      margin-bottom: 0.25rem;
+      margin-bottom: 0.35rem;
     }
-    .login-label {
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-      color: var(--color-text-secondary);
-    }
+    .login-field-row .form-label { margin-bottom: 0; }
     .login-forgot {
       font-size: 0.75rem;
       color: var(--color-accent);
       font-weight: 500;
     }
-    .login-forgot:hover {
-      text-decoration: underline;
-    }
+    .login-forgot:hover { text-decoration: underline; }
 
-    .login-password-wrap {
-      position: relative;
-    }
-    .login-password-wrap input {
-      padding-right: 2.5rem;
-    }
+    .login-password-wrap { position: relative; }
+    .login-password-wrap input { padding-right: 2.5rem; }
     .login-toggle-password {
       position: absolute;
       right: 0.5rem;
@@ -118,47 +96,7 @@
       display: flex;
       align-items: center;
     }
-    .login-toggle-password svg {
-      width: 1.1rem;
-      height: 1.1rem;
-    }
-
-    .login-divider-row {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      margin: 1.5rem 0 1rem;
-    }
-    .login-divider-row::before,
-    .login-divider-row::after {
-      content: "";
-      flex: 1;
-      height: 1px;
-      background: var(--color-border);
-    }
-    .login-divider-text {
-      font-size: 0.65rem;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--color-text-muted);
-      white-space: nowrap;
-    }
-
-    .login-register-btn {
-      display: block;
-      width: 100%;
-      text-align: center;
-      border: 1px solid var(--color-accent);
-      color: var(--color-accent-dark);
-      background: transparent;
-      border-radius: var(--radius-control);
-      padding: 0.625rem;
-      font-size: 0.875rem;
-      font-weight: 600;
-    }
-    .login-register-btn:hover {
-      background: var(--color-accent-bg);
-    }
+    .login-toggle-password svg { width: 1.1rem; height: 1.1rem; }
 
     .login-footer {
       padding: 1.25rem 1.5rem;
@@ -170,13 +108,8 @@
       gap: 0.375rem 1.25rem;
     }
     .login-footer span,
-    .login-footer a {
-      font-size: 0.7rem;
-      color: var(--color-text-muted);
-    }
-    .login-footer a:hover {
-      color: var(--color-text-secondary);
-    }
+    .login-footer a { font-size: 0.7rem; color: var(--color-text-muted); }
+    .login-footer a:hover { color: var(--color-text-secondary); }
   </style>
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-900">
@@ -192,28 +125,28 @@
     </div>
 
     <div class="login-main">
-      <div class="login-card">
+      <div class="login-card card">
 
-        <p class="login-eyebrow" data-i18n="login.eyebrow">Official entry portal</p>
+        <span class="badge" data-i18n="login.eyebrow">Official entry portal</span>
         <h1 data-i18n="login.heading">Welcome back</h1>
         <p class="login-sub" data-i18n="login.subtext">Log in to pick up your settlement journey where you left off.</p>
 
         <form id="login-form">
 
-          <div class="mb-4">
+          <div class="form-field">
             <div class="login-field-row">
-              <label class="login-label" for="email" data-i18n="login.email_label">Email address</label>
+              <label class="form-label" for="email" data-i18n="login.email_label">Email address</label>
             </div>
-            <input id="email" type="email" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="e.g. name@domain.gov.uk" data-i18n-placeholder="login.email_placeholder" />
+            <input id="email" type="email" required class="form-input" placeholder="e.g. name@domain.gov.uk" data-i18n-placeholder="login.email_placeholder" />
           </div>
 
-          <div class="mb-4">
+          <div class="form-field">
             <div class="login-field-row">
-              <label class="login-label" for="password" data-i18n="login.password_label">Password</label>
+              <label class="form-label" for="password" data-i18n="login.password_label">Password</label>
               <a href="#" class="login-forgot" data-i18n="login.forgot">Forgot?</a>
             </div>
             <div class="login-password-wrap">
-              <input id="password" type="password" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="Your password" data-i18n-placeholder="login.password_placeholder" />
+              <input id="password" type="password" required class="form-input" placeholder="Your password" data-i18n-placeholder="login.password_placeholder" />
               <button type="button" class="login-toggle-password" id="toggle-password" aria-label="Show password" data-i18n-aria-label="login.show_password">
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
@@ -223,15 +156,15 @@
             </div>
           </div>
 
-          <button type="submit" class="w-full bg-slate-900 text-white rounded-lg py-2.5 text-sm font-medium" data-i18n="login.submit">Sign in &rarr;</button>
+          <button type="submit" class="btn btn-primary btn-block" data-i18n="login.submit">Sign in &rarr;</button>
 
         </form>
 
-        <div class="login-divider-row">
-          <span class="login-divider-text" data-i18n="login.divider">New to Se2L</span>
+        <div class="divider-row">
+          <span class="divider-row-label" data-i18n="login.divider">New to Se2L</span>
         </div>
 
-        <a href="onboarding.html" class="login-register-btn" data-i18n="login.register">Register account</a>
+        <a href="onboarding.html" class="btn btn-secondary btn-block" data-i18n="login.register">Register account</a>
 
       </div>
     </div>

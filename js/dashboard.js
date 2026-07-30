@@ -33,8 +33,14 @@ async function loadDashboard() {
   };
   const emailEl = document.getElementById("sidebar-user-email");
   const rolePillEl = document.getElementById("sidebar-role-pill");
+  const avatarEl = document.getElementById("sidebar-identity-avatar");
   if (emailEl) emailEl.textContent = user.email || t("common.unknown_user");
   if (rolePillEl) rolePillEl.textContent = roleLabels[profile.role] || t("roles.newcomer");
+  if (avatarEl && user.email) {
+    const namePart = user.email.split("@")[0];
+    const initials = namePart.replace(/[^a-zA-Z]/g, " ").trim().split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase();
+    avatarEl.textContent = initials || namePart.slice(0, 2).toUpperCase();
+  }
 
   // --- SE2L-39: For Your Family section ---
   // Called early and independently of the task-list logic below, since that
@@ -44,9 +50,9 @@ async function loadDashboard() {
 
   const welcomeDiv = document.getElementById("welcome-message");
   welcomeDiv.innerHTML = `
-    <h2 class="text-lg font-semibold">${t("dashboard.welcome_heading")}</h2>
-    <p class="text-sm text-slate-500">
-      ${profile.visa_type.replace("_", " ")} · ${profile.uk_region} · ${t("dashboard.arrived_prefix")} ${profile.arrival_date}
+    <h2 class="dashboard-hero-heading">${t("dashboard.welcome_heading")}</h2>
+    <p class="dashboard-hero-meta">
+      ${profile.visa_type.replace("_", " ")} · ${profile.uk_region} · ${t("dashboard.arrived_prefix")} <span class="dashboard-hero-meta-mono">${profile.arrival_date}</span>
     </p>
   `;
 
@@ -85,21 +91,24 @@ async function loadDashboard() {
   const timelineDiv = document.getElementById("phase-timeline");
   const currentSortOrder = currentPhase ? currentPhase.sort_order : phases[phases.length - 1].sort_order + 1;
 
+  timelineDiv.classList.add("phase-stepper");
   timelineDiv.innerHTML = phases.map(p => {
     const isPast = p.sort_order < currentSortOrder;
     const isCurrent = currentPhase && p.id === currentPhase.id;
     if (isPast) {
-      return `<div class="flex-1 text-center py-2 px-1 rounded-lg bg-green-50 cursor-pointer hover:bg-green-100" data-review-phase-id="${p.id}" data-review-phase-name="${p.name}" tabindex="0">
-                <div class="text-green-600 text-sm">✓</div>
-                <div class="text-xs mt-1">${p.name}</div>
+      return `<div class="phase-step is-done bg-green-50" data-review-phase-id="${p.id}" data-review-phase-name="${p.name}" tabindex="0">
+                <span class="phase-step-dot text-green-600">✓</span>
+                <span class="phase-step-label text-xs">${p.name}</span>
               </div>`;
     } else if (isCurrent) {
-      return `<div class="flex-1 text-center py-2 px-1 rounded-lg bg-indigo-50 border-2 border-indigo-600">
-                <div class="text-xs font-medium mt-1 text-indigo-700">${p.name}</div>
+      return `<div class="phase-step is-current bg-indigo-50 border-indigo-600">
+                <span class="phase-step-dot"></span>
+                <span class="phase-step-label text-xs font-medium text-indigo-700">${p.name}</span>
               </div>`;
     } else {
-      return `<div class="flex-1 text-center py-2 px-1 rounded-lg bg-slate-100 text-slate-400">
-                <div class="text-xs mt-1">${p.name}</div>
+      return `<div class="phase-step is-locked bg-slate-100 text-slate-400">
+                <span class="phase-step-dot"></span>
+                <span class="phase-step-label text-xs">${p.name}</span>
               </div>`;
     }
   }).join("");
@@ -178,14 +187,15 @@ async function loadDashboard() {
 
   taskListDiv.innerHTML = tasks.map(task => {
     const isDone = completedIds.has(task.id);
+    const chevronIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`;
     return `
-    <a href="task-detail.html?id=${task.id}" class="bg-white border border-slate-200 rounded-xl p-4 flex justify-between items-center ${isDone ? "opacity-60" : ""}">
+    <a href="task-detail.html?id=${task.id}" class="task-card bg-white border border-slate-200 rounded-xl p-4 flex justify-between items-center ${isDone ? "opacity-60" : ""}">
       <div>
-        <span class="text-xs ${urgencyColor[task.urgency] || "text-slate-500"} font-medium">${task.urgency}</span>
+        <span class="task-urgency-badge ${urgencyColor[task.urgency] || "text-slate-500"}">${task.urgency}</span>
         <span class="text-xs text-slate-400">· ${task.category || t("common.general")}</span>
         <p class="text-sm font-medium mt-0.5 ${isDone ? "line-through" : ""}">${task.title}</p>
       </div>
-      <span>${isDone ? "✓" : "›"}</span>
+      <span class="task-card-chevron">${chevronIcon}</span>
     </a>
   `;
   }).join("");
@@ -195,10 +205,16 @@ async function loadDashboard() {
   const progressStrip = document.getElementById("progress-strip");
   if (progressStrip) {
     progressStrip.classList.remove("hidden");
+    const pct = tasks.length ? Math.round((completedCount / tasks.length) * 100) : 0;
     progressStrip.innerHTML = `
-      <div class="bg-white border border-slate-200 rounded-xl p-3 flex items-center justify-between text-sm">
-        <span class="text-slate-600">${t("dashboard.progress_day", { day: daysSinceArrival + 1, phase: currentPhase.name })}</span>
-        <span class="font-medium">${t("dashboard.progress_complete", { completed: completedCount, total: tasks.length })}</span>
+      <div class="bg-white border border-slate-200 rounded-xl p-3 text-sm progress-strip-card">
+        <div class="flex items-center justify-between">
+          <span class="text-slate-600">${t("dashboard.progress_day", { day: daysSinceArrival + 1, phase: currentPhase.name })}</span>
+          <span class="font-medium">${t("dashboard.progress_complete", { completed: completedCount, total: tasks.length })}</span>
+        </div>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" style="width: ${pct}%;"></div>
+        </div>
       </div>
     `;
   }
@@ -384,7 +400,10 @@ async function loadPhaseReview(phaseId, phaseName, userId, visaType, ukRegion) {
             ${linkRow}
           </div>
         </div>
-        <button type="button" data-share-url="${shareUrl}" data-share-title="${task.title}" class="share-task-btn text-xs text-slate-500 font-medium border border-slate-300 rounded-lg px-2 py-1">${t("common.share")}</button>
+        <button type="button" data-share-url="${shareUrl}" data-share-title="${task.title}" class="share-task-btn btn btn-ghost btn-sm">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.5" x2="15.4" y2="6.5"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/></svg>
+          ${t("common.share")}
+        </button>
       </div>
     `;
   }).join("");

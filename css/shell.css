@@ -11,16 +11,18 @@
   min-height: 100vh;
 }
 
+/* Button system now lives in components.css, shared by every page
+   (public and app-shell alike) — link components.css before this file. */
 .app-sidebar {
   position: fixed;
   top: 0;
   bottom: 0;
   left: 0;
   z-index: 30;
-  width: 224px;
+  width: 248px;
   background: var(--color-surface);
   border-right: 1px solid var(--color-border);
-  padding: 2rem 1.25rem;
+  padding: 2.25rem 1.5rem;
   display: flex;
   flex-direction: column;
   transform: translateX(-100%);
@@ -36,19 +38,20 @@
    the color sweep already recolors to the teal accent), so no HTML
    needs to change. */
 .app-sidebar nav {
-  gap: 0.5rem !important;
+  gap: 0.3rem !important;
 }
 .app-sidebar nav a {
-  padding: 0.75rem 1rem !important;
-  border-radius: var(--radius-control) !important;
-  transition: background-color 0.15s ease, padding-left 0.15s ease;
+  padding: 0.7rem 1rem !important;
+  border-radius: 9999px !important;
+  font-weight: 500;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 .app-sidebar nav a:hover {
   background: var(--color-surface-muted);
 }
 .app-sidebar nav a.bg-indigo-50.text-indigo-700 {
-  border-left: 3px solid var(--color-accent);
-  padding-left: calc(1rem - 3px) !important;
+  background: var(--color-accent-bg) !important;
+  color: var(--color-accent-dark) !important;
   font-weight: 600;
 }
 
@@ -84,7 +87,7 @@
 .app-main {
   flex: 1;
   width: 100%;
-  padding: 4rem 1.5rem 2.5rem;
+  padding: 4.5rem 2rem 3rem;
 }
 
 /* System check status pills — was inline el.style.backgroundColor /
@@ -114,14 +117,14 @@
 .sidebar-brand {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0 0.5rem;
-  margin-bottom: 1.25rem;
+  gap: 0.55rem;
+  padding: 0 0.15rem;
+  margin-bottom: 1.5rem;
 }
 .sidebar-brand-mark {
-  width: 1.4rem;
-  height: 1.4rem;
-  color: var(--color-accent-dark);
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--color-accent);
   flex-shrink: 0;
 }
 /* .app-sidebar-title is already display:none below 768px and shown as
@@ -130,41 +133,47 @@
    has, just now sitting next to an icon instead of alone. */
 .sidebar-brand .app-sidebar-title {
   font-family: var(--font-heading);
-  font-weight: 800;
-  font-size: 1.05rem;
-  color: var(--color-accent-dark);
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--color-text);
   margin: 0;
   padding: 0;
 }
 
+/* Identity block: a quiet tinted panel, not a bordered id-card — the
+   softness comes from a filled tint and generous padding rather than a
+   hairline border. */
 .sidebar-identity {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.6rem;
-  margin-bottom: 0.5rem;
+  gap: 0.75rem;
+  padding: 0.85rem;
+  margin-bottom: 1.5rem;
   background: var(--color-surface-muted);
   border-radius: var(--radius-control);
 }
 .sidebar-identity-avatar {
-  width: 2rem;
-  height: 2rem;
+  width: 2.3rem;
+  height: 2.3rem;
   flex-shrink: 0;
   border-radius: 9999px;
   background: var(--color-accent-bg);
+  color: var(--color-accent-dark);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.8rem;
 }
 .sidebar-identity-info {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.3rem;
   min-width: 0;
 }
 .sidebar-identity-email {
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 600;
   color: var(--color-text);
   white-space: nowrap;
@@ -175,7 +184,7 @@
 .sidebar-identity-info .status-pill {
   width: fit-content;
   font-size: 0.65rem;
-  padding: 0.1rem 0.5rem;
+  padding: 0.15rem 0.6rem;
 }
 
 .sidebar-subnav {
@@ -258,6 +267,17 @@
   opacity: 0.6;
 }
 
+/* Sign-out button, now a proper .btn-ghost.btn-block instance instead of
+   a bare underlined text link — see dashboard.html for the class change. */
+#signout-btn {
+  margin-top: auto;
+  justify-content: flex-start !important;
+  color: var(--color-text-muted) !important;
+}
+#signout-btn:hover {
+  color: var(--color-critical) !important;
+}
+
 .family-member-card {
   display: flex;
   align-items: center;
@@ -309,7 +329,7 @@
     display: none !important;
   }
   .app-main {
-    padding: 2.5rem 1.5rem;
+    padding: 3rem 2.5rem;
   }
   .app-sidebar nav {
     margin-top: 0;

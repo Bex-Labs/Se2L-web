@@ -1,0 +1,166 @@
+/* Se2L shared components — v2, warm/calm/minimal.
+   Soft pill buttons, borderless cards that rely on whitespace and a
+   faint shadow rather than hairlines, generously padded form fields.
+   Linked on every page, public and app-shell alike. tokens.css still
+   recolors old Tailwind utility classes as a safety net for anything
+   not yet migrated to these. */
+
+/* --- Buttons: soft filled/outline pills, generous padding --- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0.75rem 1.4rem;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+.btn:hover { background: var(--color-border); }
+.btn:active { transform: scale(0.98); }
+.btn svg { width: 1.05rem; height: 1.05rem; flex-shrink: 0; }
+
+.btn-primary {
+  background: var(--color-accent);
+  color: #ffffff;
+}
+.btn-primary:hover { background: var(--color-accent-dark); }
+
+.btn-secondary {
+  background: transparent;
+  border-color: var(--color-accent-light);
+  color: var(--color-accent-dark);
+}
+.btn-secondary:hover { background: var(--color-accent-bg); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-text-secondary);
+}
+.btn-ghost:hover { background: var(--color-surface-muted); color: var(--color-text); }
+
+.btn-sm { font-size: 0.78rem; padding: 0.5rem 1rem; }
+.btn-lg { font-size: 1rem; padding: 0.9rem 1.75rem; }
+.btn-block { width: 100%; }
+
+/* --- Cards: whitespace and a faint shadow do the separating, not a
+   hard border. Generous internal padding is part of the calm feel. --- */
+.card {
+  background: var(--color-surface);
+  border: none;
+  border-radius: var(--radius-card);
+  padding: 1.75rem;
+  box-shadow: 0 1px 3px rgba(51, 49, 44, 0.05), 0 1px 2px rgba(51, 49, 44, 0.04);
+}
+.card-accent {
+  background: var(--color-accent);
+  color: #ffffff;
+  box-shadow: none;
+}
+
+/* --- Badges: one soft pill shape, no stamp/mono treatment --- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.4rem 0.9rem;
+  border-radius: 9999px;
+  background: var(--color-accent-bg);
+  color: var(--color-accent-dark);
+}
+
+/* --- Form fields: quiet, generously spaced, soft focus glow --- */
+.form-field { margin-bottom: 1.4rem; }
+.form-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.45rem;
+}
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--color-text);
+  background: var(--color-surface-muted);
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  padding: 0.8rem 1rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  outline: none;
+  background: var(--color-surface);
+  border-color: var(--color-accent-light);
+  box-shadow: 0 0 0 4px var(--color-accent-bg);
+}
+.form-textarea { resize: vertical; min-height: 5.5rem; }
+
+/* --- Section divider with a centered label --- */
+.divider-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem 0 1.5rem;
+}
+.divider-row::before,
+.divider-row::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+.divider-row-label {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+/* --- Numbered step marker --- */
+.step-marker {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 9999px;
+  background: var(--color-accent-bg);
+  color: var(--color-accent-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  margin: 0 auto 1.25rem;
+}
+
+/* --- Icon tile: soft rounded square, no border — a quiet container
+   for a stroke icon rather than an emoji. --- */
+.icon-tile {
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--radius-control);
+  background: var(--color-accent-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent-dark);
+  margin-bottom: 1rem;
+}
+.icon-tile svg { width: 1.5rem; height: 1.5rem; }
+.card-accent .icon-tile {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}

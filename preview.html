@@ -33,61 +33,57 @@
         <div class="sidebar-identity-avatar">👤</div>
         <div class="sidebar-identity-info">
           <span id="sidebar-user-email" class="sidebar-identity-email">Loading…</span>
-          <span id="sidebar-role-pill" class="status-pill">App Manager</span>
+          <span id="sidebar-role-pill" class="status-pill" data-i18n="roles.app_manager">App Manager</span>
         </div>
       </div>
 
       <nav class="flex flex-col gap-1" style="margin-top: 1rem;">
-        <a href="dashboard.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Dashboard</a>
-        <a href="app-manager.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Manage content</a>
-        <a href="resources.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Resources</a>
-        <a href="settings.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Settings</a>
+        <a href="dashboard.html" class="px-3 py-2 rounded-lg text-sm text-slate-600" data-i18n="nav.dashboard">Dashboard</a>
+        <a href="app-manager.html" class="px-3 py-2 rounded-lg text-sm text-slate-600" data-i18n="nav.manage_content">Manage content</a>
+        <a href="resources.html" class="px-3 py-2 rounded-lg text-sm text-slate-600" data-i18n="nav.resources">Resources</a>
+        <a href="settings.html" class="px-3 py-2 rounded-lg text-sm text-slate-600" data-i18n="nav.settings">Settings</a>
       </nav>
-      <button id="signout-btn" class="mt-auto text-xs text-slate-400 underline text-left px-3">Sign out</button>
+      <button id="signout-btn" class="mt-auto text-xs text-slate-400 underline text-left px-3" data-i18n="common.sign_out">Sign out</button>
     </aside>
 
     <main class="app-main">
       <div class="max-w-2xl mx-auto">
 
-        <a href="app-manager.html" class="text-sm text-slate-500 flex items-center gap-1 mb-4">
+        <a href="app-manager.html" class="text-sm text-slate-500 flex items-center gap-1 mb-4" data-i18n="preview.back_to_app_manager">
           ← Back to App Manager
         </a>
 
-    <span class="inline-flex bg-indigo-50 text-indigo-700 text-sm px-4 py-1.5 rounded-full mb-4">
+    <span class="inline-flex bg-indigo-50 text-indigo-700 text-sm px-4 py-1.5 rounded-full mb-4" data-i18n="preview.badge">
       Preview mode
     </span>
 
-    <h1 class="text-xl font-semibold mb-1">Preview a newcomer profile</h1>
-    <p class="text-sm text-slate-500 mb-6">
+    <h1 class="text-xl font-semibold mb-1" data-i18n="preview.heading">Preview a newcomer profile</h1>
+    <p class="text-sm text-slate-500 mb-6" data-i18n="preview.subtext">
       Pick a visa type and UK region to see exactly which tasks that profile would see, phase by phase — including drafts, if you want to check content before publishing.
     </p>
 
     <div class="bg-white border border-slate-200 rounded-xl p-6 mb-8">
       <div class="grid grid-cols-2 gap-4 mb-4">
         <div>
-          <label class="text-sm font-medium block mb-1">Visa type</label>
+          <label class="text-sm font-medium block mb-1" data-i18n="preview.visa_type_label">Visa type</label>
           <select id="preview_visa_type" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
-            <option value="skilled_worker">Skilled Worker</option>
-            <option value="student">Student</option>
+            <option value="" data-i18n="appmgr.loading_visa_types">Loading visa types...</option>
           </select>
         </div>
         <div>
-          <label class="text-sm font-medium block mb-1">UK region</label>
+          <label class="text-sm font-medium block mb-1" data-i18n="preview.uk_region_label">UK region</label>
           <select id="preview_uk_region" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
-            <option value="england">England</option>
-            <option value="scotland">Scotland</option>
-            <option value="wales">Wales</option>
-            <option value="northern_ireland">Northern Ireland</option>
+            <option value="" data-i18n="appmgr.loading_regions">Loading regions...</option>
           </select>
         </div>
       </div>
 
       <label class="flex items-center gap-2 text-sm mb-4">
         <input type="checkbox" id="include_unpublished" checked />
-        Include draft and in-review tasks (uncheck to see exactly what's live right now)
+        <span data-i18n="preview.include_unpublished">Include draft and in-review tasks (uncheck to see exactly what's live right now)</span>
       </label>
 
-      <button id="load-preview-btn" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium">
+      <button id="load-preview-btn" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium" data-i18n="preview.load_preview">
         Load preview
       </button>
     </div>
@@ -102,6 +98,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
   <script src="js/branding.js"></script>
+  <script src="js/lang/en.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/shell.js"></script>
   <script src="js/preview.js"></script>
 

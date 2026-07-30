@@ -33,55 +33,55 @@
         <div class="sidebar-identity-avatar">👤</div>
         <div class="sidebar-identity-info">
           <span id="sidebar-user-email" class="sidebar-identity-email">Loading…</span>
-          <span id="sidebar-role-pill" class="status-pill">Newcomer</span>
+          <span id="sidebar-role-pill" class="status-pill" data-i18n="roles.newcomer">Newcomer</span>
         </div>
       </div>
 
       <nav class="flex flex-col gap-1" style="margin-top: 1rem;">
-        <a id="dashboard-nav-link" href="dashboard.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Dashboard</a>
-        <a id="app-manager-link" href="app-manager.html" class="hidden px-3 py-2 rounded-lg text-sm text-slate-600">Manage content</a>
-        <a id="super-admin-link" href="super-admin.html" class="hidden px-3 py-2 rounded-lg text-sm text-slate-600">Platform overview</a>
-        <a href="resources.html" class="px-3 py-2 rounded-lg text-sm font-medium bg-indigo-50 text-indigo-700">Resources</a>
-        <a href="settings.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Settings</a>
+        <a id="dashboard-nav-link" href="dashboard.html" class="px-3 py-2 rounded-lg text-sm text-slate-600" data-i18n="nav.dashboard">Dashboard</a>
+        <a id="app-manager-link" href="app-manager.html" class="hidden px-3 py-2 rounded-lg text-sm text-slate-600" data-i18n="nav.manage_content">Manage content</a>
+        <a id="super-admin-link" href="super-admin.html" class="hidden px-3 py-2 rounded-lg text-sm text-slate-600" data-i18n="nav.platform_overview">Platform overview</a>
+        <a href="resources.html" class="px-3 py-2 rounded-lg text-sm font-medium bg-indigo-50 text-indigo-700" data-i18n="nav.resources">Resources</a>
+        <a href="settings.html" class="px-3 py-2 rounded-lg text-sm text-slate-600" data-i18n="nav.settings">Settings</a>
       </nav>
-      <button id="signout-btn" class="mt-auto text-xs text-slate-400 underline text-left px-3">Sign out</button>
+      <button id="signout-btn" class="mt-auto text-xs text-slate-400 underline text-left px-3" data-i18n="common.sign_out">Sign out</button>
     </aside>
 
     <main class="app-main">
       <div class="max-w-2xl mx-auto">
 
-        <a id="back-link" href="index.html" class="text-sm text-slate-500 flex items-center gap-1 mb-6">
+        <a id="back-link" href="index.html" class="text-sm text-slate-500 flex items-center gap-1 mb-6" data-i18n="resources.back_home">
           ← Back home
         </a>
 
-    <h1 class="text-xl font-semibold mb-1">Trusted settlement resources</h1>
-    <p class="text-sm text-slate-500 mb-4">Browse guidance for healthcare, work, money, and family setup.</p>
+    <h1 class="text-xl font-semibold mb-1" data-i18n="resources.heading">Trusted settlement resources</h1>
+    <p class="text-sm text-slate-500 mb-4" data-i18n="resources.subtext">Browse guidance for healthcare, work, money, and family setup.</p>
 
-    <input id="resource-search" type="search" placeholder="Search resources" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mb-4" />
+    <input id="resource-search" type="search" placeholder="Search resources" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mb-4" data-i18n-placeholder="resources.search_placeholder" />
 
     <div id="category-pills" class="flex gap-2 mb-6 flex-wrap"></div>
 
     <div id="resource-list" class="grid grid-cols-2 gap-3">
-      <p class="text-sm text-slate-400 col-span-2">Loading resources...</p>
+      <p class="text-sm text-slate-400 col-span-2" data-i18n="resources.loading">Loading resources...</p>
     </div>
 
     <!-- SE2L-51: only shown to a logged-in app_manager, checked without
          redirecting anyone else — this page stays fully public otherwise. -->
     <details id="add-resource-section" class="hidden bg-white border border-slate-200 rounded-xl mt-8">
-      <summary class="cursor-pointer p-6 font-semibold text-lg">Add a resource</summary>
+      <summary class="cursor-pointer p-6 font-semibold text-lg" data-i18n="resources.add_resource_heading">Add a resource</summary>
       <div class="px-6 pb-6">
         <form id="resource-form" class="border-t border-slate-200 pt-4">
           <div class="mb-4">
-            <label class="text-sm font-medium block mb-1">Title</label>
-            <input id="resource_title" type="text" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="e.g. Registering with a GP" />
+            <label class="text-sm font-medium block mb-1" data-i18n="resources.title_label">Title</label>
+            <input id="resource_title" type="text" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="e.g. Registering with a GP" data-i18n-placeholder="resources.title_placeholder" />
           </div>
           <div class="mb-4">
-            <label class="text-sm font-medium block mb-1">Description</label>
-            <textarea id="resource_description" rows="2" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="Short summary of what this resource covers"></textarea>
+            <label class="text-sm font-medium block mb-1" data-i18n="resources.description_label">Description</label>
+            <textarea id="resource_description" rows="2" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="Short summary of what this resource covers" data-i18n-placeholder="resources.description_placeholder"></textarea>
           </div>
           <div class="grid grid-cols-2 gap-4 mb-4">
             <div>
-              <label class="text-sm font-medium block mb-1">Category</label>
+              <label class="text-sm font-medium block mb-1" data-i18n="resources.category_label">Category</label>
               <select id="resource_category" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
                 <option value="Housing">Housing</option>
                 <option value="Legal">Legal</option>
@@ -93,19 +93,19 @@
               </select>
             </div>
             <div>
-              <label class="text-sm font-medium block mb-1">Status</label>
+              <label class="text-sm font-medium block mb-1" data-i18n="resources.status_label">Status</label>
               <select id="resource_status" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
-                <option value="draft">Draft (not visible to the public yet)</option>
-                <option value="published">Published</option>
+                <option value="draft" data-i18n="resources.status_draft">Draft (not visible to the public yet)</option>
+                <option value="published" data-i18n="resources.status_published">Published</option>
               </select>
             </div>
           </div>
           <div class="mb-4">
-            <label class="text-sm font-medium block mb-1">Link (optional)</label>
+            <label class="text-sm font-medium block mb-1" data-i18n="resources.link_label">Link (optional)</label>
             <input id="resource_url" type="url" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="https://gov.uk/..." />
           </div>
           <div class="flex justify-end pt-4 border-t border-slate-200">
-            <button type="submit" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium">Add resource</button>
+            <button type="submit" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium" data-i18n="resources.add_resource_btn">Add resource</button>
           </div>
         </form>
       </div>
@@ -119,6 +119,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
   <script src="js/branding.js"></script>
+  <script src="js/lang/en.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/shell.js"></script>
   <script src="js/resources.js"></script>
 

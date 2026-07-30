@@ -33,30 +33,30 @@
         <div class="sidebar-identity-avatar">👤</div>
         <div class="sidebar-identity-info">
           <span id="sidebar-user-email" class="sidebar-identity-email">Loading…</span>
-          <span id="sidebar-role-pill" class="status-pill">Newcomer</span>
+          <span id="sidebar-role-pill" class="status-pill" data-i18n="roles.newcomer">Newcomer</span>
         </div>
       </div>
 
       <nav class="flex flex-col gap-1" style="margin-top: 1rem;">
-        <a id="dashboard-nav-link" href="dashboard.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Dashboard</a>
-        <a id="app-manager-link" href="app-manager.html" class="hidden px-3 py-2 rounded-lg text-sm text-slate-600">Manage content</a>
-        <a id="super-admin-link" href="super-admin.html" class="hidden px-3 py-2 rounded-lg text-sm text-slate-600">Platform overview</a>
-        <a href="resources.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Resources</a>
-        <a href="settings.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Settings</a>
+        <a id="dashboard-nav-link" href="dashboard.html" class="px-3 py-2 rounded-lg text-sm text-slate-600" data-i18n="nav.dashboard">Dashboard</a>
+        <a id="app-manager-link" href="app-manager.html" class="hidden px-3 py-2 rounded-lg text-sm text-slate-600" data-i18n="nav.manage_content">Manage content</a>
+        <a id="super-admin-link" href="super-admin.html" class="hidden px-3 py-2 rounded-lg text-sm text-slate-600" data-i18n="nav.platform_overview">Platform overview</a>
+        <a href="resources.html" class="px-3 py-2 rounded-lg text-sm text-slate-600" data-i18n="nav.resources">Resources</a>
+        <a href="settings.html" class="px-3 py-2 rounded-lg text-sm text-slate-600" data-i18n="nav.settings">Settings</a>
       </nav>
-      <button id="signout-btn" class="mt-auto text-xs text-slate-400 underline text-left px-3">Sign out</button>
+      <button id="signout-btn" class="mt-auto text-xs text-slate-400 underline text-left px-3" data-i18n="common.sign_out">Sign out</button>
     </aside>
 
     <main class="app-main">
       <div class="max-w-xl mx-auto">
 
-        <a id="back-link" href="dashboard.html" class="text-sm text-slate-500 flex items-center gap-1 mb-4">
+        <a id="back-link" href="dashboard.html" class="text-sm text-slate-500 flex items-center gap-1 mb-4" data-i18n="resources.back_to_dashboard">
           ← Back to dashboard
         </a>
 
     <div class="flex justify-between items-start">
-      <span id="task-meta" class="text-xs text-red-600 font-medium">Loading...</span>
-      <button id="bookmark-btn" class="text-sm text-slate-400 font-medium">☆ Bookmark</button>
+      <span id="task-meta" class="text-xs text-red-600 font-medium" data-i18n="taskdetail.loading">Loading...</span>
+      <button id="bookmark-btn" class="text-sm text-slate-400 font-medium" data-i18n="taskdetail.bookmark">☆ Bookmark</button>
     </div>
     <h1 id="task-title" class="text-xl font-semibold mt-1 mb-2"></h1>
     <p id="task-time" class="text-sm text-slate-500 mb-4"></p>
@@ -68,28 +68,28 @@
     <div id="task-link-container" class="mb-6"></div>
 
     <div class="mb-6">
-      <label class="text-sm font-medium block mb-1">Your personal notes</label>
-      <textarea id="personal-note" rows="3" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="Add a private note for yourself — only you can see this."></textarea>
+      <label class="text-sm font-medium block mb-1" data-i18n="taskdetail.notes_label">Your personal notes</label>
+      <textarea id="personal-note" rows="3" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="Add a private note for yourself — only you can see this." data-i18n-placeholder="taskdetail.notes_placeholder"></textarea>
       <div class="flex justify-end mt-2">
-        <button id="save-note-btn" class="text-xs text-indigo-600 font-medium">Save note</button>
+        <button id="save-note-btn" class="text-xs text-indigo-600 font-medium" data-i18n="taskdetail.save_note">Save note</button>
       </div>
     </div>
 
     <div class="flex gap-3">
-      <button id="mark-complete-btn" class="flex-1 bg-slate-900 text-white rounded-lg py-2.5 text-sm font-medium">
+      <button id="mark-complete-btn" class="flex-1 bg-slate-900 text-white rounded-lg py-2.5 text-sm font-medium" data-i18n="taskdetail.mark_complete">
         ✓ Mark complete
       </button>
     </div>
 
     <div class="mt-6" id="feedback-section">
-      <label class="text-sm font-medium block mb-1">Was this task helpful?</label>
+      <label class="text-sm font-medium block mb-1" data-i18n="taskdetail.feedback_question">Was this task helpful?</label>
       <div class="flex gap-3 mb-2">
-        <button id="thumbs-up-btn" class="flex-1 border border-slate-300 rounded-lg py-2 text-sm font-medium">👍 Yes</button>
-        <button id="thumbs-down-btn" class="flex-1 border border-slate-300 rounded-lg py-2 text-sm font-medium">👎 No</button>
+        <button id="thumbs-up-btn" class="flex-1 border border-slate-300 rounded-lg py-2 text-sm font-medium" data-i18n="taskdetail.thumbs_up">👍 Yes</button>
+        <button id="thumbs-down-btn" class="flex-1 border border-slate-300 rounded-lg py-2 text-sm font-medium" data-i18n="taskdetail.thumbs_down">👎 No</button>
       </div>
-      <textarea id="feedback-comment" rows="2" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="Optional comment — visible to the team improving this content"></textarea>
+      <textarea id="feedback-comment" rows="2" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="Optional comment — visible to the team improving this content" data-i18n-placeholder="taskdetail.feedback_placeholder"></textarea>
       <div class="flex justify-end mt-2">
-        <button id="save-feedback-btn" class="text-xs text-indigo-600 font-medium">Save feedback</button>
+        <button id="save-feedback-btn" class="text-xs text-indigo-600 font-medium" data-i18n="taskdetail.save_feedback">Save feedback</button>
       </div>
     </div>
 
@@ -101,6 +101,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
   <script src="js/branding.js"></script>
+  <script src="js/lang/en.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/shell.js"></script>
   <script src="js/task-detail.js"></script>
 
