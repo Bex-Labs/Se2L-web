@@ -122,9 +122,13 @@
   margin-bottom: 1.5rem;
 }
 .sidebar-brand-mark {
-  width: 1.5rem;
-  height: 1.5rem;
-  color: var(--color-navy);
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.45rem;
+  background: var(--color-navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
 /* .app-sidebar-title is already display:none below 768px and shown as
