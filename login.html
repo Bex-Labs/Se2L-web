@@ -7,7 +7,7 @@
   <link href="css/output.css" rel="stylesheet">
   <link href="css/tokens.css" rel="stylesheet">
   <link href="css/components.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
   <style>
     /* Page-specific layout only — buttons, inputs, badges, and dividers
        now come from components.css. Kept local: the overall page frame
@@ -18,6 +18,33 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      background-color: var(--color-bg);
+      background-image: radial-gradient(var(--color-navy-bg) 1.5px, transparent 1.5px);
+      background-size: 22px 22px;
+    }
+    .login-page-wrap::before {
+      content: "";
+      position: absolute;
+      top: -6rem;
+      right: -6rem;
+      width: 20rem;
+      height: 20rem;
+      border-radius: 9999px;
+      background: radial-gradient(circle, var(--color-accent-bg) 0%, rgba(217,242,226,0) 70%);
+      pointer-events: none;
+    }
+    .login-page-wrap::after {
+      content: "";
+      position: absolute;
+      bottom: -8rem;
+      left: -8rem;
+      width: 24rem;
+      height: 24rem;
+      border-radius: 9999px;
+      background: radial-gradient(circle, var(--color-navy-bg) 0%, rgba(231,233,242,0) 70%);
+      pointer-events: none;
     }
 
     .login-header {
@@ -26,18 +53,24 @@
       justify-content: center;
       gap: 0.5rem;
       padding: 2rem 1.5rem 0;
+      position: relative;
+      z-index: 1;
     }
     .login-header-mark {
-      width: 1.85rem;
-      height: 1.85rem;
-      color: var(--color-accent);
+      width: 2rem;
+      height: 2rem;
+      border-radius: 0.5rem;
+      background: var(--color-navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
       flex-shrink: 0;
     }
     .login-header-title {
       font-family: var(--font-heading);
-      font-weight: 700;
-      font-size: 1.4rem;
-      color: var(--color-text);
+      font-weight: 800;
+      font-size: 1.3rem;
+      color: var(--color-navy);
     }
 
     .login-main {
@@ -46,11 +79,14 @@
       align-items: center;
       justify-content: center;
       padding: 2rem 1.5rem;
+      position: relative;
+      z-index: 1;
     }
 
     .login-card {
       width: 100%;
       max-width: 24rem;
+      box-shadow: 0 4px 20px rgba(15, 26, 68, 0.08);
     }
     .login-card .badge { margin-bottom: 0.75rem; }
     .login-card h1 {
@@ -106,6 +142,8 @@
       align-items: center;
       justify-content: center;
       gap: 0.375rem 1.25rem;
+      position: relative;
+      z-index: 1;
     }
     .login-footer span,
     .login-footer a { font-size: 0.7rem; color: var(--color-text-muted); }
@@ -117,11 +155,12 @@
   <div class="login-page-wrap">
 
     <div class="login-header">
-      <svg class="login-header-mark" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 2L2 7V12C2 16.97 6.24 21.44 12 22.5C17.76 21.44 22 16.97 22 12V7L12 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-        <path d="M9 12L11 14L15.5 9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      <span class="login-header-title">Se2L Settlement</span>
+      <div class="login-header-mark">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L2 7V12C2 16.97 6.24 21.44 12 22.5C17.76 21.44 22 16.97 22 12V7L12 2Z" stroke="#ffffff" stroke-width="1.6" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="login-header-title">Se2L</span>
     </div>
 
     <div class="login-main">

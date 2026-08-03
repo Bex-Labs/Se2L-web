@@ -1,24 +1,16 @@
 /* Dashboard-specific visual enhancements — kept out of tokens.css/shell.css
-   since those are meant to stay universal/page-agnostic (per their own
-   header comments). Warm/calm/minimal pass: dropped the ink-stamp/dashed
-   treatments from the previous version in favor of soft filled shapes
-   and quieter motion. Pairs with the phase-stepper/task-card markup
-   already in dashboard.js — no further JS changes needed here. */
-
-#task-list .rounded-xl,
-#progress-strip .rounded-xl,
-#upcoming-phase-teaser .rounded-xl,
-#phase-review-section.rounded-xl {
-  border-radius: var(--radius-card) !important;
-}
+   since those are meant to stay universal/page-agnostic. Matched to the
+   reference screens: task cards are now a grid of status-bordered cards
+   with an icon tile, pill badge, and explicit CTA button, rather than
+   compact list rows. Pairs with the markup dashboard.js now renders. */
 
 /* --- Hero header --- */
 .dashboard-hero-heading {
   font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 1.75rem;
+  font-weight: 800;
+  font-size: 1.9rem;
   color: var(--color-text);
-  margin: 0 0 0.5rem;
+  margin: 0 0 0.4rem;
 }
 .dashboard-hero-meta {
   font-size: 0.9rem;
@@ -28,178 +20,99 @@
 .dashboard-hero-meta-mono {
   text-transform: none;
   color: var(--color-text);
+  font-weight: 600;
 }
 
-/* --- Phase stepper ---
-   A quiet connected sequence: a thin baseline behind every step, a soft
-   dot marker per phase, a label underneath. No dashes, no rotated marks —
-   completion is shown with a filled soft dot, not a stamp. */
+/* --- Progress strip: bold percentage on the right, thick bar below —
+   matches the reference's "35% Complete" treatment. --- */
+.progress-strip-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.progress-strip-pct {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--color-text);
+}
+.progress-strip-pct-label {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+/* --- Phase stepper: kept, but simplified to small quiet dots since the
+   reference doesn't carry an equivalent element on the main dashboard
+   (its phase list lives in a page-specific onboarding sidebar instead,
+   which doesn't map onto this app's persistent site-wide nav — see
+   chat for why this stayed as a lightweight secondary element here). --- */
 .phase-stepper {
-  position: relative;
-  gap: 0;
-  margin-bottom: 0.5rem !important;
+  gap: 0.5rem;
 }
 .phase-step {
-  position: relative;
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.5rem 0.4rem 0;
+  gap: 0.4rem;
+  padding: 0.5rem 0.3rem;
   background: transparent !important;
   border: none !important;
 }
-.phase-step::before {
-  content: "";
-  position: absolute;
-  top: 1.05rem;
-  left: -50%;
-  width: 100%;
-  height: 2px;
-  background: var(--color-border);
-  z-index: 0;
-}
-.phase-step:first-child::before {
-  display: none;
-}
 .phase-step-dot {
-  position: relative;
-  z-index: 1;
-  width: 1.35rem;
-  height: 1.35rem;
+  width: 0.6rem;
+  height: 0.6rem;
   border-radius: 9999px;
-  background: var(--color-surface-muted);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.7rem;
+  background: var(--color-border);
 }
 .phase-step-label {
-  text-align: center;
-  line-height: 1.3;
-  font-size: 0.78rem;
-}
-
-/* Completed phase — filled soft sage dot with a checkmark. */
-.phase-step.is-done { cursor: pointer; }
-.phase-step.is-done::before { background: var(--color-accent-light); }
-.phase-step.is-done .phase-step-dot {
-  background: var(--color-accent);
-  color: #ffffff !important;
-}
-.phase-step.is-done .phase-step-label { color: var(--color-text-secondary); }
-.phase-step.is-done:hover .phase-step-dot { background: var(--color-accent-dark); }
-
-/* Current phase — the one slightly larger dot, ring rather than fill,
-   so it stands out as "you are here" without shouting. */
-.phase-step.is-current::before { background: var(--color-accent-light); }
-.phase-step.is-current .phase-step-dot {
-  background: var(--color-surface);
-  box-shadow: 0 0 0 3px var(--color-accent-bg), 0 0 0 4.5px var(--color-accent);
-  width: 1.5rem;
-  height: 1.5rem;
-}
-.phase-step.is-current .phase-step-label { color: var(--color-text) !important; font-weight: 600; }
-
-/* Locked phase — quiet, plain outline dot, muted label. */
-.phase-step.is-locked .phase-step-dot {
-  color: var(--color-text-muted);
-}
-.phase-step.is-locked .phase-step-label { color: var(--color-text-muted) !important; }
-
-/* --- Task cards ---
-   Soft hover lift, filled pill urgency badge instead of an outlined
-   stamp-style tag, chevron icon instead of a "›" character. */
-#task-list {
-  gap: 0.75rem;
-}
-#task-list > a.task-card {
-  border: none;
-  transition: box-shadow 0.2s ease, transform 0.15s ease;
-}
-#task-list > a.task-card:hover {
-  box-shadow: 0 4px 14px rgba(51, 49, 44, 0.07);
-  transform: translateY(-1px);
-}
-
-.task-urgency-badge {
-  display: inline-block;
   font-size: 0.68rem;
-  font-weight: 600;
-  padding: 0.2rem 0.55rem;
-  border-radius: 9999px;
-  background: currentColor;
-}
-.task-urgency-badge.text-red-600 { color: var(--color-critical); }
-.task-urgency-badge.text-amber-600 { color: var(--color-brass); }
-.task-urgency-badge.text-slate-500 { color: var(--color-text-muted); }
-.task-urgency-badge {
-  color: #ffffff !important;
-}
-.task-urgency-badge.text-red-600 { background: var(--color-critical); }
-.task-urgency-badge.text-amber-600 { background: var(--color-brass); }
-.task-urgency-badge.text-slate-500 { background: var(--color-text-muted); }
-
-.task-card-chevron {
-  display: inline-flex;
+  text-align: center;
   color: var(--color-text-muted);
-  transition: transform 0.15s ease;
 }
-.task-card-chevron svg { width: 1.1rem; height: 1.1rem; }
-#task-list > a.task-card:hover .task-card-chevron {
-  transform: translateX(3px);
-  color: var(--color-accent);
-}
+.phase-step.is-done .phase-step-dot { background: var(--color-accent); }
+.phase-step.is-done .phase-step-label { color: var(--color-text-secondary); }
+.phase-step.is-current .phase-step-dot { background: var(--color-navy); width: 0.75rem; height: 0.75rem; }
+.phase-step.is-current .phase-step-label { color: var(--color-text); font-weight: 700; }
 
-/* Done tasks: dashboard.js adds opacity-60 to the card and line-through
-   to the title. Swap the chevron for a filled soft checkmark instead of
-   dimming the whole card, so completion reads as calm and deliberate. */
-#task-list > a.task-card.opacity-60 {
-  opacity: 1 !important;
-  background-color: var(--color-surface-muted) !important;
+/* --- Task grid: replaces the old compact list-row cards with the
+   reference's card anatomy — icon tile, badge, title, description,
+   explicit CTA button. --- */
+.task-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
 }
-#task-list > a.task-card.opacity-60:hover {
-  transform: none;
-  box-shadow: none;
+@media (max-width: 640px) {
+  .task-grid { grid-template-columns: 1fr; }
 }
-#task-list > a.task-card.opacity-60 p.line-through {
-  color: var(--color-text-muted);
-  text-decoration: none;
-}
-#task-list > a.task-card.opacity-60 .task-card-chevron svg {
-  display: none;
-}
-#task-list > a.task-card.opacity-60 .task-card-chevron {
-  width: 1.4rem;
-  height: 1.4rem;
-  border-radius: 9999px;
-  background: var(--color-accent);
-  color: #ffffff;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.7rem;
-}
-#task-list > a.task-card.opacity-60 .task-card-chevron::after {
-  content: "✓";
-}
-
-/* --- Progress bar --- */
-.progress-strip-card {
+.task-grid-card {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
 }
-.progress-bar-track {
-  width: 100%;
-  height: 6px;
-  border-radius: 3px;
-  background: var(--color-surface-muted);
-  overflow: hidden;
+.task-grid-title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--color-text);
+  margin: 0.9rem 0 0.35rem;
 }
-.progress-bar-fill {
-  height: 100%;
-  background: var(--color-accent);
-  border-radius: 3px;
-  transition: width 0.3s ease;
+.task-grid-desc {
+  font-size: 0.82rem;
+  color: var(--color-text-secondary);
+  margin: 0 0 1.1rem;
+  flex: 1;
+}
+.task-grid-card .btn {
+  align-self: flex-start;
+}
+
+/* --- Upcoming phase teaser / phase review section: crisp radius from
+   the shared token, and a navy CTA band styled like the reference's
+   full-width dark callout. --- */
+#upcoming-phase-teaser .rounded-xl,
+#phase-review-section.rounded-xl {
+  border-radius: var(--radius-card) !important;
 }

@@ -6,7 +6,8 @@
   <title>Se2L — App manager</title>
   <link href="css/output.css" rel="stylesheet">
   <link href="css/tokens.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Literata:wght@600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="css/components.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
     <link href="css/shell.css" rel="stylesheet">
     <link href="css/app-manager.css" rel="stylesheet">
 </head>
@@ -31,7 +32,7 @@
       </div>
 
       <div class="sidebar-identity">
-        <div class="sidebar-identity-avatar">👤</div>
+        <div id="sidebar-identity-avatar" class="sidebar-identity-avatar">··</div>
         <div class="sidebar-identity-info">
           <span id="sidebar-user-email" class="sidebar-identity-email">Loading…</span>
           <span class="status-pill" data-i18n="roles.app_manager">App Manager</span>
@@ -49,13 +50,13 @@
         <a href="preview.html" class="px-3 py-2 rounded-lg text-sm text-slate-600" data-i18n="appmgr.nav_preview">Preview as newcomer</a>
         <a href="settings.html" class="px-3 py-2 rounded-lg text-sm text-slate-600" data-i18n="nav.settings">Settings</a>
       </nav>
-      <button id="signout-btn" class="mt-auto text-xs text-slate-400 underline text-left px-3" data-i18n="common.sign_out">Sign out</button>
+      <button id="signout-btn" class="btn btn-ghost btn-sm btn-block" style="margin-top: auto; justify-content: flex-start;" data-i18n="common.sign_out">Sign out</button>
     </aside>
 
     <main class="app-main">
       <div class="max-w-2xl mx-auto">
 
-    <span class="inline-flex bg-indigo-50 text-indigo-700 text-sm px-4 py-1.5 rounded-full mb-4" data-i18n="appmgr.badge">
+    <span class="badge mb-4" data-i18n="appmgr.badge">
       App manager
     </span>
 
@@ -76,14 +77,14 @@
           <div class="grid grid-cols-2 gap-4 mb-4">
             <div>
               <label class="text-sm font-medium block mb-1" data-i18n="appmgr.visa_type_label">Visa type</label>
-              <select id="journey_visa_type" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+              <select id="journey_visa_type" class="form-input">
                 <option value="" data-i18n="appmgr.loading_visa_types">Loading visa types...</option>
               </select>
-              <input id="journey_visa_type_other" type="text" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mt-2 hidden" placeholder="e.g. health_care_worker" />
+              <input id="journey_visa_type_other" type="text" class="form-input mt-2 hidden" placeholder="e.g. health_care_worker" />
             </div>
             <div>
               <label class="text-sm font-medium block mb-1" data-i18n="appmgr.uk_region_label">UK region</label>
-              <select id="journey_uk_region" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+              <select id="journey_uk_region" class="form-input">
                 <option value="" data-i18n="appmgr.loading_regions">Loading regions...</option>
               </select>
             </div>
@@ -91,7 +92,7 @@
 
           <div class="mb-4">
             <label class="text-sm font-medium block mb-1" data-i18n="appmgr.journey_name_label">Journey name</label>
-            <input id="journey_name" type="text" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="e.g. Skilled Worker — England" />
+            <input id="journey_name" type="text" required class="form-input" placeholder="e.g. Skilled Worker — England" />
           </div>
 
           <div class="mb-4">
@@ -104,7 +105,7 @@
           </div>
 
           <div class="flex justify-end pt-4 border-t border-slate-200">
-            <button type="submit" id="journey-submit-btn" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium" data-i18n="appmgr.create_journey">Create journey</button>
+            <button type="submit" id="journey-submit-btn" class="btn btn-primary" data-i18n="appmgr.create_journey">Create journey</button>
           </div>
         </form>
 
@@ -126,18 +127,18 @@
 
           <div class="mb-4">
             <label class="text-sm font-medium block mb-1" data-i18n="appmgr.title_label">Title</label>
-            <input id="title" type="text" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="e.g. Register for council tax" data-i18n-placeholder="appmgr.title_placeholder" />
+            <input id="title" type="text" required class="form-input" placeholder="e.g. Register for council tax" data-i18n-placeholder="appmgr.title_placeholder" />
           </div>
 
           <div class="mb-4">
             <label class="text-sm font-medium block mb-1" data-i18n="appmgr.description_label">Description / guidance</label>
-            <textarea id="body_html" rows="4" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="Explain why it matters and what to do. Use lines starting with '- ' for a bullet list." data-i18n-placeholder="appmgr.description_placeholder"></textarea>
+            <textarea id="body_html" rows="4" class="form-input" placeholder="Explain why it matters and what to do. Use lines starting with '- ' for a bullet list." data-i18n-placeholder="appmgr.description_placeholder"></textarea>
           </div>
 
           <div class="grid grid-cols-2 gap-4 mb-4">
             <div>
               <label class="text-sm font-medium block mb-1" data-i18n="appmgr.category_label">Category</label>
-              <select id="category" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+              <select id="category" class="form-input">
                 <option value="Housing">Housing</option>
                 <option value="Legal">Legal</option>
                 <option value="Banking">Banking</option>
@@ -165,11 +166,11 @@
           <div class="grid grid-cols-2 gap-4 mb-4">
             <div>
               <label class="text-sm font-medium block mb-1" data-i18n="appmgr.time_estimate_label">Time estimate (minutes)</label>
-              <input id="time_estimate" type="number" min="1" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="20" />
+              <input id="time_estimate" type="number" min="1" class="form-input" placeholder="20" />
             </div>
             <div>
               <label class="text-sm font-medium block mb-1" data-i18n="appmgr.phase_label">Phase</label>
-              <select id="phase_id" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+              <select id="phase_id" class="form-input">
                 <option value="" data-i18n="appmgr.loading_phases">Loading phases...</option>
               </select>
             </div>
@@ -195,17 +196,17 @@
 
           <div class="mb-4">
             <label class="text-sm font-medium block mb-1" data-i18n="appmgr.link_label">External link (optional)</label>
-            <input id="link_url" type="url" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="https://gov.uk/..." />
+            <input id="link_url" type="url" class="form-input" placeholder="https://gov.uk/..." />
           </div>
 
           <div class="mb-4">
             <label class="text-sm font-medium block mb-1" data-i18n="appmgr.youtube_label">YouTube video URL (optional)</label>
-            <input id="youtube_url" type="url" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="https://youtube.com/watch?v=..." />
+            <input id="youtube_url" type="url" class="form-input" placeholder="https://youtube.com/watch?v=..." />
           </div>
 
           <div class="mb-4">
             <label class="text-sm font-medium block mb-1" data-i18n="appmgr.depends_on_label">Depends on (optional)</label>
-            <select id="depends_on" multiple class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm h-28">
+            <select id="depends_on" multiple class="form-input" style="height:7rem;">
               <option value="" data-i18n="appmgr.loading_tasks_option">Loading tasks...</option>
             </select>
             <p class="text-xs text-slate-400 mt-1" data-i18n="appmgr.depends_on_hint">
@@ -222,7 +223,7 @@
 
           <div class="mb-4">
             <label class="text-sm font-medium block mb-1" data-i18n="appmgr.status_label">Status</label>
-            <select id="status" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+            <select id="status" class="form-input">
               <option value="draft" data-i18n="appmgr.status_draft">Draft (only visible to App Managers)</option>
               <option value="in_review" data-i18n="appmgr.status_in_review">In review</option>
               <option value="published" data-i18n="appmgr.status_published">Published (visible to newcomers)</option>
@@ -234,15 +235,15 @@
 
           <div class="mb-4">
             <label class="text-sm font-medium block mb-1" data-i18n="appmgr.schedule_label">Schedule for later (optional)</label>
-            <input id="scheduled_publish_at" type="datetime-local" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+            <input id="scheduled_publish_at" type="datetime-local" class="form-input" />
             <p class="text-xs text-slate-400 mt-1" data-i18n="appmgr.schedule_hint">
               If set, this task automatically switches to Published at this date and time — no need to come back and publish it manually. Only applies while the task is Draft or In review.
             </p>
           </div>
 
           <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
-            <button type="button" id="cancel-edit-btn" class="border border-slate-300 px-4 py-2 rounded-lg text-sm font-medium hidden" data-i18n="appmgr.cancel_edit">Cancel edit</button>
-            <button type="submit" id="submit-btn" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium" data-i18n="appmgr.save_as_draft">Save as draft</button>
+            <button type="button" id="cancel-edit-btn" class="btn btn-secondary hidden" data-i18n="appmgr.cancel_edit">Cancel edit</button>
+            <button type="submit" id="submit-btn" class="btn btn-primary" data-i18n="appmgr.save_as_draft">Save as draft</button>
           </div>
 
         </form>
@@ -268,14 +269,14 @@
         </p>
 
         <label class="text-sm font-medium block mb-1" data-i18n="appmgr.phase_label">Phase</label>
-        <select id="reorder_phase_select" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mb-4">
+        <select id="reorder_phase_select" class="form-input mb-4">
           <option value="" data-i18n="appmgr.loading_phases">Loading phases...</option>
         </select>
 
         <div id="reorder-task-list" class="flex flex-col gap-2 mb-4"></div>
 
         <div class="flex justify-end">
-          <button type="button" id="save-task-order-btn" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium hidden" data-i18n="appmgr.save_order">Save order</button>
+          <button type="button" id="save-task-order-btn" class="btn btn-primary hidden" data-i18n="appmgr.save_order">Save order</button>
         </div>
       </div>
     </details>
@@ -301,7 +302,14 @@
       const emailEl = document.getElementById("sidebar-user-email");
       if (!emailEl) return;
       const { data } = await supabaseClient.auth.getUser();
-      emailEl.textContent = data?.user?.email || window.t("common.unknown_user");
+      const email = data?.user?.email;
+      emailEl.textContent = email || window.t("common.unknown_user");
+      const avatarEl = document.getElementById("sidebar-identity-avatar");
+      if (avatarEl && email) {
+        const namePart = email.split("@")[0];
+        const initials = namePart.replace(/[^a-zA-Z]/g, " ").trim().split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase();
+        avatarEl.textContent = initials || namePart.slice(0, 2).toUpperCase();
+      }
     })();
   </script>
 

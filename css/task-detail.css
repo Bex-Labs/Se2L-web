@@ -1,0 +1,40 @@
+/* Task detail page — pairs with task-detail.html markup and the
+   urgency-badge template now in task-detail.js. No functional changes,
+   only presentation. */
+
+.task-meta-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.task-detail-title {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.4rem;
+  margin: 0.6rem 0 0.25rem;
+  color: var(--color-text);
+}
+
+/* Urgency badges — distinct from the generic mint .badge default so
+   "Critical" reads as urgent rather than positive. */
+.badge-critical { background: var(--color-critical-bg); color: var(--color-critical); }
+.badge-important { background: var(--color-warning-bg); color: var(--color-warning); }
+.badge-optional { background: var(--color-surface-muted); color: var(--color-text-secondary); }
+
+/* Two-column layout: main task content + a side column for the real
+   bookmark/notes and feedback features. Reference's "Required Documents"
+   panel isn't included here — there's no documents-list concept in the
+   actual data model, so it isn't faked. */
+.task-detail-layout {
+  display: grid;
+  grid-template-columns: 1fr 20rem;
+  gap: 2rem;
+  align-items: start;
+  max-width: 56rem;
+  margin: 0 auto;
+}
+@media (max-width: 800px) {
+  .task-detail-layout { grid-template-columns: 1fr; max-width: 34rem; }
+}

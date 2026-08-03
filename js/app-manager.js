@@ -34,9 +34,9 @@ function addPhaseRow(prefill) {
   row.id = rowId;
   row.className = "flex gap-2 items-start";
   row.innerHTML = `
-    <input type="text" class="phase-name flex-1 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="${t("appmgr.phase_name_placeholder")}" value="${prefill?.name || ""}" />
-    <input type="number" class="phase-start w-20 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="${t("appmgr.phase_from_placeholder")}" value="${prefill?.start ?? ""}" />
-    <input type="number" class="phase-end w-20 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="${t("appmgr.phase_to_placeholder")}" value="${prefill?.end ?? ""}" />
+    <input type="text" class="phase-name flex-1 form-input" placeholder="${t("appmgr.phase_name_placeholder")}" value="${prefill?.name || ""}" />
+    <input type="number" class="phase-start form-input" style="width:5rem;" placeholder="${t("appmgr.phase_from_placeholder")}" value="${prefill?.start ?? ""}" />
+    <input type="number" class="phase-end form-input" style="width:5rem;" placeholder="${t("appmgr.phase_to_placeholder")}" value="${prefill?.end ?? ""}" />
     <button type="button" class="remove-phase-row-btn text-xs text-red-600 font-medium px-2 py-2" data-row-id="${rowId}">${t("common.remove")}</button>
   `;
   document.getElementById("phase-rows").appendChild(row);
@@ -78,7 +78,7 @@ async function loadExistingJourneys() {
   }
 
   listDiv.innerHTML = journeys.map(j => `
-    <div class="bg-slate-50 border border-slate-200 rounded-lg p-3" id="journey-card-${j.id}">
+    <div class="card" id="journey-card-${j.id}">
       <div class="flex justify-between items-center">
         <div>
           <p class="text-sm font-medium">${j.name}</p>
@@ -165,9 +165,9 @@ function addPhaseEditRow(rowsDiv, phase) {
   row.className = "flex gap-2 items-start";
   row.dataset.phaseId = phase?.id || "";
   row.innerHTML = `
-    <input type="text" class="edit-phase-name flex-1 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="${t("appmgr.phase_name_placeholder")}" value="${phase?.name || ""}" />
-    <input type="number" class="edit-phase-start w-20 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="${t("appmgr.phase_from_placeholder")}" value="${phase?.days_after_arrival_start ?? ""}" />
-    <input type="number" class="edit-phase-end w-20 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="${t("appmgr.phase_to_placeholder")}" value="${phase?.days_after_arrival_end ?? ""}" />
+    <input type="text" class="edit-phase-name flex-1 form-input" placeholder="${t("appmgr.phase_name_placeholder")}" value="${phase?.name || ""}" />
+    <input type="number" class="edit-phase-start form-input" style="width:5rem;" placeholder="${t("appmgr.phase_from_placeholder")}" value="${phase?.days_after_arrival_start ?? ""}" />
+    <input type="number" class="edit-phase-end form-input" style="width:5rem;" placeholder="${t("appmgr.phase_to_placeholder")}" value="${phase?.days_after_arrival_end ?? ""}" />
     <button type="button" class="remove-edit-phase-row-btn text-xs text-red-600 font-medium px-2 py-2">${t("common.remove")}</button>
   `;
   rowsDiv.appendChild(row);
@@ -200,8 +200,8 @@ async function toggleJourneyPhaseEditor(journeyId) {
     <div class="edit-phase-rows flex flex-col gap-2 mb-2"></div>
     <button type="button" class="add-edit-phase-row-btn text-xs text-indigo-600 font-medium">${t("appmgr.add_phase")}</button>
     <div class="flex justify-end gap-2 mt-3">
-      <button type="button" class="cancel-phase-edit-btn border border-slate-300 px-3 py-1.5 rounded-lg text-xs font-medium">${t("common.cancel")}</button>
-      <button type="button" class="save-phase-edit-btn bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-medium">${t("appmgr.save_phases")}</button>
+      <button type="button" class="cancel-phase-edit-btn btn btn-secondary btn-sm">${t("common.cancel")}</button>
+      <button type="button" class="save-phase-edit-btn btn btn-primary btn-sm">${t("appmgr.save_phases")}</button>
     </div>
   `;
   container.classList.remove("hidden");
@@ -632,13 +632,26 @@ function renderStatusActions(task) {
 }
 
 async function loadExistingTasks() {
+  const listDiv = document.getElementById("task-list");
+  listDiv.innerHTML = `<p class="text-sm text-slate-400">${t("appmgr.loading_tasks_option") || "Loading tasks..."}</p>`;
+
   // Same ordering source as loadPhaseOptions: phases deduped by name,
   // ordered by sort_order — that's the real day-progression order
   // (Pre-arrival, Arrival day, First week...), not alphabetical.
-  const { data: allPhases } = await supabaseClient
-    .from("phases")
-    .select("name")
-    .order("sort_order", { ascending: true });
+  // Neither query depends on the other's result, so they run in
+  // parallel via Promise.all rather than one after another — this was
+  // previously two sequential round-trips for no reason, which is the
+  // actual cause of the visible delay before tasks appeared.
+  const [{ data: allPhases }, { data: tasks }] = await Promise.all([
+    supabaseClient
+      .from("phases")
+      .select("name")
+      .order("sort_order", { ascending: true }),
+    supabaseClient
+      .from("tasks")
+      .select("*, task_phases(phases(name))")
+      .order("created_at", { ascending: false })
+  ]);
 
   const seenPhaseNames = new Set();
   const orderedPhaseNames = (allPhases || []).filter(p => {
@@ -646,13 +659,6 @@ async function loadExistingTasks() {
     seenPhaseNames.add(p.name);
     return true;
   }).map(p => p.name);
-
-  const { data: tasks } = await supabaseClient
-    .from("tasks")
-    .select("*, task_phases(phases(name))")
-    .order("created_at", { ascending: false });
-
-  const listDiv = document.getElementById("task-list");
 
   if (!tasks || tasks.length === 0) {
     listDiv.innerHTML = `<p class="text-sm text-slate-400">${t("appmgr.no_tasks_yet")}</p>`;

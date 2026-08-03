@@ -6,171 +6,276 @@
   <title>Se2L — Onboarding</title>
   <link href="css/output.css" rel="stylesheet">
   <link href="css/tokens.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Literata:wght@600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="css/components.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
   <style>
-    /* New hero header for this page only — same lockup as login.html's
-       header, kept local here since only these two pages use it so far. */
-    .onboarding-header {
+    /* Split-screen onboarding layout — a wide desktop-oriented frame
+       (reassurance panel + form panel) rather than a single narrow
+       centered card, so it doesn't read as a mobile screen stretched
+       onto a desktop viewport. Deliberately distinct in structure from
+       index.html's hero/steps/bento layout, while sharing the same
+       navy/mint/cream design language. */
+    html, body { height: 100%; }
+    body { display: flex; }
+
+    .onboarding-shell {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      padding: 1rem 1.5rem 0;
-    }
-    .onboarding-header-mark {
-      width: 1.4rem;
-      height: 1.4rem;
-      color: var(--color-accent-dark);
-      flex-shrink: 0;
-    }
-    .onboarding-header-title {
-      font-family: var(--font-heading);
-      font-weight: 800;
-      font-size: 1.15rem;
-      color: var(--color-accent-dark);
+      width: 100%;
+      min-height: 100vh;
     }
 
-    .onboarding-hero {
-      text-align: center;
-      max-width: 32rem;
-      margin: 0.5rem auto 0;
-      padding: 0 1.5rem;
+    .onboarding-panel {
+      flex: 0 0 38%;
+      min-width: 320px;
+      background: linear-gradient(160deg, var(--color-navy) 0%, #16225a 60%, #1a2d4a 100%);
+      padding: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      color: #ffffff;
+      position: relative;
+      overflow: hidden;
     }
-    .onboarding-hero h2 {
+    .onboarding-panel::before {
+      content: "";
+      position: absolute;
+      top: -3.5rem;
+      right: -3.5rem;
+      width: 13rem;
+      height: 13rem;
+      border-radius: 9999px;
+      background: rgba(47, 174, 99, 0.15);
+    }
+    .onboarding-panel::after {
+      content: "";
+      position: absolute;
+      bottom: -4.5rem;
+      left: -2.5rem;
+      width: 15rem;
+      height: 15rem;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .onboarding-panel-brand { display: flex; align-items: center; gap: 0.55rem; position: relative; z-index: 1; }
+    .onboarding-panel-brand-mark {
+      width: 2rem; height: 2rem; border-radius: 0.5rem;
+      background: rgba(255,255,255,0.12);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .onboarding-panel-brand-title { font-family: var(--font-heading); font-weight: 800; font-size: 1.25rem; }
+
+    .onboarding-panel-copy { margin-top: auto; position: relative; z-index: 1; }
+    .onboarding-panel-copy h2 {
       font-family: var(--font-heading);
-      font-size: 1.05rem;
-      color: var(--color-text);
-      margin-bottom: 0.25rem;
+      font-weight: 800;
+      font-size: 1.85rem;
+      line-height: 1.25;
+      margin: 0 0 1rem;
     }
-    .onboarding-hero p {
-      font-size: 0.75rem;
-      color: var(--color-text-secondary);
-      line-height: 1.4;
+    .onboarding-panel-copy p {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.75);
+      line-height: 1.6;
+      margin: 0 0 2rem;
+      max-width: 26rem;
+    }
+    .onboarding-panel-stats {
+      display: flex;
+      gap: 1.75rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.15);
+    }
+    .onboarding-panel-stat-value {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 1.3rem;
+      color: #7ee2a8;
+      margin: 0;
+    }
+    .onboarding-panel-stat-label { font-size: 0.72rem; color: rgba(255,255,255,0.6); margin: 0.2rem 0 0; }
+
+    .onboarding-form-panel {
+      flex: 1;
+      background: var(--color-bg);
+      padding: 2.5rem 3.5rem 4rem;
+      overflow-y: auto;
+    }
+    .onboarding-form-panel-top { display: flex; justify-content: flex-end; margin-bottom: 1.5rem; }
+    .onboarding-wrap { max-width: 34rem; }
+
+    .onboarding-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1.25rem; }
+    @media (max-width: 560px) { .onboarding-form-grid { grid-template-columns: 1fr; } }
+    .onboarding-section-divider { margin-top: 0.5rem; padding-top: 1.25rem; border-top: 1px solid var(--color-border); }
+    .onboarding-hint { font-size: 0.72rem; color: var(--color-text-muted); margin-top: 0.35rem; line-height: 1.4; }
+    .onboarding-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--color-border); }
+
+    .dependant-entry { background: var(--color-surface-muted); border-radius: var(--radius-card); padding: 1.25rem; margin-bottom: 1rem; }
+    .dependant-entry .form-field { margin-bottom: 1rem; }
+    .dependant-entry-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1.25rem; }
+    @media (max-width: 560px) { .dependant-entry-grid { grid-template-columns: 1fr; } }
+
+    /* Stack panels on narrow viewports rather than squeezing both side
+       by side — the reassurance panel becomes a shorter top banner. */
+    @media (max-width: 860px) {
+      .onboarding-shell { flex-direction: column; }
+      .onboarding-form-panel { order: 1; padding: 1.5rem 1.5rem 2rem; }
+      .onboarding-panel { order: 2; flex: 0 0 auto; padding: 1.75rem 2rem; }
+      .onboarding-panel-copy { margin-top: 1.25rem; }
+      .onboarding-panel-copy h2 { font-size: 1.25rem; margin-bottom: 0.6rem; }
+      .onboarding-panel-copy p { display: none; }
+      .onboarding-panel-stats { flex-wrap: wrap; row-gap: 1rem; padding-top: 1rem; }
     }
   </style>
 </head>
-<body class="min-h-screen bg-slate-50 text-slate-900">
+<body class="text-slate-900">
 
-  <div class="onboarding-header">
-    <svg class="onboarding-header-mark" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 2L2 7V12C2 16.97 6.24 21.44 12 22.5C17.76 21.44 22 16.97 22 12V7L12 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-      <path d="M9 12L11 14L15.5 9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    <span class="onboarding-header-title">Se2L Settlement</span>
-  </div>
+  <div class="onboarding-shell">
 
-  <div class="onboarding-hero">
-    <h2 data-i18n="onboarding.hero_heading">Your guided journey to life in the UK</h2>
-    <p data-i18n="onboarding.hero_subtext">A few details now means a checklist built around your visa, your region, and your household — from day one.</p>
-  </div>
-
-  <div class="max-w-xl mx-auto py-4 px-6">
-
-    <span class="inline-flex items-center bg-indigo-50 text-indigo-700 text-xs px-3 py-1 rounded-full mb-2" data-i18n="onboarding.eyebrow">
-      Start your settlement journey
-    </span>
-
-    <h1 class="text-lg font-semibold mb-0.5" data-i18n="onboarding.heading">Tell us about your move to the UK</h1>
-    <p class="text-slate-600 text-xs mb-3" data-i18n="onboarding.subtext">We use this to build a personalised checklist for you.</p>
-
-    <form id="onboarding-form" class="bg-white border border-slate-200 rounded-xl p-4">
-
-      <div class="grid grid-cols-2 gap-3">
-        <div>
-          <label class="text-sm font-medium block mb-1" data-i18n="onboarding.visa_type_label">Visa type</label>
-          <select id="visa_type" class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm">
-            <option value="">Loading visa types...</option>
-          </select>
+    <aside class="onboarding-panel">
+      <div class="onboarding-panel-brand">
+        <div class="onboarding-panel-brand-mark">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 7V12C2 16.97 6.24 21.44 12 22.5C17.76 21.44 22 16.97 22 12V7L12 2Z" stroke="#ffffff" stroke-width="1.6" stroke-linejoin="round"/>
+          </svg>
         </div>
-        <div>
-          <label class="text-sm font-medium block mb-1" data-i18n="onboarding.arrival_date_label">Arrival date</label>
-         <input id="arrival_date" type="date" required class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm" />
-         <p class="text-xs text-slate-400 mt-1" data-i18n="onboarding.arrival_date_hint">Already in the UK? Enter your arrival date. Not yet arrived? Enter your planned arrival date — we'll get you ready in advance.</p>
-        </div>
-        <div>
-          <label class="text-sm font-medium block mb-1" data-i18n="onboarding.uk_region_label">UK region</label>
-          <select id="uk_region" class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm">
-            <option value="">Loading regions...</option>
-          </select>
-        </div>
-        <div>
-          <label class="text-sm font-medium block mb-1" data-i18n="onboarding.language_label">Preferred language</label>
-          <select id="language" class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm">
-            <option value="english">English</option>
-          </select>
-        </div>
+        <span class="onboarding-panel-brand-title">Se2L</span>
       </div>
 
-      <div class="mt-3">
-        <label class="text-sm font-medium block mb-1" data-i18n="onboarding.dependants_question">Settling with dependants?</label>
-        <select id="has_dependants" class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm">
-          <option value="" data-i18n="onboarding.select_option">Select an option</option>
-          <option value="no" data-i18n="onboarding.option_no">No</option>
-          <option value="yes" data-i18n="onboarding.option_yes">Yes</option>
-        </select>
-      </div>
+      <div class="onboarding-panel-copy">
+        <h2 data-i18n="onboarding.hero_heading">A clear plan for your first 90 days in the UK.</h2>
+        <p data-i18n="onboarding.hero_subtext">A few details now means a checklist built around your visa, your region, and your household — from day one.</p>
 
-      <!-- SE2L-23: household members section, shown only when has_dependants = yes -->
-      <div id="dependants-section" class="mt-3 pt-3 border-t border-slate-200 hidden">
-        <div class="flex items-center justify-between mb-3">
-          <label class="text-sm font-medium" data-i18n="onboarding.household_members">Household members</label>
-          <button type="button" id="add-dependant-btn" class="text-indigo-700 text-xs font-medium border border-indigo-200 bg-indigo-50 px-3 py-1.5 rounded-lg" data-i18n="onboarding.add_household_member">
-            + Add household member
-          </button>
-        </div>
-        <p class="text-xs text-slate-400 mb-3" data-i18n="onboarding.household_hint">Add anyone settling with you — partner, children, or other relatives. Adults you add will get their own invite to set up an account.</p>
-        <div id="dependants-container"></div>
-      </div>
-
-      <div class="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-slate-200">
-        <div>
-          <label class="text-sm font-medium block mb-1" data-i18n="onboarding.email_label">Email</label>
-          <input id="email" type="email" required placeholder="you@example.com" class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm" data-i18n-placeholder="onboarding.email_placeholder" />
-        </div>
-        <div>
-          <label class="text-sm font-medium block mb-1" data-i18n="onboarding.password_label">Password</label>
-          <input id="password" type="password" required minlength="6" placeholder="At least 6 characters" class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm" data-i18n-placeholder="onboarding.password_placeholder" />
+        <div class="onboarding-panel-stats">
+          <div>
+            <p class="onboarding-panel-stat-value">12,400+</p>
+            <p class="onboarding-panel-stat-label" data-i18n="index.stat_roadmaps_label">Active roadmaps</p>
+          </div>
+          <div>
+            <p class="onboarding-panel-stat-value">4</p>
+            <p class="onboarding-panel-stat-label" data-i18n="index.stat_regions">UK regions covered</p>
+          </div>
+          <div>
+            <p class="onboarding-panel-stat-value">5 min</p>
+            <p class="onboarding-panel-stat-label" data-i18n="onboarding.stat_setup_time">To set up</p>
+          </div>
         </div>
       </div>
+    </aside>
 
-      <div class="flex justify-end gap-3 mt-4 pt-3 border-t border-slate-200">
-        <a href="index.html" class="border border-slate-300 px-4 py-2 rounded-lg text-sm font-medium" data-i18n="onboarding.back">Back</a>
-        <button type="submit" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium" data-i18n="onboarding.submit">Create my journey</button>
+    <div class="onboarding-form-panel">
+      <div class="onboarding-form-panel-top">
+        <a href="login.html" style="font-size: 0.85rem; font-weight: 600; color: var(--color-text-secondary); text-decoration: none;">
+          <span data-i18n="index.hero_have_account">Already have an account?</span>
+          <span style="color: var(--color-navy);" data-i18n="index.header_login">Log in</span>
+        </a>
       </div>
 
-    </form>
+      <div class="onboarding-wrap">
 
+        <span class="badge badge-eyebrow" data-i18n="onboarding.eyebrow">Start your settlement journey</span>
+
+        <h1 style="font-family: var(--font-heading); font-weight: 800; font-size: 1.5rem; margin: 0.75rem 0 0.25rem;" data-i18n="onboarding.heading">Tell us about your move to the UK</h1>
+        <p class="text-slate-600 text-sm mb-4" data-i18n="onboarding.subtext">We use this to build a personalised checklist for you.</p>
+
+        <form id="onboarding-form" class="card">
+
+          <div class="onboarding-form-grid">
+            <div class="form-field">
+              <label class="form-label" data-i18n="onboarding.visa_type_label">Visa type</label>
+              <select id="visa_type" class="form-select">
+                <option value="">Loading visa types...</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label" data-i18n="onboarding.arrival_date_label">Arrival date</label>
+              <input id="arrival_date" type="date" required class="form-input" />
+              <p class="onboarding-hint" data-i18n="onboarding.arrival_date_hint">Already in the UK? Enter your arrival date. Not yet arrived? Enter your planned arrival date — we'll get you ready in advance.</p>
+            </div>
+            <div class="form-field">
+              <label class="form-label" data-i18n="onboarding.uk_region_label">UK region</label>
+              <select id="uk_region" class="form-select">
+                <option value="">Loading regions...</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label" data-i18n="onboarding.language_label">Preferred language</label>
+              <select id="language" class="form-select">
+                <option value="english">English</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label" data-i18n="onboarding.dependants_question">Settling with dependants?</label>
+            <select id="has_dependants" class="form-select">
+              <option value="" data-i18n="onboarding.select_option">Select an option</option>
+              <option value="no" data-i18n="onboarding.option_no">No</option>
+              <option value="yes" data-i18n="onboarding.option_yes">Yes</option>
+            </select>
+          </div>
+
+          <!-- SE2L-23: household members section, shown only when has_dependants = yes -->
+          <div id="dependants-section" class="onboarding-section-divider hidden">
+            <div class="flex items-center justify-between mb-3">
+              <label class="form-label" style="margin-bottom: 0;" data-i18n="onboarding.household_members">Household members</label>
+              <button type="button" id="add-dependant-btn" class="btn btn-secondary btn-sm" data-i18n="onboarding.add_household_member">
+                + Add household member
+              </button>
+            </div>
+            <p class="onboarding-hint mb-3" data-i18n="onboarding.household_hint">Add anyone settling with you — partner, children, or other relatives. Adults you add will get their own invite to set up an account.</p>
+            <div id="dependants-container"></div>
+          </div>
+
+          <div class="onboarding-form-grid onboarding-section-divider">
+            <div class="form-field">
+              <label class="form-label" data-i18n="onboarding.email_label">Email</label>
+              <input id="email" type="email" required placeholder="you@example.com" class="form-input" data-i18n-placeholder="onboarding.email_placeholder" />
+            </div>
+            <div class="form-field">
+              <label class="form-label" data-i18n="onboarding.password_label">Password</label>
+              <input id="password" type="password" required minlength="6" placeholder="At least 6 characters" class="form-input" data-i18n-placeholder="onboarding.password_placeholder" />
+            </div>
+          </div>
+
+          <div class="onboarding-actions">
+            <a href="index.html" class="btn btn-secondary" data-i18n="onboarding.back">Back</a>
+            <button type="submit" class="btn btn-primary" data-i18n="onboarding.submit">Create my journey</button>
+          </div>
+
+        </form>
+
+      </div>
+    </div>
   </div>
 
   <!-- SE2L-23: template for one household member entry, cloned by onboarding.js -->
   <template id="dependant-entry-template">
-    <div class="dependant-entry border border-slate-200 rounded-lg p-4 mb-3">
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <label class="text-xs font-medium block mb-1" data-i18n="onboarding.dep_name_label">Full name</label>
-          <input type="text" class="dependant-name w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" required />
+    <div class="dependant-entry">
+      <div class="dependant-entry-grid">
+        <div class="form-field">
+          <label class="form-label" data-i18n="onboarding.dep_name_label">Full name</label>
+          <input type="text" class="dependant-name form-input" required />
         </div>
-        <div>
-          <label class="text-xs font-medium block mb-1" data-i18n="onboarding.dep_dob_label">Date of birth</label>
-          <input type="date" class="dependant-dob w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+        <div class="form-field">
+          <label class="form-label" data-i18n="onboarding.dep_dob_label">Date of birth</label>
+          <input type="date" class="dependant-dob form-input" />
         </div>
-        <div>
-          <label class="text-xs font-medium block mb-1" data-i18n="onboarding.dep_category_label">Category</label>
-          <select class="dependant-type w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+        <div class="form-field">
+          <label class="form-label" data-i18n="onboarding.dep_category_label">Category</label>
+          <select class="dependant-type form-select">
             <option value="minor" data-i18n="onboarding.dep_category_child">Child</option>
             <option value="adult" data-i18n="onboarding.dep_category_adult">Adult (partner / relative)</option>
           </select>
         </div>
-        <div>
-          <label class="text-xs font-medium block mb-1" data-i18n="onboarding.dep_relationship_label">Relationship</label>
-          <input type="text" class="dependant-relationship w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="e.g. Son, Daughter, Niece" data-i18n-placeholder="onboarding.dep_relationship_placeholder" />
+        <div class="form-field">
+          <label class="form-label" data-i18n="onboarding.dep_relationship_label">Relationship</label>
+          <input type="text" class="dependant-relationship form-input" placeholder="e.g. Son, Daughter, Niece" data-i18n-placeholder="onboarding.dep_relationship_placeholder" />
         </div>
-        <div class="dependant-email-wrapper hidden">
-          <label class="text-xs font-medium block mb-1" data-i18n="onboarding.dep_email_label">Email (for their invite)</label>
-          <input type="email" class="dependant-email w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="their@email.com" data-i18n-placeholder="onboarding.dep_email_placeholder" />
+        <div class="dependant-email-wrapper hidden form-field">
+          <label class="form-label" data-i18n="onboarding.dep_email_label">Email (for their invite)</label>
+          <input type="email" class="dependant-email form-input" placeholder="their@email.com" data-i18n-placeholder="onboarding.dep_email_placeholder" />
         </div>
       </div>
-      <button type="button" class="remove-dependant-btn text-xs text-red-600 mt-3" data-i18n="onboarding.dep_remove">Remove</button>
+      <button type="button" class="remove-dependant-btn btn btn-ghost btn-sm" style="color: var(--color-critical);" data-i18n="onboarding.dep_remove">Remove</button>
     </div>
   </template>
 

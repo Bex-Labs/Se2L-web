@@ -6,16 +6,14 @@
   <title>Se2L — Super admin</title>
   <link href="css/output.css" rel="stylesheet">
   <link href="css/tokens.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Literata:wght@600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="css/components.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
     <link href="css/shell.css" rel="stylesheet">
   <style>
     .admin-stat-card {
       background: var(--color-surface-muted);
       border-radius: var(--radius-card);
       padding: 1rem;
-    }
-    .admin-stat-icon {
-      font-size: 1.1rem;
     }
     .admin-stat-label {
       font-size: 0.75rem;
@@ -38,10 +36,6 @@
       gap: 0.4rem;
       margin-bottom: 0.5rem;
     }
-    .admin-section-icon {
-      font-size: 1rem;
-    }
-
     .admin-account-card {
       background: var(--color-surface);
       border: 1px solid var(--color-border);
@@ -175,6 +169,16 @@
     .moderation-action-btn.is-danger {
       color: var(--color-critical);
     }
+
+    /* output.css defines .rounded-lg/.rounded-xl as hardcoded rem values,
+       not the --radius-card/--radius-control tokens — reasserting it here
+       for the remaining plain wrapper divs (system check rows, form card
+       wrappers) so the whole page reads at one consistent radius. */
+    #panel-overview .rounded-lg,
+    #panel-app-managers .rounded-xl,
+    #panel-settings .rounded-xl {
+      border-radius: var(--radius-card) !important;
+    }
   </style>
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-900">
@@ -198,7 +202,7 @@
       </div>
 
       <div class="sidebar-identity">
-        <div class="sidebar-identity-avatar">👤</div>
+        <div id="sidebar-identity-avatar" class="sidebar-identity-avatar">··</div>
         <div class="sidebar-identity-info">
           <span id="sidebar-user-email" class="sidebar-identity-email">Loading…</span>
           <span id="sidebar-role-pill" class="status-pill">Super Admin</span>
@@ -221,7 +225,7 @@
         <a href="resources.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Resources</a>
         <a href="settings.html" class="px-3 py-2 rounded-lg text-sm text-slate-600">Settings</a>
       </nav>
-      <button id="signout-btn" class="mt-auto text-xs text-slate-400 underline text-left px-3">Sign out</button>
+      <button id="signout-btn" class="btn btn-ghost btn-sm btn-block" style="margin-top: auto; justify-content: flex-start;">Sign out</button>
     </aside>
 
     <main class="app-main">
@@ -232,29 +236,37 @@
 
     <div class="grid grid-cols-4 gap-3 mb-6">
       <div class="admin-stat-card">
-        <span class="admin-stat-icon">👥</span>
+        <div class="icon-tile" style="width:2rem; height:2rem; margin-bottom:0.5rem;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:1.1rem; height:1.1rem;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
         <p class="admin-stat-label">App managers</p>
         <p id="stat-app-managers" class="admin-stat-value">—</p>
       </div>
       <div class="admin-stat-card">
-        <span class="admin-stat-icon">🧭</span>
+        <div class="icon-tile icon-tile-mint" style="width:2rem; height:2rem; margin-bottom:0.5rem;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:1.1rem; height:1.1rem;"><circle cx="12" cy="12" r="9"/><polygon points="12 7 14 12 12 17 10 12 12 7"/></svg>
+        </div>
         <p class="admin-stat-label">Visa journeys</p>
         <p id="stat-journeys" class="admin-stat-value">—</p>
       </div>
       <div class="admin-stat-card">
-        <span class="admin-stat-icon">📍</span>
+        <div class="icon-tile" style="width:2rem; height:2rem; margin-bottom:0.5rem;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:1.1rem; height:1.1rem;"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
         <p class="admin-stat-label">UK regions</p>
         <p id="stat-regions" class="admin-stat-value">—</p>
       </div>
       <div class="admin-stat-card">
-        <span class="admin-stat-icon">📄</span>
+        <div class="icon-tile icon-tile-navy-solid" style="width:2rem; height:2rem; margin-bottom:0.5rem;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:1.1rem; height:1.1rem;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        </div>
         <p class="admin-stat-label">Content status</p>
         <p id="stat-content-status" class="admin-stat-value admin-stat-value-small">Loading...</p>
       </div>
     </div>
 
     <div class="admin-section-heading">
-      <span class="admin-section-icon">🩺</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-dark)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:1.1rem; height:1.1rem;"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
       <p class="text-sm font-medium">System checks</p>
     </div>
     <div class="flex flex-col gap-2">
@@ -281,16 +293,16 @@
     <!-- SE2L-73: manage App Manager accounts -->
     <div id="app-manager-accounts-section" class="mt-8">
       <div class="admin-section-heading">
-        <span class="admin-section-icon">🔑</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-dark)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:1.1rem; height:1.1rem;"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
         <h2 class="text-base font-semibold">App Manager accounts</h2>
       </div>
 
       <form id="invite-form" class="bg-white border border-slate-200 rounded-xl p-4 flex gap-3 items-end mb-4">
         <div class="flex-1">
           <label class="text-sm font-medium block mb-1">Invite a new App Manager</label>
-          <input id="invite_email" type="email" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="name@example.com" />
+          <input id="invite_email" type="email" required class="form-input" placeholder="name@example.com" />
         </div>
-        <button type="submit" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium">Send invite</button>
+        <button type="submit" class="btn btn-primary">Send invite</button>
       </form>
 
       <div id="app-manager-list" class="flex flex-col gap-2 mb-4"></div>
@@ -304,7 +316,7 @@
     <!-- SE2L-74: configure available visa types and UK regions -->
     <div id="visa-region-section" class="mt-8">
       <div class="admin-section-heading">
-        <span class="admin-section-icon">🌍</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-dark)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:1.1rem; height:1.1rem;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
         <h2 class="text-base font-semibold">Visa types & UK regions</h2>
       </div>
       <p class="text-sm text-slate-500 mb-4">
@@ -315,9 +327,9 @@
         <div class="visa-region-card">
           <h3 class="text-sm font-medium mb-3">Visa types</h3>
           <form id="add-visa-type-form" class="visa-region-add-form">
-            <input id="new_visa_type_value" type="text" required class="border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="value, e.g. bno" />
-            <input id="new_visa_type_label" type="text" required class="border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="label, e.g. BN(O)" />
-            <button type="submit" class="bg-slate-900 text-white px-3 py-2 rounded-lg text-sm font-medium">Add</button>
+            <input id="new_visa_type_value" type="text" required class="form-input" placeholder="value, e.g. bno" />
+            <input id="new_visa_type_label" type="text" required class="form-input" placeholder="label, e.g. BN(O)" />
+            <button type="submit" class="btn btn-primary btn-sm">Add</button>
           </form>
           <div id="visa-type-list" class="flex flex-col gap-2"></div>
         </div>
@@ -325,9 +337,9 @@
         <div class="visa-region-card">
           <h3 class="text-sm font-medium mb-3">UK regions</h3>
           <form id="add-uk-region-form" class="visa-region-add-form">
-            <input id="new_uk_region_value" type="text" required class="border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="value, e.g. wales" />
-            <input id="new_uk_region_label" type="text" required class="border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="label, e.g. Wales" />
-            <button type="submit" class="bg-slate-900 text-white px-3 py-2 rounded-lg text-sm font-medium">Add</button>
+            <input id="new_uk_region_value" type="text" required class="form-input" placeholder="value, e.g. wales" />
+            <input id="new_uk_region_label" type="text" required class="form-input" placeholder="label, e.g. Wales" />
+            <button type="submit" class="btn btn-primary btn-sm">Add</button>
           </form>
           <div id="uk-region-list" class="flex flex-col gap-2"></div>
         </div>
@@ -339,7 +351,7 @@
     <!-- SE2L-75: override or unpublish any content, regardless of author -->
     <div id="moderation-section" class="mt-8">
       <div class="admin-section-heading">
-        <span class="admin-section-icon">🛡️</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--color-critical)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:1.1rem; height:1.1rem;"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/></svg>
         <h2 class="text-base font-semibold">Content moderation</h2>
       </div>
       <p class="text-sm text-slate-500 mb-4">
@@ -347,11 +359,11 @@
       </p>
 
       <h3 class="text-sm font-medium mb-2">Tasks</h3>
-      <input id="moderation-task-search" type="search" placeholder="Search tasks by title" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mb-3" />
+      <input id="moderation-task-search" type="search" placeholder="Search tasks by title" class="form-input mb-3" />
       <div id="moderation-task-list" class="flex flex-col gap-2 mb-6"></div>
 
       <h3 class="text-sm font-medium mb-2">Resources</h3>
-      <input id="moderation-resource-search" type="search" placeholder="Search resources by title" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mb-3" />
+      <input id="moderation-resource-search" type="search" placeholder="Search resources by title" class="form-input mb-3" />
       <div id="moderation-resource-list" class="flex flex-col gap-2"></div>
     </div>
     </div>
@@ -359,7 +371,7 @@
     <div id="panel-settings" class="admin-panel">
       <!-- SE2L-77: manage platform settings -->
       <div class="admin-section-heading">
-        <span class="admin-section-icon">⚙️</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--color-navy)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:1.1rem; height:1.1rem;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         <h2 class="text-base font-semibold">Platform settings</h2>
       </div>
 
@@ -372,23 +384,23 @@
         <div class="grid grid-cols-2 gap-4 mb-4">
           <div>
             <label class="text-sm font-medium block mb-1">Site name</label>
-            <input id="branding_site_name" type="text" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="Se2L" />
+            <input id="branding_site_name" type="text" class="form-input" placeholder="Se2L" />
           </div>
           <div>
             <label class="text-sm font-medium block mb-1">Accent color</label>
             <div class="flex gap-2 items-center">
-              <input id="branding_accent_color" type="color" class="border border-slate-300 rounded-lg h-10 w-14" />
-              <input id="branding_accent_color_text" type="text" class="flex-1 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="#0d4d4d" />
+              <input id="branding_accent_color" type="color" class="form-input" style="height:2.5rem; width:3.5rem; padding:0.25rem;" />
+              <input id="branding_accent_color_text" type="text" class="flex-1 form-input" placeholder="#0d4d4d" />
             </div>
           </div>
         </div>
         <label class="text-sm font-medium block mb-1">Support email</label>
-        <input id="branding_support_email" type="email" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mb-3" placeholder="support@example.com" />
+        <input id="branding_support_email" type="email" class="form-input mb-3" placeholder="support@example.com" />
 
         <p id="branding-save-message" class="text-sm mb-3 hidden"></p>
 
         <div class="flex justify-end">
-          <button type="button" id="save-branding-btn" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium">Save changes</button>
+          <button type="button" id="save-branding-btn" class="btn btn-primary">Save changes</button>
         </div>
       </div>
       </div>
@@ -400,7 +412,7 @@
       </p>
       <div class="bg-white border border-slate-200 rounded-xl p-4 mb-6">
         <label class="text-sm font-medium block mb-1">Which email</label>
-        <select id="email_template_select" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mb-3">
+        <select id="email_template_select" class="form-input mb-3">
           <option value="app_manager_invite">App Manager invite</option>
           <option value="dependant_invite">Household member invite</option>
           <option value="phase_activation">New phase started</option>
@@ -411,14 +423,14 @@
         <p id="email-template-placeholders" class="text-xs text-slate-400 mb-3"></p>
 
         <label class="text-sm font-medium block mb-1">Subject</label>
-        <input id="email_template_subject" type="text" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mb-4" />
+        <input id="email_template_subject" type="text" class="form-input mb-4" />
 
         <label class="text-sm font-medium block mb-1">Content (HTML)</label>
-        <textarea id="email_template_body" rows="8" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mb-2 font-mono"></textarea>
+        <textarea id="email_template_body" rows="8" class="form-input mb-2 font-mono"></textarea>
         <p id="email-template-save-message" class="text-sm mb-3 hidden"></p>
 
         <div class="flex justify-end">
-          <button type="button" id="save-email-template-btn" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium">Save changes</button>
+          <button type="button" id="save-email-template-btn" class="btn btn-primary">Save changes</button>
         </div>
       </div>
       </div>
@@ -430,14 +442,14 @@
       </p>
       <div class="bg-white border border-slate-200 rounded-xl p-4">
         <label class="text-sm font-medium block mb-1">Page title</label>
-        <input id="terms_title" type="text" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mb-4" />
+        <input id="terms_title" type="text" class="form-input mb-4" />
 
         <label class="text-sm font-medium block mb-1">Content</label>
-        <textarea id="terms_body" rows="10" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mb-2" placeholder="Use lines starting with '- ' for a bullet list."></textarea>
+        <textarea id="terms_body" rows="10" class="form-input mb-2" placeholder="Use lines starting with '- ' for a bullet list."></textarea>
         <p id="terms-save-message" class="text-sm mb-3 hidden"></p>
 
         <div class="flex justify-end">
-          <button type="button" id="save-terms-btn" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium">Save changes</button>
+          <button type="button" id="save-terms-btn" class="btn btn-primary">Save changes</button>
         </div>
       </div>
       </div>

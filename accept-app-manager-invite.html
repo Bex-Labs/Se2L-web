@@ -6,72 +6,112 @@
   <title>Se2L — Accept App Manager invite</title>
   <link href="css/output.css" rel="stylesheet">
   <link href="css/tokens.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Literata:wght@600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  </head>
+  <link href="css/components.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    .invite-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 2.5rem 1.5rem 0;
+    }
+    .invite-header-mark {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 0.5rem;
+      background: var(--color-navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .invite-header-title {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 1.3rem;
+      color: var(--color-navy);
+    }
+    .invite-wrap {
+      max-width: 32rem;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+    }
+  </style>
+</head>
 <body class="min-h-screen bg-slate-50 text-slate-900">
 
-  <div class="max-w-xl mx-auto py-16 px-6">
+  <div class="invite-header">
+    <div class="invite-header-mark">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L2 7V12C2 16.97 6.24 21.44 12 22.5C17.76 21.44 22 16.97 22 12V7L12 2Z" stroke="#ffffff" stroke-width="1.6" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <span class="invite-header-title">Se2L</span>
+  </div>
 
-    <span class="inline-flex items-center bg-indigo-50 text-indigo-700 text-sm px-4 py-1.5 rounded-full mb-4">
+  <div class="invite-wrap">
+
+    <span class="badge badge-eyebrow mb-4">
       You've been invited as an App Manager
     </span>
 
-    <h1 id="invite-heading" class="text-2xl font-semibold mb-1">Set up your Se2L App Manager account</h1>
+    <h1 id="invite-heading" style="font-family: var(--font-heading); font-weight: 800; font-size: 1.5rem; margin-bottom: 0.25rem;">Set up your Se2L App Manager account</h1>
     <p id="invite-subtext" class="text-slate-600 text-sm mb-6">Loading your invite...</p>
 
     <!-- Shown if the token is invalid, expired, or already used -->
-    <div id="invite-error" class="hidden bg-white border border-red-200 rounded-xl p-6 text-sm text-red-700">
+    <div id="invite-error" class="hidden card" style="border-top: 3px solid var(--color-critical); color: var(--color-critical);">
       This invite link isn't valid. It may have already been used, or the link may be incomplete.
       Please check the link in your email, or contact the Super Admin who invited you for a new one.
     </div>
 
-    <form id="accept-invite-form" class="hidden bg-white border border-slate-200 rounded-xl p-6">
+    <form id="accept-invite-form" class="hidden card">
 
-      <div>
-        <label class="text-sm font-medium block mb-1">Email</label>
-        <input id="invite-email" type="email" disabled class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-slate-50 text-slate-500" />
+      <div class="form-field">
+        <label class="form-label">Email</label>
+        <input id="invite-email" type="email" disabled class="form-input" style="background: var(--color-surface-muted); color: var(--color-text-secondary);" />
       </div>
 
-      <div class="mt-4">
-        <label class="text-sm font-medium block mb-1">Password</label>
-        <input id="password" type="password" required minlength="6" placeholder="At least 6 characters" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+      <div class="form-field">
+        <label class="form-label">Password</label>
+        <input id="password" type="password" required minlength="6" placeholder="At least 6 characters" class="form-input" />
       </div>
 
-      <p class="text-xs text-slate-400 mt-4 pt-4 border-t border-slate-200">
+      <p class="text-xs text-slate-400" style="padding-top: 1rem; border-top: 1px solid var(--color-border);">
         These last few fields exist on every Se2L account, even staff ones — they don't affect your App Manager access.
       </p>
 
-      <div class="grid grid-cols-2 gap-4 mt-2">
-        <div>
-          <label class="text-sm font-medium block mb-1">Visa type</label>
-          <select id="visa_type" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0 1.25rem; margin-top: 0.5rem;">
+        <div class="form-field">
+          <label class="form-label">Visa type</label>
+          <select id="visa_type" class="form-select">
             <option value="skilled_worker">Skilled Worker</option>
             <option value="student">Student</option>
           </select>
         </div>
-        <div>
-          <label class="text-sm font-medium block mb-1">Date</label>
-          <input id="arrival_date" type="date" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+        <div class="form-field">
+          <label class="form-label">Date</label>
+          <input id="arrival_date" type="date" required class="form-input" />
         </div>
-        <div>
-          <label class="text-sm font-medium block mb-1">UK region</label>
-          <select id="uk_region" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+        <div class="form-field">
+          <label class="form-label">UK region</label>
+          <select id="uk_region" class="form-select">
             <option value="england">England</option>
             <option value="scotland">Scotland</option>
             <option value="wales">Wales</option>
             <option value="northern_ireland">Northern Ireland</option>
           </select>
         </div>
-        <div>
-          <label class="text-sm font-medium block mb-1">Preferred language</label>
-          <select id="language" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+        <div class="form-field">
+          <label class="form-label">Preferred language</label>
+          <select id="language" class="form-select">
             <option value="english">English</option>
           </select>
         </div>
       </div>
 
-      <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-200">
-        <button type="submit" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium">Create my account</button>
+      <div class="flex justify-end pt-4" style="border-top: 1px solid var(--color-border);">
+        <button type="submit" class="btn btn-primary">Create my account</button>
       </div>
 
     </form>

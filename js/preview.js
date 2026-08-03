@@ -17,7 +17,7 @@ async function checkAccess() {
     .single();
 
   if (!profile || profile.role !== "app_manager") {
-    document.querySelector(".max-w-2xl").innerHTML = `<p class="text-sm text-red-600 mt-10">${t("common.access_denied")}</p>`;
+    document.querySelector(".max-w-2xl").innerHTML = `<p class="text-sm text-red-600 mt-10">You don't have access to this page.</p>`;
     return null;
   }
 
@@ -26,15 +26,21 @@ async function checkAccess() {
   // here: the access check above already guarantees only app_manager
   // reaches this point, so the pill is always "App Manager" in practice.
   const emailEl = document.getElementById("sidebar-user-email");
-  if (emailEl) emailEl.textContent = user.email || t("common.unknown_user");
+  if (emailEl) emailEl.textContent = user.email || "Unknown user";
+  const avatarEl = document.getElementById("sidebar-identity-avatar");
+  if (avatarEl && user.email) {
+    const namePart = user.email.split("@")[0];
+    const initials = namePart.replace(/[^a-zA-Z]/g, " ").trim().split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase();
+    avatarEl.textContent = initials || namePart.slice(0, 2).toUpperCase();
+  }
 
   return user;
 }
 
 const statusBadge = {
-  draft: () => `<span class="bg-slate-100 text-slate-500 text-xs px-2 py-0.5 rounded-full ml-2">${t("appmgr.status_draft_short")}</span>`,
-  in_review: () => `<span class="bg-amber-50 text-amber-700 text-xs px-2 py-0.5 rounded-full ml-2">${t("appmgr.status_in_review")}</span>`,
-  published: () => ""  // no badge needed for the normal live state
+  draft: `<span class="bg-slate-100 text-slate-500 text-xs px-2 py-0.5 rounded-full ml-2">Draft</span>`,
+  in_review: `<span class="bg-amber-50 text-amber-700 text-xs px-2 py-0.5 rounded-full ml-2">In review</span>`,
+  published: ""  // no badge needed for the normal live state
 };
 
 async function loadPreview() {
@@ -43,7 +49,7 @@ async function loadPreview() {
   const includeUnpublished = document.getElementById("include_unpublished").checked;
   const resultsDiv = document.getElementById("preview-results");
 
-  resultsDiv.innerHTML = `<p class="text-sm text-slate-400">${t("common.loading")}</p>`;
+  resultsDiv.innerHTML = `<p class="text-sm text-slate-400">Loading...</p>`;
 
   const { data: journey, error: journeyError } = await supabaseClient
     .from("journeys")
@@ -53,7 +59,7 @@ async function loadPreview() {
     .single();
 
   if (journeyError || !journey) {
-    resultsDiv.innerHTML = `<p class="text-sm text-red-600">${t("preview.no_journey")}</p>`;
+    resultsDiv.innerHTML = `<p class="text-sm text-red-600">No journey exists yet for this visa type + region combination.</p>`;
     return;
   }
 
@@ -64,7 +70,7 @@ async function loadPreview() {
     .order("sort_order", { ascending: true });
 
   if (phasesError || !phases || phases.length === 0) {
-    resultsDiv.innerHTML = `<p class="text-sm text-slate-500">${t("preview.no_phases")}</p>`;
+    resultsDiv.innerHTML = `<p class="text-sm text-slate-500">No phases configured for this journey yet.</p>`;
     return;
   }
 
@@ -86,15 +92,15 @@ async function loadPreview() {
 
     html += `
       <div class="mb-6">
-        <h2 class="text-base font-semibold mb-2">${phase.name}</h2>
+        <h2 style="font-family: var(--font-heading); font-weight: 700; font-size: 1.05rem; margin-bottom: 0.5rem;">${phase.name}</h2>
         ${
           !tasks || tasks.length === 0
-            ? `<p class="text-sm text-slate-400 mb-2">${t("preview.no_matching_tasks")}</p>`
-            : tasks.map(task => `
-              <a href="task-detail.html?id=${task.id}&preview=1" target="_blank" class="bg-white border border-slate-200 rounded-xl p-4 flex justify-between items-center mb-2">
+            ? `<p class="text-sm text-slate-400 mb-2">No matching tasks in this phase.</p>`
+            : tasks.map(t => `
+              <a href="task-detail.html?id=${t.id}&preview=1" target="_blank" class="card flex justify-between items-center mb-2" style="padding: 1rem 1.25rem;">
                 <div>
-                  <span class="text-xs text-slate-500 font-medium">${task.urgency}</span>
-                  <p class="text-sm font-medium mt-0.5">${task.title}${statusBadge[task.status]?.() || ""}</p>
+                  <span class="text-xs text-slate-500 font-medium">${t.urgency}</span>
+                  <p class="text-sm font-medium mt-0.5">${t.title}${statusBadge[t.status] || ""}</p>
                 </div>
                 <span>›</span>
               </a>
@@ -107,28 +113,9 @@ async function loadPreview() {
   resultsDiv.innerHTML = html;
 }
 
-// Loads active visa types and regions dynamically from the same
-// Super-Admin-managed tables app-manager.html and onboarding.html use
-// (SE2L-74) — this page previously had these hardcoded, so a visa type
-// or region added later wouldn't show up here as an option.
-async function loadPreviewVisaTypeAndRegionOptions() {
-  const [visaTypesResult, regionsResult] = await Promise.all([
-    supabaseClient.from("available_visa_types").select("value, label").eq("is_active", true).order("sort_order", { ascending: true }),
-    supabaseClient.from("available_uk_regions").select("value, label").eq("is_active", true).order("sort_order", { ascending: true })
-  ]);
-
-  const visaSelect = document.getElementById("preview_visa_type");
-  const regionSelect = document.getElementById("preview_uk_region");
-
-  visaSelect.innerHTML = (visaTypesResult.data || []).map(v => `<option value="${v.value}">${v.label}</option>`).join("");
-  regionSelect.innerHTML = (regionsResult.data || []).map(r => `<option value="${r.value}">${r.label}</option>`).join("");
-}
-
 async function init() {
   const user = await checkAccess();
   if (!user) return;
-
-  await loadPreviewVisaTypeAndRegionOptions();
 
   // If opened from a specific task's "Preview" link (task=<id> in the URL),
   // pre-load that task's visa type/region so the preview lines up with it.

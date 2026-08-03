@@ -1,0 +1,105 @@
+/* Resources page — pairs with the markup already in resources.html and
+   the template changes in resources.js (category pills, resource cards).
+   No functional behavior changes here, only presentation. */
+
+.resources-search-wrap {
+  position: relative;
+  margin-bottom: 1rem;
+}
+.resources-search-wrap svg {
+  position: absolute;
+  left: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.05rem;
+  height: 1.05rem;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+.resources-search-wrap .form-input {
+  padding-left: 2.5rem;
+}
+
+.resource-pill {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.4rem 0.9rem;
+  border-radius: 9999px;
+  background: var(--color-surface-muted);
+  color: var(--color-text-secondary);
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.resource-pill:hover { background: var(--color-border); }
+.resource-pill.is-active {
+  background: var(--color-accent);
+  color: #ffffff;
+}
+
+.resources-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+@media (max-width: 560px) {
+  .resources-grid { grid-template-columns: 1fr; }
+}
+.resource-card {
+  transition: box-shadow 0.15s ease, transform 0.1s ease;
+}
+.resource-card:hover {
+  box-shadow: 0 4px 14px rgba(15, 26, 68, 0.08);
+  transform: translateY(-1px);
+}
+.resource-card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-accent-dark);
+  margin-top: 0.5rem;
+}
+.resource-card-link svg { width: 0.9rem; height: 0.9rem; }
+
+.resource-featured {
+  grid-column: 1 / -1;
+}
+.resource-featured-title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.15rem;
+  margin-top: 0.5rem;
+}
+.resource-featured-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-top: 1rem;
+}
+.resource-featured-link svg { width: 0.95rem; height: 0.95rem; }
+
+.resources-help-card {
+  margin-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+.resources-help-card-title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1rem;
+  margin: 0 0 0.3rem;
+}
+.resources-help-card-desc {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: 26rem;
+}

@@ -1,11 +1,9 @@
-/* Se2L shared components — v2, warm/calm/minimal.
-   Soft pill buttons, borderless cards that rely on whitespace and a
-   faint shadow rather than hairlines, generously padded form fields.
-   Linked on every page, public and app-shell alike. tokens.css still
-   recolors old Tailwind utility classes as a safety net for anything
-   not yet migrated to these. */
+/* Se2L shared components — v3, matched to reference (navy/mint/cream).
+   Rounded-rectangle buttons (not pills), white cards with a colored
+   status top-border, colored icon tiles, and two status pill styles
+   (mint = in progress, gray = pending). Linked on every page. */
 
-/* --- Buttons: soft filled/outline pills, generous padding --- */
+/* --- Buttons --- */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -13,11 +11,11 @@
   gap: 0.5rem;
   font-family: var(--font-body);
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1;
-  padding: 0.75rem 1.4rem;
-  border-radius: 9999px;
-  border: 1px solid transparent;
+  padding: 0.8rem 1.4rem;
+  border-radius: var(--radius-control);
+  border: 1.5px solid transparent;
   background: var(--color-surface-muted);
   color: var(--color-text);
   cursor: pointer;
@@ -29,17 +27,17 @@
 .btn svg { width: 1.05rem; height: 1.05rem; flex-shrink: 0; }
 
 .btn-primary {
-  background: var(--color-accent);
+  background: var(--color-navy);
   color: #ffffff;
 }
-.btn-primary:hover { background: var(--color-accent-dark); }
+.btn-primary:hover { background: var(--color-navy-dark); }
 
 .btn-secondary {
-  background: transparent;
-  border-color: var(--color-accent-light);
-  color: var(--color-accent-dark);
+  background: var(--color-surface);
+  border-color: var(--color-navy);
+  color: var(--color-navy);
 }
-.btn-secondary:hover { background: var(--color-accent-bg); }
+.btn-secondary:hover { background: var(--color-navy-bg); }
 
 .btn-ghost {
   background: transparent;
@@ -47,46 +45,61 @@
 }
 .btn-ghost:hover { background: var(--color-surface-muted); color: var(--color-text); }
 
-.btn-sm { font-size: 0.78rem; padding: 0.5rem 1rem; }
-.btn-lg { font-size: 1rem; padding: 0.9rem 1.75rem; }
+.btn-sm { font-size: 0.78rem; padding: 0.55rem 1rem; }
+.btn-lg { font-size: 1rem; padding: 0.95rem 1.75rem; }
 .btn-block { width: 100%; }
 
-/* --- Cards: whitespace and a faint shadow do the separating, not a
-   hard border. Generous internal padding is part of the calm feel. --- */
+/* --- Cards: white, generously rounded, soft shadow, optional colored
+   top border indicating status --- */
 .card {
   background: var(--color-surface);
   border: none;
+  border-top: 3px solid transparent;
   border-radius: var(--radius-card);
-  padding: 1.75rem;
-  box-shadow: 0 1px 3px rgba(51, 49, 44, 0.05), 0 1px 2px rgba(51, 49, 44, 0.04);
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(15, 26, 68, 0.06), 0 1px 2px rgba(15, 26, 68, 0.04);
 }
+.card-status-progress { border-top-color: var(--color-accent); }
+.card-status-pending { border-top-color: var(--color-navy); }
 .card-accent {
-  background: var(--color-accent);
+  background: var(--color-navy);
   color: #ffffff;
   box-shadow: none;
+  border-top: none;
 }
 
-/* --- Badges: one soft pill shape, no stamp/mono treatment --- */
+/* --- Badges: two pill styles used across the reference — mint for
+   "in progress / positive", gray for "pending / neutral" --- */
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  font-size: 0.78rem;
-  font-weight: 600;
-  padding: 0.4rem 0.9rem;
+  gap: 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.7rem;
   border-radius: 9999px;
   background: var(--color-accent-bg);
   color: var(--color-accent-dark);
 }
+.badge-pending {
+  background: var(--color-surface-muted);
+  color: var(--color-text-secondary);
+}
+.badge-eyebrow {
+  background: var(--color-accent-bg);
+  color: var(--color-accent-dark);
+}
 
-/* --- Form fields: quiet, generously spaced, soft focus glow --- */
-.form-field { margin-bottom: 1.4rem; }
+/* --- Form fields --- */
+.form-field { margin-bottom: 1.25rem; }
 .form-label {
   display: block;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 600;
   color: var(--color-text-secondary);
-  margin-bottom: 0.45rem;
+  margin-bottom: 0.4rem;
 }
 .form-input,
 .form-select,
@@ -95,28 +108,27 @@
   font-family: var(--font-body);
   font-size: 0.95rem;
   color: var(--color-text);
-  background: var(--color-surface-muted);
-  border: 1px solid transparent;
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
   border-radius: var(--radius-control);
-  padding: 0.8rem 1rem;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+  padding: 0.75rem 0.95rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .form-input:focus,
 .form-select:focus,
 .form-textarea:focus {
   outline: none;
-  background: var(--color-surface);
-  border-color: var(--color-accent-light);
-  box-shadow: 0 0 0 4px var(--color-accent-bg);
+  border-color: var(--color-navy);
+  box-shadow: 0 0 0 3px var(--color-navy-bg);
 }
 .form-textarea { resize: vertical; min-height: 5.5rem; }
 
-/* --- Section divider with a centered label --- */
+/* --- Section divider --- */
 .divider-row {
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin: 2rem 0 1.5rem;
+  margin: 1.75rem 0 1.25rem;
 }
 .divider-row::before,
 .divider-row::after {
@@ -131,36 +143,49 @@
   white-space: nowrap;
 }
 
-/* --- Numbered step marker --- */
+/* --- Numbered step marker (landing "how it works") --- */
 .step-marker {
-  width: 2.75rem;
-  height: 2.75rem;
-  border-radius: 9999px;
-  background: var(--color-accent-bg);
-  color: var(--color-accent-dark);
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.65rem;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-heading);
-  font-weight: 600;
-  margin: 0 auto 1.25rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
 }
 
-/* --- Icon tile: soft rounded square, no border — a quiet container
-   for a stroke icon rather than an emoji. --- */
+/* --- Icon tile: colored rounded square, alternating tint by index so a
+   row of tiles doesn't read as one flat block — matches the reference's
+   alternating lavender/mint/navy icon squares. --- */
 .icon-tile {
-  width: 3rem;
-  height: 3rem;
-  border-radius: var(--radius-control);
-  background: var(--color-accent-bg);
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.65rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-accent-dark);
-  margin-bottom: 1rem;
+  margin-bottom: 0.85rem;
+  background: var(--color-navy-bg);
+  color: var(--color-navy);
 }
-.icon-tile svg { width: 1.5rem; height: 1.5rem; }
-.card-accent .icon-tile {
-  background: rgba(255, 255, 255, 0.18);
-  color: #ffffff;
+.icon-tile svg { width: 1.4rem; height: 1.4rem; }
+.icon-tile-mint { background: var(--color-accent-bg); color: var(--color-accent-dark); }
+.icon-tile-navy-solid { background: var(--color-navy); color: #ffffff; }
+.card-accent .icon-tile { background: rgba(255, 255, 255, 0.15); color: #ffffff; }
+
+/* --- Progress bar --- */
+.progress-bar-track {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--color-surface-muted);
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: 4px;
+  transition: width 0.3s ease;
 }

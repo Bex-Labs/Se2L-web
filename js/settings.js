@@ -22,8 +22,14 @@ async function loadSidebarIdentity() {
 
   const emailEl = document.getElementById("sidebar-user-email");
   const rolePillEl = document.getElementById("sidebar-role-pill");
+  const avatarEl = document.getElementById("sidebar-identity-avatar");
   if (emailEl) emailEl.textContent = user.email || "Unknown user";
   if (rolePillEl) rolePillEl.textContent = roleLabels[profile?.role] || "Newcomer";
+  if (avatarEl && user.email) {
+    const namePart = user.email.split("@")[0];
+    const initials = namePart.replace(/[^a-zA-Z]/g, " ").trim().split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase();
+    avatarEl.textContent = initials || namePart.slice(0, 2).toUpperCase();
+  }
 
   const backLink = document.getElementById("back-link");
   const dashboardNavLink = document.getElementById("dashboard-nav-link");

@@ -7,297 +7,290 @@
   <link href="css/output.css" rel="stylesheet">
   <link href="css/tokens.css" rel="stylesheet">
   <link href="css/components.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
   <style>
-    /* Landing page only — no other page uses this hero/feature-grid/CTA
-       layout, so it's kept local here rather than added to a shared file. */
+    /* Landing page only — this hero/steps/bento/CTA-band layout doesn't
+       exist on any other page, so it's kept local rather than shared. */
 
     .landing-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      max-width: 72rem;
+      max-width: 76rem;
       margin: 0 auto;
-      padding: 1.5rem 1.5rem 0;
+      padding: 1.5rem 2rem 0;
     }
-    .landing-header-brand {
+    .landing-header-brand { display: flex; align-items: center; gap: 0.5rem; }
+    .landing-header-mark {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 0.5rem;
+      background: var(--color-navy);
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      justify-content: center;
+      flex-shrink: 0;
     }
-    .landing-header-mark {
-      width: 1.9rem;
-      height: 1.9rem;
-      color: var(--color-accent);
-    }
-    .landing-header-title {
-      font-family: var(--font-heading);
-      font-weight: 700;
-      font-size: 1.5rem;
-      color: var(--color-text);
-    }
+    .landing-header-title { font-family: var(--font-heading); font-weight: 800; font-size: 1.3rem; color: var(--color-navy); }
+    .landing-header-nav { display: flex; align-items: center; gap: 2rem; }
+    .landing-header-nav a { font-size: 0.9rem; font-weight: 500; color: var(--color-text-secondary); text-decoration: none; }
+    .landing-header-nav a:hover { color: var(--color-text); }
+    .landing-header-actions { display: flex; align-items: center; gap: 1.25rem; }
 
     .landing-hero {
-      max-width: 42rem;
+      max-width: 76rem;
       margin: 0 auto;
-      padding: 4rem 1.5rem 3rem;
-      text-align: center;
+      padding: 3.5rem 2rem 4rem;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+      align-items: center;
+    }
+    @media (min-width: 900px) {
+      .landing-hero { grid-template-columns: 1.1fr 1fr; }
     }
     .landing-hero h1 {
       font-family: var(--font-heading);
-      font-weight: 700;
-      font-size: 2.25rem;
-      line-height: 1.15;
-      margin: 1.25rem 0 0.85rem;
+      font-weight: 800;
+      font-size: 2.6rem;
+      line-height: 1.1;
+      margin: 1rem 0 1rem;
       color: var(--color-text);
     }
-
-    .landing-hero-stats {
+    .landing-hero-photo-wrap { position: relative; }
+    .landing-hero-photo {
+      width: 100%;
+      aspect-ratio: 4/3;
+      border-radius: 1.5rem;
+      background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-accent) 100%);
       display: flex;
-      justify-content: center;
-      gap: 2.5rem;
-      margin-top: 2.25rem;
-      padding-top: 1.75rem;
-      border-top: 1px solid var(--color-border);
-    }
-    .landing-hero-stat-value {
-      font-family: var(--font-mono);
-      font-weight: 700;
-      font-size: 1.4rem;
-      color: var(--color-accent);
-    }
-    .landing-hero-stat-label {
-      font-size: 0.75rem;
-      color: var(--color-text-secondary);
-    }
-
-    .landing-steps {
-      max-width: 60rem;
-      margin: 0 auto;
-      padding: 2rem 1.5rem 3rem;
-    }
-    .landing-steps-heading, .landing-features-heading {
-      text-align: center;
-      margin-bottom: 2.5rem;
-    }
-    .landing-steps-heading h2, .landing-features-heading h2 {
-      font-family: var(--font-heading);
-      font-weight: 700;
-      font-size: 1.7rem;
-      margin-bottom: 0.5rem;
-      color: var(--color-text);
-    }
-    .landing-step-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 2rem;
-    }
-    @media (min-width: 700px) {
-      .landing-step-grid { grid-template-columns: 1fr 1fr 1fr; }
-    }
-    .landing-step { text-align: center; }
-    .landing-step-title {
-      font-family: var(--font-heading);
-      font-weight: 700;
-      font-size: 1.05rem;
-      margin-bottom: 0.4rem;
-      color: var(--color-text);
-    }
-    .landing-step-desc {
-      font-size: 0.875rem;
-      color: var(--color-text-secondary);
-      line-height: 1.5;
-    }
-
-    .landing-features {
-      max-width: 72rem;
-      margin: 0 auto;
-      padding: 2rem 1.5rem 3rem;
-    }
-    .landing-feature-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1.25rem;
-    }
-    @media (min-width: 700px) {
-      .landing-feature-grid { grid-template-columns: 1fr 1fr; }
-    }
-    .landing-feature-title {
-      font-family: var(--font-heading);
-      font-weight: 700;
-      font-size: 1.05rem;
-      margin-bottom: 0.4rem;
-    }
-    .landing-feature-desc {
-      font-size: 0.875rem;
-      line-height: 1.5;
-      color: var(--color-text-secondary);
-    }
-    .card-accent .landing-feature-desc { color: rgba(255, 253, 246, 0.85); }
-
-    .landing-cta-band {
-      max-width: 72rem;
-      margin: 0 2rem 3rem;
-      padding: 3rem 1.5rem;
-      border-radius: var(--radius-card);
-      text-align: center;
-      border: 1px solid var(--color-border);
-      background-color: var(--color-surface-muted);
-    }
-    @media (min-width: 768px) {
-      .landing-cta-band { margin-left: auto; margin-right: auto; }
-    }
-    .landing-cta-band h2 {
-      font-family: var(--font-heading);
-      font-weight: 700;
-      font-size: 1.5rem;
-      margin-bottom: 0.5rem;
-      color: var(--color-text);
-    }
-    .landing-cta-band p {
-      font-size: 0.9rem;
-      color: var(--color-text-secondary);
-      margin-bottom: 1.5rem;
-    }
-
-    .landing-footer {
-      padding: 1.5rem;
-      border-top: 1px solid var(--color-border);
-      display: flex;
-      flex-wrap: wrap;
       align-items: center;
       justify-content: center;
-      gap: 0.375rem 1.25rem;
+      color: rgba(255,255,255,0.85);
+      font-size: 0.85rem;
+      text-align: center;
+      padding: 2rem;
     }
-    .landing-footer span,
-    .landing-footer a {
-      font-size: 0.7rem;
-      color: var(--color-text-muted);
+    .landing-hero-badge {
+      position: absolute;
+      bottom: -1rem;
+      left: 1.5rem;
+      background: var(--color-surface);
+      border-radius: var(--radius-control);
+      padding: 0.6rem 1rem;
+      box-shadow: 0 4px 14px rgba(15,26,68,0.12);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--color-text);
     }
-    .landing-footer a:hover { color: var(--color-text-secondary); }
+    .landing-hero-check {
+      position: absolute;
+      top: -0.9rem;
+      right: -0.9rem;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 9999px;
+      background: var(--color-accent);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .landing-steps { max-width: 76rem; margin: 0 auto; padding: 3rem 2rem; background: var(--color-surface-muted); border-radius: 2rem; }
+    .landing-steps-heading { text-align: center; margin-bottom: 2.5rem; }
+    .landing-steps-heading h2 { font-family: var(--font-heading); font-weight: 800; font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--color-text); }
+    .landing-step-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+    @media (min-width: 700px) { .landing-step-grid { grid-template-columns: 1fr 1fr 1fr; } }
+    .landing-step { background: var(--color-surface); border-radius: var(--radius-card); padding: 1.5rem; }
+    .landing-step-title { font-family: var(--font-heading); font-weight: 700; font-size: 1.02rem; margin-bottom: 0.4rem; color: var(--color-text); }
+    .landing-step-desc { font-size: 0.85rem; color: var(--color-text-secondary); line-height: 1.5; }
+
+    .landing-bento { max-width: 76rem; margin: 0 auto; padding: 3.5rem 2rem; display: grid; grid-template-columns: 1fr; gap: 1.25rem; align-items: start; }
+    @media (min-width: 800px) { .landing-bento { grid-template-columns: 1.4fr 1fr; } }
+    .landing-bento-row { display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
+    @media (min-width: 500px) { .landing-bento-row { grid-template-columns: 1fr 1fr; } }
+    .landing-bento .card { display: flex; flex-direction: column; }
+    .landing-bento-title { font-family: var(--font-heading); font-weight: 700; font-size: 1.15rem; margin-bottom: 0.4rem; }
+    .landing-bento-desc { font-size: 0.85rem; line-height: 1.5; }
+    .card-accent .landing-bento-desc { color: rgba(255,255,255,0.82); }
+    .landing-bento-link {
+      margin-top: auto;
+      padding-top: 1.5rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: inherit;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .landing-cta-band { max-width: 76rem; margin: 0 auto 3.5rem; padding: 3.5rem 2rem; border-radius: 2rem; text-align: center; background: var(--color-navy); }
+    .landing-cta-band h2 { font-family: var(--font-heading); font-weight: 800; font-size: 1.7rem; margin-bottom: 0.6rem; color: #fff; }
+    .landing-cta-band p { font-size: 0.9rem; color: rgba(255,255,255,0.75); margin-bottom: 1.5rem; }
+
+    .landing-footer { max-width: 76rem; margin: 0 auto; padding: 0 2rem 2rem; display: grid; grid-template-columns: 1fr; gap: 2rem; }
+    @media (min-width: 700px) { .landing-footer { grid-template-columns: 1.4fr 1fr 1fr; } }
+    .landing-footer-desc { font-size: 0.82rem; color: var(--color-text-secondary); line-height: 1.6; margin-top: 0.75rem; max-width: 22rem; }
+    .landing-footer-col h4 { font-size: 0.78rem; font-weight: 700; color: var(--color-text); margin-bottom: 0.75rem; }
+    .landing-footer-col a { display: block; font-size: 0.82rem; color: var(--color-text-secondary); text-decoration: none; margin-bottom: 0.5rem; }
+    .landing-footer-col a:hover { color: var(--color-text); }
+    .landing-footer-bottom {
+      max-width: 76rem; margin: 0 auto; padding: 1.5rem 2rem; border-top: 1px solid var(--color-border);
+      display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.75rem; font-size: 0.75rem; color: var(--color-text-muted);
+    }
+    .landing-footer-bottom a { color: var(--color-text-muted); text-decoration: none; margin-left: 1.25rem; }
   </style>
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-900">
 
   <header class="landing-header">
     <div class="landing-header-brand">
-      <svg class="landing-header-mark" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 2L2 7V12C2 16.97 6.24 21.44 12 22.5C17.76 21.44 22 16.97 22 12V7L12 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-        <path d="M9 12L11 14L15.5 9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
+      <div class="landing-header-mark">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L2 7V12C2 16.97 6.24 21.44 12 22.5C17.76 21.44 22 16.97 22 12V7L12 2Z" stroke="#ffffff" stroke-width="1.6" stroke-linejoin="round"/>
+        </svg>
+      </div>
       <span class="landing-header-title">Se2L</span>
     </div>
-    <a href="login.html" class="btn btn-secondary btn-sm" data-i18n="index.header_login">Log in</a>
+    <nav class="landing-header-nav">
+      <a href="#how-it-works">How it Works</a>
+      <a href="resources.html">Resources</a>
+      <a id="footer-support-link" href="#">Support</a>
+    </nav>
+    <div class="landing-header-actions">
+      <a href="login.html" style="font-size: 0.9rem; font-weight: 600; color: var(--color-text);" data-i18n="index.header_login">Log in</a>
+      <a href="onboarding.html" class="btn btn-primary btn-sm" data-i18n="index.hero_cta_primary">Sign up</a>
+    </div>
   </header>
 
   <section class="landing-hero">
-    <span class="badge" data-i18n="index.hero_eyebrow">Guided UK settlement</span>
-
-    <h1 data-i18n="index.hero_heading">Your next step in the UK, always clear</h1>
-
-    <p class="text-slate-600 mb-6" data-i18n="index.hero_subtext">
-      A personalised checklist that guides newcomers through settlement, task by task, based on visa type and arrival date.
-    </p>
-
-    <div class="flex justify-center gap-3 mb-3">
-      <a href="onboarding.html" class="btn btn-primary btn-lg" data-i18n="index.hero_cta_primary">Start my journey</a>
-      <a href="resources.html" class="btn btn-lg" data-i18n="index.hero_cta_secondary">Browse resources</a>
+    <div>
+      <span class="badge badge-eyebrow" data-i18n="index.hero_eyebrow">Official Newcomer Platform</span>
+      <h1 data-i18n="index.hero_heading">Your journey to the UK starts here</h1>
+      <p class="text-slate-600 mb-6" style="max-width: 30rem;" data-i18n="index.hero_subtext">
+        A personalised checklist that guides newcomers through settlement, task by task, based on visa type and arrival date.
+      </p>
+      <div class="flex gap-3">
+        <a href="onboarding.html" class="btn btn-primary btn-lg" data-i18n="index.hero_cta_primary">Get Started</a>
+        <a href="resources.html" class="btn btn-secondary btn-lg" data-i18n="index.hero_cta_secondary">Browse Resources</a>
+      </div>
     </div>
-
-    <p class="text-sm text-slate-500">
-      <span data-i18n="index.hero_have_account">Already have an account?</span> <a href="login.html" class="text-indigo-600 font-medium" data-i18n="index.hero_login_link">Log in</a>
-    </p>
-
-    <div class="landing-hero-stats">
-      <div>
-        <p class="landing-hero-stat-value">7</p>
-        <p class="landing-hero-stat-label" data-i18n="index.stat_phases">Settlement phases covered</p>
+    <div class="landing-hero-photo-wrap">
+      <!-- Placeholder for a real photo — swap this block for an actual
+           licensed image; kept as a gradient block here to avoid using
+           an unlicensed photo in the implementation. -->
+      <div class="landing-hero-photo">Photo placeholder — newcomers settling into life in the UK</div>
+      <div class="landing-hero-check">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
       </div>
-      <div>
-        <p class="landing-hero-stat-value">4</p>
-        <p class="landing-hero-stat-label" data-i18n="index.stat_regions">UK regions supported</p>
-      </div>
+      <div class="landing-hero-badge" data-i18n="index.stat_roadmaps">Active roadmaps: 12,400+</div>
     </div>
   </section>
 
-  <section class="landing-steps">
+  <section class="landing-steps" id="how-it-works">
     <div class="landing-steps-heading">
-      <h2 data-i18n="index.steps_heading">How it works</h2>
-      <p class="text-slate-500 text-sm" data-i18n="index.steps_subtext">Three steps between you and a clear plan.</p>
+      <h2 data-i18n="index.steps_heading">Simplify your arrival</h2>
+      <p class="text-slate-500 text-sm" data-i18n="index.steps_subtext">We've broken the settlement process into three manageable steps.</p>
     </div>
-
     <div class="landing-step-grid">
       <div class="landing-step">
-        <div class="step-marker">1</div>
-        <p class="landing-step-title" data-i18n="index.step1_title">Tell us about your move</p>
-        <p class="landing-step-desc" data-i18n="index.step1_desc">Visa type, arrival date, UK region, and who's settling with you.</p>
+        <div class="icon-tile">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        </div>
+        <p class="landing-step-title" data-i18n="index.step1_title">1. Create your profile</p>
+        <p class="landing-step-desc" data-i18n="index.step1_desc">Tell us your visa type, arrival date, and destination city to receive tailored advice.</p>
       </div>
       <div class="landing-step">
-        <div class="step-marker">2</div>
-        <p class="landing-step-title" data-i18n="index.step2_title">Get your checklist</p>
-        <p class="landing-step-desc" data-i18n="index.step2_desc">We build a personalised, phase-by-phase plan just for your situation.</p>
+        <div class="icon-tile icon-tile-mint">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <p class="landing-step-title" data-i18n="index.step2_title">2. Get your roadmap</p>
+        <p class="landing-step-desc" data-i18n="index.step2_desc">Receive a step-by-step checklist covering NHS registration, NI numbers, and housing.</p>
       </div>
       <div class="landing-step">
-        <div class="step-marker">3</div>
-        <p class="landing-step-title" data-i18n="index.step3_title">Work through it, step by step</p>
-        <p class="landing-step-desc" data-i18n="index.step3_desc">Clear guidance for each task, in the order that actually matters.</p>
+        <div class="icon-tile icon-tile-navy-solid">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>
+        </div>
+        <p class="landing-step-title" data-i18n="index.step3_title">3. Navigate with confidence</p>
+        <p class="landing-step-desc" data-i18n="index.step3_desc">Execute your tasks with verified links and support from the community by your side.</p>
       </div>
     </div>
   </section>
 
-  <section class="landing-features">
-    <div class="landing-features-heading">
-      <h2 data-i18n="index.features_heading">Everything you need to settle in, in one place</h2>
-      <p class="text-slate-500 text-sm" data-i18n="index.features_subtext">From your first week to year two, Se2L keeps the next step clear.</p>
+  <section class="landing-bento">
+    <div class="card card-accent">
+      <div class="icon-tile">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21C12 21 4 15.5 4 9.5a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 9.5C20 15.5 12 21 12 21z"/></svg>
+      </div>
+      <p class="landing-bento-title">NI Number &amp; NHS Access</p>
+      <p class="landing-bento-desc">Essential guides for setting up your legal and health identity in the UK, without the stress.</p>
+      <a href="resources.html" class="landing-bento-link">Learn more <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
     </div>
-
-    <div class="landing-feature-grid">
+    <div class="landing-bento-row">
       <div class="card">
         <div class="icon-tile">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polygon points="12 7 14 12 12 17 10 12 12 7"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="10" width="18" height="9" rx="1"/><path d="M3 10L12 4l9 6"/></svg>
         </div>
-        <p class="landing-feature-title" data-i18n="index.feature1_title">Phase-by-phase guidance</p>
-        <p class="landing-feature-desc" data-i18n="index.feature1_desc">Tasks are grouped by exactly where you are — pre-arrival, arrival day, first week, and beyond — so you only ever see what matters right now.</p>
+        <p class="landing-bento-title">Banking</p>
+        <p class="landing-bento-desc">Compare top UK banks and fintech solutions for newcomers.</p>
       </div>
-      <div class="card">
-        <div class="icon-tile">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <div class="card" style="background: var(--color-accent-bg);">
+        <div class="icon-tile icon-tile-mint">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
         </div>
-        <p class="landing-feature-title" data-i18n="index.feature2_title">Clear, practical checklists</p>
-        <p class="landing-feature-desc" data-i18n="index.feature2_desc">Every task comes with plain-language guidance, helpful links, and video walkthroughs where they help — no legal jargon to decode.</p>
+        <p class="landing-bento-title">Rent Search</p>
+        <p class="landing-bento-desc">Understand the rental market, deposits, and council tax.</p>
       </div>
-      <div class="card card-accent">
+      <div class="card" style="grid-column: 1 / -1;">
         <div class="icon-tile">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         </div>
-        <p class="landing-feature-title" data-i18n="index.feature3_title">Bring your family along</p>
-        <p class="landing-feature-desc" data-i18n="index.feature3_desc">Add partners, children, or relatives settling with you. Adults get their own invite; children get an age-matched checklist automatically.</p>
-      </div>
-      <div class="card">
-        <div class="icon-tile">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-        </div>
-        <p class="landing-feature-title" data-i18n="index.feature4_title">Trusted resource library</p>
-        <p class="landing-feature-desc" data-i18n="index.feature4_desc">Browse curated guidance on housing, healthcare, banking, and more — searchable by category, anytime you need it.</p>
+        <p class="landing-bento-title">Community Hubs</p>
+        <p class="landing-bento-desc">Connect with local groups and meetups in your new city to build your network instantly.</p>
       </div>
     </div>
   </section>
 
   <section class="landing-cta-band">
-    <h2 data-i18n="index.cta_heading">Ready when you are</h2>
-    <p data-i18n="index.cta_subtext">Free to use, and takes less than five minutes to set up your first checklist.</p>
-    <div class="flex justify-center">
-      <a href="onboarding.html" class="btn btn-primary btn-lg" data-i18n="index.hero_cta_primary">Start my journey</a>
-    </div>
+    <h2 data-i18n="index.cta_heading">Ready to make your move?</h2>
+    <p data-i18n="index.cta_subtext">Join thousands of newcomers who navigated their UK journey with a personalised roadmap. Free, no credit card required.</p>
+    <a href="onboarding.html" class="btn btn-secondary btn-lg" style="background: #fff;" data-i18n="index.hero_cta_primary">Start Your Free Roadmap</a>
   </section>
 
-  <div class="landing-footer">
-    <span data-i18n="footer.copyright">Se2L UK &copy; 2026 Se2L UK Settlement Service. All rights reserved.</span>
-    <a href="#" data-i18n="footer.privacy">Privacy Policy</a>
-    <a href="terms.html" data-i18n="footer.terms">Terms of Service</a>
-    <a id="footer-support-link" href="#" data-i18n="footer.contact">Contact Support</a>
-    <a href="#" data-i18n="footer.accessibility">Accessibility</a>
-  </div>
+  <footer>
+    <div class="landing-footer">
+      <div>
+        <div class="landing-header-brand">
+          <div class="landing-header-mark" style="width: 1.75rem; height: 1.75rem;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L2 7V12C2 16.97 6.24 21.44 12 22.5C17.76 21.44 22 16.97 22 12V7L12 2Z" stroke="#ffffff" stroke-width="1.6" stroke-linejoin="round"/></svg>
+          </div>
+          <span class="landing-header-title" style="font-size: 1.05rem;">Se2L</span>
+        </div>
+        <p class="landing-footer-desc">Helping individuals and families navigate their relocation to the United Kingdom with trust, clarity, and empathy.</p>
+      </div>
+      <div class="landing-footer-col">
+        <h4>Partners</h4>
+        <a href="#">GOV.UK</a>
+        <a href="#">Citizens Advice</a>
+        <a href="#">NHS Guide</a>
+      </div>
+      <div class="landing-footer-col">
+        <h4>Connect</h4>
+        <a href="#">Community Hub</a>
+        <a href="#">Success Stories</a>
+        <a href="#">Contact Support</a>
+      </div>
+    </div>
+    <div class="landing-footer-bottom">
+      <span data-i18n="footer.copyright">Se2L UK &copy; 2026 Se2L UK Settlement Service. All rights reserved.</span>
+      <div>
+        <a href="#" data-i18n="footer.privacy">Privacy Policy</a>
+        <a href="terms.html" data-i18n="footer.terms">Terms of Service</a>
+      </div>
+    </div>
+  </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>

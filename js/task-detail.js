@@ -5,22 +5,22 @@ function renderVideoConsentGate(container, videoId) {
     <div style="position:relative; width:100%; border-radius:var(--radius-card); overflow:hidden; background:var(--color-video-bg); padding-top:56.25%;">
       <img
         src="${thumbnailUrl}"
-        alt="${t("taskdetail.video_preview_alt")}"
+        alt="Video preview"
         style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0.6;"
       />
       <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.75rem; padding:0 1.5rem; text-align:center;">
         <div style="width:3.5rem; height:3.5rem; border-radius:9999px; background:rgba(255,255,255,0.9); display:flex; align-items:center; justify-content:center;">
           <span style="color:var(--color-video-bg); font-size:1.25rem; margin-left:0.25rem;">▶</span>
         </div>
-        <p style="color:#fff; font-size:0.875rem; font-weight:500; margin:0;">${t("taskdetail.video_includes")}</p>
+        <p style="color:#fff; font-size:0.875rem; font-weight:500; margin:0;">This task includes a YouTube video</p>
         <p style="color:rgba(255,255,255,0.8); font-size:0.75rem; max-width:20rem; margin:0;">
-          ${t("taskdetail.video_privacy_notice")}
+          Playing it will load content from YouTube, which uses cookies and may collect data per Google's privacy policy.
         </p>
         <button
           id="video-consent-btn"
           style="background:#fff; color:var(--color-video-bg); font-size:0.875rem; font-weight:500; padding:0.5rem 1rem; border-radius:var(--radius-control); border:none; cursor:pointer;"
         >
-          ${t("taskdetail.load_video")}
+          Load video
         </button>
       </div>
     </div>
@@ -32,13 +32,13 @@ function renderVideoConsentGate(container, videoId) {
         <iframe
           style="position:absolute; top:0; left:0; width:100%; height:100%; border-radius:0.75rem; border:none;"
           src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1"
-          title="${t("taskdetail.video_iframe_title")}"
+          title="Task video guide"
           frameborder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowfullscreen>
         </iframe>
       </div>
-      <p style="font-size:0.75rem; color:var(--color-video-text-muted); margin-top:0.25rem;">${t("taskdetail.video_muted_notice")}</p>
+      <p style="font-size:0.75rem; color:var(--color-video-text-muted); margin-top:0.25rem;">Video starts muted (browser autoplay policy) — use the volume icon inside the player to unmute.</p>
     `;
   });
 }
@@ -67,13 +67,19 @@ async function loadTaskDetail() {
     .maybeSingle();
 
   const roleLabels = {
-    app_manager: t("roles.app_manager"),
-    super_admin: t("roles.super_admin")
+    app_manager: "App Manager",
+    super_admin: "Super Admin"
   };
   const sidebarEmailEl = document.getElementById("sidebar-user-email");
   const sidebarRolePillEl = document.getElementById("sidebar-role-pill");
-  if (sidebarEmailEl) sidebarEmailEl.textContent = user.email || t("common.unknown_user");
-  if (sidebarRolePillEl) sidebarRolePillEl.textContent = roleLabels[sidebarProfile?.role] || t("roles.newcomer");
+  const sidebarAvatarEl = document.getElementById("sidebar-identity-avatar");
+  if (sidebarEmailEl) sidebarEmailEl.textContent = user.email || "Unknown user";
+  if (sidebarRolePillEl) sidebarRolePillEl.textContent = roleLabels[sidebarProfile?.role] || "Newcomer";
+  if (sidebarAvatarEl && user.email) {
+    const namePart = user.email.split("@")[0];
+    const initials = namePart.replace(/[^a-zA-Z]/g, " ").trim().split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase();
+    sidebarAvatarEl.textContent = initials || namePart.slice(0, 2).toUpperCase();
+  }
 
   if (sidebarProfile?.role === "app_manager") {
     document.getElementById("app-manager-link")?.classList.remove("hidden");
@@ -87,7 +93,7 @@ async function loadTaskDetail() {
   const taskId = getTaskIdFromUrl();
 
   if (!taskId) {
-    document.querySelector(".max-w-xl").innerHTML = `<p class="text-sm text-red-600">${t("taskdetail.no_task_specified")}</p>`;
+    document.querySelector(".task-detail-main").innerHTML = `<p class="text-sm text-red-600">No task specified.</p>`;
     return;
   }
 
@@ -99,7 +105,7 @@ async function loadTaskDetail() {
 
   if (taskError || !task) {
     console.error(taskError);
-    document.querySelector(".max-w-xl").innerHTML = `<p class="text-sm text-red-600">${t("taskdetail.task_not_found")}</p>`;
+    document.querySelector(".task-detail-main").innerHTML = `<p class="text-sm text-red-600">Task not found.</p>`;
     return;
   }
 
@@ -109,22 +115,23 @@ async function loadTaskDetail() {
   const isPreview = new URLSearchParams(window.location.search).get("preview") === "1";
   if (isPreview) {
     const banner = document.createElement("div");
-    banner.style.cssText = "background:#eef2ff; color:#4338ca; font-size:0.8rem; font-weight:500; padding:0.5rem 0.75rem; border-radius:0.5rem; margin-bottom:1rem;";
-    banner.textContent = t("taskdetail.preview_banner") + (task.status !== "published" ? ` ${t("taskdetail.preview_banner_status", { status: task.status.replace("_", " ") })}` : "");
-    document.querySelector(".max-w-xl").prepend(banner);
+    banner.style.cssText = "background:var(--color-navy-bg); color:var(--color-navy); font-size:0.8rem; font-weight:500; padding:0.5rem 0.75rem; border-radius:var(--radius-control); margin-bottom:1rem;";
+    banner.textContent = `Preview mode — this is how the task appears to a newcomer. Nothing you do here is saved.` + (task.status !== "published" ? ` (Currently ${task.status.replace("_", " ")}, not live yet.)` : "");
+    document.querySelector(".task-detail-main").prepend(banner);
 
     const backLink = document.getElementById("back-link");
     if (backLink) {
       backLink.href = "app-manager.html";
-      backLink.textContent = t("taskdetail.back_to_app_manager");
+      backLink.textContent = "← Back to App Manager";
     }
   }
 
-  const minorTag = task.is_minor_task ? ` · <span class="text-indigo-600">${t("taskdetail.for_your_family")}</span>` : "";
-  document.getElementById("task-meta").innerHTML = `${task.urgency} · ${task.category || t("common.general")}${minorTag}`;
+  const urgencyBadgeClass = { Critical: "badge-critical", Important: "badge-important", Optional: "badge-optional" }[task.urgency] || "badge-optional";
+  const minorTag = task.is_minor_task ? ` <span class="text-indigo-600">· For your family</span>` : "";
+  document.getElementById("task-meta").innerHTML = `<span class="badge ${urgencyBadgeClass}">${task.urgency}</span> <span class="text-slate-500 text-xs">${task.category || "General"}</span>${minorTag}`;
   document.getElementById("task-title").textContent = task.title;
   document.getElementById("task-time").textContent = task.time_estimate_minutes
-    ? t("taskdetail.estimated_time", { minutes: task.time_estimate_minutes })
+    ? `Estimated time: ${task.time_estimate_minutes} minutes`
     : "";
 
   const bodyDiv = document.getElementById("task-body");
@@ -142,7 +149,7 @@ async function loadTaskDetail() {
       .join("");
     bodyDiv.innerHTML = formatted;
   } else {
-    bodyDiv.innerHTML = `<p class="text-slate-400">${t("taskdetail.no_guidance")}</p>`;
+    bodyDiv.innerHTML = `<p class="text-slate-400">No detailed guidance added yet for this task.</p>`;
   }
 
   const videoId = task.task_youtube_videos?.[0]?.youtube_video_id;
@@ -155,8 +162,9 @@ async function loadTaskDetail() {
   const linkContainer = document.getElementById("task-link-container");
   if (linkUrl) {
     linkContainer.innerHTML = `
-      <a href="${linkUrl}" target="_blank" rel="noopener" class="text-sm text-indigo-600 font-medium flex items-center gap-1">
-        ${task.task_links[0].label || t("taskdetail.more_info")} ↗
+      <a href="${linkUrl}" target="_blank" rel="noopener" class="btn btn-secondary">
+        ${task.task_links[0].label || "More info"}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
       </a>
     `;
   }
@@ -179,7 +187,7 @@ async function loadTaskDetail() {
   noteTextarea.value = existingBookmark?.personal_note || "";
 
   function setBookmarkButtonState(bookmarked) {
-    bookmarkBtn.textContent = bookmarked ? t("taskdetail.bookmarked") : t("taskdetail.bookmark");
+    bookmarkBtn.textContent = bookmarked ? "★ Bookmarked" : "☆ Bookmark";
     bookmarkBtn.classList.toggle("text-amber-500", bookmarked);
     bookmarkBtn.classList.toggle("text-slate-400", !bookmarked);
   }
@@ -205,7 +213,7 @@ async function loadTaskDetail() {
       el.style.opacity = "0.5";
       el.style.cursor = "not-allowed";
     });
-    bookmarkBtn.title = t("taskdetail.disabled_in_preview");
+    bookmarkBtn.title = "Disabled in preview mode";
   } else {
     bookmarkBtn.addEventListener("click", async () => {
       isBookmarked = !isBookmarked;
@@ -213,7 +221,7 @@ async function loadTaskDetail() {
       const error = await saveBookmarkState(isBookmarked);
       if (error) {
         console.error(error);
-        alert(t("taskdetail.bookmark_error"));
+        alert("Could not update bookmark.");
       }
     });
 
@@ -221,10 +229,10 @@ async function loadTaskDetail() {
       const error = await saveBookmarkState(isBookmarked);
       if (error) {
         console.error(error);
-        alert(t("taskdetail.note_error"));
+        alert("Could not save note.");
       } else {
-        saveNoteBtn.textContent = t("taskdetail.saved_check");
-        setTimeout(() => { saveNoteBtn.textContent = t("taskdetail.save_note"); }, 1500);
+        saveNoteBtn.textContent = "Saved ✓";
+        setTimeout(() => { saveNoteBtn.textContent = "Save note"; }, 1500);
       }
     });
   }
@@ -240,11 +248,11 @@ async function loadTaskDetail() {
 
   function setButtonState(isComplete) {
     if (isComplete) {
-      markCompleteBtn.textContent = t("taskdetail.completed");
+      markCompleteBtn.textContent = "✓ Completed";
       markCompleteBtn.classList.add("bg-green-600");
       markCompleteBtn.classList.remove("bg-slate-900");
     } else {
-      markCompleteBtn.textContent = t("taskdetail.mark_complete");
+      markCompleteBtn.textContent = "✓ Mark complete";
       markCompleteBtn.classList.add("bg-slate-900");
       markCompleteBtn.classList.remove("bg-green-600");
     }
@@ -257,7 +265,7 @@ async function loadTaskDetail() {
     markCompleteBtn.disabled = true;
     markCompleteBtn.style.opacity = "0.5";
     markCompleteBtn.style.cursor = "not-allowed";
-    markCompleteBtn.title = t("taskdetail.disabled_in_preview");
+    markCompleteBtn.title = "Disabled in preview mode";
   } else {
     markCompleteBtn.addEventListener("click", async () => {
       isComplete = !isComplete;
@@ -274,7 +282,7 @@ async function loadTaskDetail() {
 
       if (upsertError) {
         console.error(upsertError);
-        alert(t("taskdetail.status_error"));
+        alert("Could not update task status.");
       }
     });
   }
@@ -334,7 +342,7 @@ async function loadTaskDetail() {
       const error = await saveFeedbackState(currentRating);
       if (error) {
         console.error(error);
-        alert(t("taskdetail.feedback_error"));
+        alert("Could not save feedback.");
       }
     });
 
@@ -344,7 +352,7 @@ async function loadTaskDetail() {
       const error = await saveFeedbackState(currentRating);
       if (error) {
         console.error(error);
-        alert(t("taskdetail.feedback_error"));
+        alert("Could not save feedback.");
       }
     });
 
@@ -352,10 +360,10 @@ async function loadTaskDetail() {
       const error = await saveFeedbackState(currentRating);
       if (error) {
         console.error(error);
-        alert(t("taskdetail.feedback_error"));
+        alert("Could not save feedback.");
       } else {
-        saveFeedbackBtn.textContent = t("taskdetail.saved_check");
-        setTimeout(() => { saveFeedbackBtn.textContent = t("taskdetail.save_feedback"); }, 1500);
+        saveFeedbackBtn.textContent = "Saved ✓";
+        setTimeout(() => { saveFeedbackBtn.textContent = "Save feedback"; }, 1500);
       }
     });
   }

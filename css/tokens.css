@@ -1,48 +1,52 @@
-/* Se2L design tokens — v3.
-   Direction change: warm & reassuring, calm & minimal, generous whitespace.
-   Dropped the ink-stamp/document motif entirely — no maroon, no mono-stamp
-   marks, no crisp/dashed edges. This palette is quiet on purpose: one soft
-   accent color (a muted sage — calm, a little hopeful, not clinical and
-   not a cliché terracotta-on-cream combo), warm neutral surfaces, gentle
-   rounded shapes, and type that reads as reassuring rather than dramatic. */
+/* Se2L design tokens — v4.
+   Direction: matched to reference screens supplied by the user (UK Arrival
+   Guide style) — warm cream background, a confident deep navy as the
+   primary UI color (headers, primary buttons, dark feature cards), and a
+   fresh mint green as the secondary "positive/in-progress" accent. Bold
+   grotesk headings rather than a serif — this reference reads as a
+   confident modern product, not a document or a wellness app. */
 
 :root {
-  --color-bg: #faf8f4;            /* soft warm neutral, quieter than a cream/terracotta cliché */
+  --color-bg: #faf6f1;            /* warm cream page background */
   --color-surface: #ffffff;
-  --color-surface-muted: #f2efe8;
-  --color-text: #33312c;          /* warm soft charcoal, not stark black — easier to sit with */
-  --color-text-secondary: #6b6760;
-  --color-text-muted: #9c988e;
-  --color-border: #ece7dc;        /* barely-there hairline, whitespace does the separating */
-  --color-backdrop: rgba(51, 49, 44, 0.32);
+  --color-surface-muted: #f2ede5;
+  --color-text: #161f3d;          /* near-navy ink for body text/headings */
+  --color-text-secondary: #5c6178;
+  --color-text-muted: #9096a8;
+  --color-border: #ece6da;
+  --color-backdrop: rgba(15, 26, 68, 0.4);
 
-  --color-accent: #7a9471;        /* muted sage — calm, reassuring, a little hopeful without being loud */
-  --color-accent-dark: #56704e;
-  --color-accent-bg: #eaf0e6;
-  --color-accent-light: #d9e5d3;
+  --color-navy: #0f1a44;          /* primary — dark CTAs, headers, active nav */
+  --color-navy-dark: #0a1230;
+  --color-navy-bg: #e7e9f2;       /* pale navy tint for badges/tags */
 
-  --color-brass: #c99a52;         /* soft honey — secondary "in progress / notable" accent, used sparingly */
+  --color-accent: #2fae63;        /* mint/emerald — secondary accent: "in progress", positive states, links on dark */
+  --color-accent-dark: #22824a;
+  --color-accent-bg: #d9f2e2;     /* pale mint tint — badges, active sidebar item */
+  --color-accent-light: #bfe8cd;
+
+  --color-brass: #c99a52;
   --color-brass-bg: #f5ecd8;
 
-  --color-critical: #bd5b4c;      /* warm muted brick rather than a harsh alarm red */
-  --color-critical-bg: #f7e6e2;
+  --color-critical: #c1483a;
+  --color-critical-bg: #f7ddd8;
   --color-warning: #c99a52;
   --color-warning-bg: #f5ecd8;
   --color-important: #c99a52;
 
-  --color-success: #56704e;
-  --color-success-dark: #3e5238;
-  --color-success-bg: #eaf0e6;
+  --color-success: #2fae63;
+  --color-success-dark: #22824a;
+  --color-success-bg: #d9f2e2;
 
-  --color-video-bg: #33312c;
-  --color-video-text-muted: #9c988e;
+  --color-video-bg: #0f1a44;
+  --color-video-text-muted: #9096a8;
 
-  --font-heading: 'Lora', serif;       /* warm, rounded, calm serif — no dramatic contrast */
+  --font-heading: 'Manrope', sans-serif;   /* bold confident grotesk, not a serif — reads as product, not document */
   --font-body: 'Inter', sans-serif;
-  --font-mono: 'Space Mono', monospace; /* used sparingly now — a date or count here and there, not a motif */
+  --font-mono: 'Space Mono', monospace;
 
-  --radius-card: 1.25rem;         /* generous soft rounding — part of the calm feel */
-  --radius-control: 0.85rem;
+  --radius-card: 1rem;             /* 16px — matches the reference card rounding */
+  --radius-control: 0.65rem;
 }
 
 /* Tailwind's utility classes (bg-slate-50, text-slate-900, etc.) still
@@ -55,10 +59,10 @@ body {
   background: var(--color-bg) !important;
   color: var(--color-text) !important;
   font-family: var(--font-body) !important;
-  line-height: 1.6;
 }
 h1, h2, h3 {
   font-family: var(--font-heading) !important;
+  font-weight: 800 !important;
 }
 
 /* Color sweep — recolors the existing Tailwind utility classes already
@@ -72,7 +76,7 @@ h1, h2, h3 {
 .bg-white { background-color: var(--color-surface) !important; }
 .bg-slate-50 { background-color: var(--color-bg) !important; }
 .bg-slate-100 { background-color: var(--color-surface-muted) !important; }
-.bg-slate-900 { background-color: var(--color-accent-dark) !important; }
+.bg-slate-900 { background-color: var(--color-navy) !important; }
 .text-slate-400 { color: var(--color-text-muted) !important; }
 .text-slate-500 { color: var(--color-text-secondary) !important; }
 .text-slate-600 { color: var(--color-text-secondary) !important; }
@@ -81,11 +85,11 @@ h1, h2, h3 {
 .border-slate-200 { border-color: var(--color-border) !important; }
 .border-slate-300 { border-color: var(--color-border) !important; }
 
-.bg-indigo-50 { background-color: var(--color-accent-bg) !important; }
-.text-indigo-600 { color: var(--color-accent-dark) !important; }
-.text-indigo-700 { color: var(--color-accent-dark) !important; }
-.border-indigo-200 { border-color: var(--color-accent-light) !important; }
-.border-indigo-600 { border-color: var(--color-accent) !important; }
+.bg-indigo-50 { background-color: var(--color-navy-bg) !important; }
+.text-indigo-600 { color: var(--color-navy) !important; }
+.text-indigo-700 { color: var(--color-navy) !important; }
+.border-indigo-200 { border-color: var(--color-navy-bg) !important; }
+.border-indigo-600 { border-color: var(--color-navy) !important; }
 
 .bg-red-50 { background-color: var(--color-critical-bg) !important; }
 .text-red-600 { color: var(--color-critical) !important; }
