@@ -49,6 +49,7 @@ form.addEventListener("submit", async (e) => {
   const arrivalDate = document.getElementById("arrival_date").value;
   const ukRegion = document.getElementById("uk_region").value;
   const language = document.getElementById("language").value;
+  localStorage.setItem("se2l_language", language);
   const email = emailInput.value;
 
   const { data, error } = await supabaseClient.auth.signUp({

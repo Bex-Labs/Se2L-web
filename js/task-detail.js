@@ -164,7 +164,7 @@ async function loadTaskDetail() {
     linkContainer.innerHTML = `
       <a href="${linkUrl}" target="_blank" rel="noopener" class="btn btn-secondary">
         ${task.task_links[0].label || "More info"}
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
       </a>
     `;
   }
@@ -289,6 +289,13 @@ async function loadTaskDetail() {
   // --- SE2L-45: thumbs up/down feedback with optional comment ---
   // Visible to App Managers/Super Admins (see task_feedback RLS), unlike
   // the strictly-private bookmarks/notes above.
+  //
+  // The actual column is a boolean `is_helpful` (true = thumbs up, false =
+  // thumbs down), not a text `rating` column — a schema mismatch found
+  // via a live 400 error, which meant every feedback save was silently
+  // failing before this fix. `currentRating` below stays "up"/"down"/null
+  // internally for the UI logic; only the read/write to Supabase converts
+  // to/from the real boolean.
   const { data: existingFeedback } = await supabaseClient
     .from("task_feedback")
     .select("*")
@@ -301,7 +308,9 @@ async function loadTaskDetail() {
   const feedbackComment = document.getElementById("feedback-comment");
   const saveFeedbackBtn = document.getElementById("save-feedback-btn");
 
-  let currentRating = existingFeedback?.rating || null;
+  let currentRating = existingFeedback
+    ? (existingFeedback.is_helpful === true ? "up" : existingFeedback.is_helpful === false ? "down" : null)
+    : null;
   feedbackComment.value = existingFeedback?.comment || "";
 
   function setFeedbackButtonState(rating) {
@@ -316,12 +325,13 @@ async function loadTaskDetail() {
   setFeedbackButtonState(currentRating);
 
   async function saveFeedbackState(rating) {
+    const isHelpful = rating === "up" ? true : rating === "down" ? false : null;
     const { error } = await supabaseClient
       .from("task_feedback")
       .upsert({
         user_id: user.id,
         task_id: taskId,
-        rating: rating,
+        is_helpful: isHelpful,
         comment: feedbackComment.value || null,
         updated_at: new Date().toISOString()
       }, { onConflict: "user_id,task_id" });

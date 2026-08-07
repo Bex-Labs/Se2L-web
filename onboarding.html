@@ -133,7 +133,7 @@
     <aside class="onboarding-panel">
       <div class="onboarding-panel-brand">
         <div class="onboarding-panel-brand-mark">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <path d="M12 2L2 7V12C2 16.97 6.24 21.44 12 22.5C17.76 21.44 22 16.97 22 12V7L12 2Z" stroke="#ffffff" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12L11 14L15.5 9.5" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
@@ -161,7 +161,7 @@
       </div>
     </aside>
 
-    <div class="onboarding-form-panel">
+    <main class="onboarding-form-panel">
       <div class="onboarding-form-panel-top">
         <a href="login.html" style="font-size: 0.85rem; font-weight: 600; color: var(--color-text-secondary); text-decoration: none;">
           <span data-i18n="index.hero_have_account">Already have an account?</span>
@@ -180,32 +180,36 @@
 
           <div class="onboarding-form-grid">
             <div class="form-field">
-              <label class="form-label" data-i18n="onboarding.visa_type_label">Visa type</label>
+              <label for="visa_type" class="form-label" data-i18n="onboarding.visa_type_label">Visa type</label>
               <select id="visa_type" class="form-select">
                 <option value="">Loading visa types...</option>
               </select>
             </div>
             <div class="form-field">
-              <label class="form-label" data-i18n="onboarding.arrival_date_label">Arrival date</label>
+              <label for="arrival_date" class="form-label" data-i18n="onboarding.arrival_date_label">Arrival date</label>
               <input id="arrival_date" type="date" required class="form-input" />
               <p class="onboarding-hint" data-i18n="onboarding.arrival_date_hint">Already in the UK? Enter your arrival date. Not yet arrived? Enter your planned arrival date — we'll get you ready in advance.</p>
             </div>
             <div class="form-field">
-              <label class="form-label" data-i18n="onboarding.uk_region_label">UK region</label>
+              <label for="uk_region" class="form-label" data-i18n="onboarding.uk_region_label">UK region</label>
               <select id="uk_region" class="form-select">
                 <option value="">Loading regions...</option>
               </select>
             </div>
             <div class="form-field">
-              <label class="form-label" data-i18n="onboarding.language_label">Preferred language</label>
+              <label for="language" class="form-label" data-i18n="onboarding.language_label">Preferred language</label>
               <select id="language" class="form-select">
-                <option value="english">English</option>
+                <option value="en">English</option>
+                <option value="ar">العربية (Arabic)</option>
+                <option value="ur">اردو (Urdu)</option>
+                <option value="zh">中文 (Mandarin)</option>
+                <option value="fr">Français (French)</option>
               </select>
             </div>
           </div>
 
           <div class="form-field">
-            <label class="form-label" data-i18n="onboarding.dependants_question">Settling with dependants?</label>
+            <label for="has_dependants" class="form-label" data-i18n="onboarding.dependants_question">Settling with dependants?</label>
             <select id="has_dependants" class="form-select">
               <option value="" data-i18n="onboarding.select_option">Select an option</option>
               <option value="no" data-i18n="onboarding.option_no">No</option>
@@ -216,7 +220,7 @@
           <!-- SE2L-23: household members section, shown only when has_dependants = yes -->
           <div id="dependants-section" class="onboarding-section-divider hidden">
             <div class="flex items-center justify-between mb-3">
-              <label class="form-label" style="margin-bottom: 0;" data-i18n="onboarding.household_members">Household members</label>
+              <label for="email" class="form-label" style="margin-bottom: 0;" data-i18n="onboarding.household_members">Household members</label>
               <button type="button" id="add-dependant-btn" class="btn btn-secondary btn-sm" data-i18n="onboarding.add_household_member">
                 + Add household member
               </button>
@@ -231,7 +235,7 @@
               <input id="email" type="email" required placeholder="you@example.com" class="form-input" data-i18n-placeholder="onboarding.email_placeholder" />
             </div>
             <div class="form-field">
-              <label class="form-label" data-i18n="onboarding.password_label">Password</label>
+              <label for="password" class="form-label" data-i18n="onboarding.password_label">Password</label>
               <input id="password" type="password" required minlength="6" placeholder="At least 6 characters" class="form-input" data-i18n-placeholder="onboarding.password_placeholder" />
             </div>
           </div>
@@ -244,7 +248,7 @@
         </form>
 
       </div>
-    </div>
+    </main>
   </div>
 
   <!-- SE2L-23: template for one household member entry, cloned by onboarding.js -->
@@ -283,6 +287,8 @@
   <script src="js/supabase-config.js"></script>
   <script src="js/branding.js"></script>
   <script src="js/lang/en.js"></script>
+  <script src="js/lang/fr.js"></script>
+  <script src="js/lang/zh.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/onboarding.js"></script>
 

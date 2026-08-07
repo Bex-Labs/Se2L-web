@@ -154,21 +154,35 @@
 
   <div class="login-page-wrap">
 
-    <div class="login-header">
+    <header class="login-header">
       <div class="login-header-mark">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <path d="M12 2L2 7V12C2 16.97 6.24 21.44 12 22.5C17.76 21.44 22 16.97 22 12V7L12 2Z" stroke="#ffffff" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12L11 14L15.5 9.5" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
       <span class="login-header-title">Se2L</span>
-    </div>
+    </header>
 
-    <div class="login-main">
+    <main class="login-main">
       <div class="login-card card">
 
         <span class="badge" data-i18n="login.eyebrow">Official entry portal</span>
         <h1 data-i18n="login.heading">Welcome back</h1>
         <p class="login-sub" data-i18n="login.subtext">Log in to pick up your settlement journey where you left off.</p>
+
+        <button type="button" id="google-signin-btn" class="btn btn-secondary btn-block" style="margin-bottom: 1.25rem; gap: 0.6rem;">
+          <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
+            <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l6-6C34 5.1 29.3 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21 21-9.4 21-21c0-1.4-.1-2.7-.4-3.5z"/>
+            <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.6 18.9 13 24 13c3.1 0 5.8 1.1 8 3l6-6C34 5.1 29.3 3 24 3 16.3 3 9.6 7.3 6.3 14.7z"/>
+            <path fill="#4CAF50" d="M24 45c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.3 36.4 26.8 37 24 37c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 40.6 16.2 45 24 45z"/>
+            <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.2 4.2-4.1 5.6l6.2 5.2C40.9 36 44 30.5 44 24c0-1.4-.1-2.7-.4-3.5z"/>
+          </svg>
+          <span data-i18n="login.google_signin">Continue with Google</span>
+        </button>
+
+        <div class="divider-row" style="margin: 0 0 1.25rem;">
+          <span class="divider-row-label" data-i18n="login.email_divider">or continue with email</span>
+        </div>
 
         <form id="login-form">
 
@@ -179,15 +193,15 @@
             <input id="email" type="email" required class="form-input" placeholder="e.g. name@domain.gov.uk" data-i18n-placeholder="login.email_placeholder" />
           </div>
 
-          <div class="form-field">
+          <div class="form-field" id="password-field">
             <div class="login-field-row">
               <label class="form-label" for="password" data-i18n="login.password_label">Password</label>
               <a href="#" class="login-forgot" data-i18n="login.forgot">Forgot?</a>
             </div>
             <div class="login-password-wrap">
-              <input id="password" type="password" required class="form-input" placeholder="Your password" data-i18n-placeholder="login.password_placeholder" />
+              <input id="password" type="password" class="form-input" placeholder="Your password" data-i18n-placeholder="login.password_placeholder" />
               <button type="button" class="login-toggle-password" id="toggle-password" aria-label="Show password" data-i18n-aria-label="login.show_password">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                   <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
                   <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/>
                 </svg>
@@ -195,7 +209,15 @@
             </div>
           </div>
 
-          <button type="submit" class="btn btn-primary btn-block" data-i18n="login.submit">Sign in &rarr;</button>
+          <p id="magic-link-message" class="hidden text-sm" style="color: var(--color-accent-dark); background: var(--color-accent-bg); padding: 0.65rem 0.85rem; border-radius: var(--radius-control); margin-bottom: 1rem;"></p>
+
+          <button type="submit" id="login-submit-btn" class="btn btn-primary btn-block" data-i18n="login.submit">Sign in &rarr;</button>
+
+          <div class="text-center mt-3">
+            <button type="button" id="magic-link-toggle" class="text-xs" style="color: var(--color-accent-dark); font-weight: 600; background: none; border: none; cursor: pointer;" data-i18n="login.use_magic_link">
+              Or email me a sign-in link instead
+            </button>
+          </div>
 
         </form>
 
@@ -206,15 +228,15 @@
         <a href="onboarding.html" class="btn btn-secondary btn-block" data-i18n="login.register">Register account</a>
 
       </div>
-    </div>
+    </main>
 
-    <div class="login-footer">
+    <footer class="login-footer">
       <span data-i18n="footer.copyright">Se2L UK &copy; 2026 Se2L UK Settlement Service. All rights reserved.</span>
       <a href="#" data-i18n="footer.privacy">Privacy Policy</a>
       <a href="terms.html" data-i18n="footer.terms">Terms of Service</a>
       <a id="footer-support-link" href="#" data-i18n="footer.contact">Contact Support</a>
       <a href="#" data-i18n="footer.accessibility">Accessibility</a>
-    </div>
+    </footer>
 
   </div>
 
@@ -234,6 +256,8 @@
   <script src="js/supabase-config.js"></script>
   <script src="js/branding.js"></script>
   <script src="js/lang/en.js"></script>
+  <script src="js/lang/fr.js"></script>
+  <script src="js/lang/zh.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/login.js"></script>
 

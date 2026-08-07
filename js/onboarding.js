@@ -1,5 +1,49 @@
 const form = document.getElementById("onboarding-form");
 
+// --- SE2L-79: Google OAuth support ---
+// A brand-new Google sign-up lands here already authenticated (from
+// login.js's redirect), but has no row in `users` yet — signUp() never
+// ran for them, since OAuth creates the auth account directly. Detect
+// that case and switch the page into "complete your profile" mode:
+// skip account creation entirely, just collect the same visa/region/
+// household fields and attach them to the existing session's user.
+let isProfileCompletionMode = false;
+let existingSessionUser = null;
+
+(async function checkForExistingSession() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session?.user) return;
+
+  const { data: existingProfile } = await supabaseClient
+    .from("users")
+    .select("id")
+    .eq("id", session.user.id)
+    .maybeSingle();
+
+  if (existingProfile) {
+    // Already fully set up — nothing to do here.
+    window.location.href = "dashboard.html";
+    return;
+  }
+
+  isProfileCompletionMode = true;
+  existingSessionUser = session.user;
+
+  // Hide account-creation fields — this person already has an account.
+  document.getElementById("email").closest(".form-field")?.classList.add("hidden");
+  document.getElementById("password").closest(".form-field")?.classList.add("hidden");
+  document.getElementById("email").required = false;
+  document.getElementById("password").required = false;
+
+  const heading = document.querySelector('[data-i18n="onboarding.heading"]');
+  const subtext = document.querySelector('[data-i18n="onboarding.subtext"]');
+  if (heading) heading.textContent = window.t("onboarding.complete_profile_heading");
+  if (subtext) subtext.textContent = window.t("onboarding.complete_profile_subtext");
+
+  const submitBtn = document.querySelector('#onboarding-form button[type="submit"]');
+  if (submitBtn) submitBtn.textContent = window.t("onboarding.complete_profile_submit");
+})();
+
 // --- SE2L-74: load active visa types and UK regions dynamically ---
 // Readable by anyone (including this pre-signup page) since these tables'
 // RLS policies grant SELECT to public — only Super Admin can write to them.
@@ -115,21 +159,31 @@ form.addEventListener("submit", async (e) => {
   const arrivalDate = document.getElementById("arrival_date").value;
   const ukRegion = document.getElementById("uk_region").value;
   const language = document.getElementById("language").value;
+  localStorage.setItem("se2l_language", language);
 
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+  let userId, email;
 
-  const { data, error } = await supabaseClient.auth.signUp({
-    email: email,
-    password: password
-  });
+  if (isProfileCompletionMode) {
+    // Already authenticated via Google — no account to create, just
+    // attach this profile data to the session that's already there.
+    userId = existingSessionUser.id;
+    email = existingSessionUser.email;
+  } else {
+    const password = document.getElementById("password").value;
+    email = document.getElementById("email").value;
 
-  if (error) {
-    alert(window.t("onboarding.signup_failed_prefix") + error.message);
-    return;
+    const { data, error } = await supabaseClient.auth.signUp({
+      email: email,
+      password: password
+    });
+
+    if (error) {
+      alert(window.t("onboarding.signup_failed_prefix") + error.message);
+      return;
+    }
+
+    userId = data.user.id;
   }
-
-  const userId = data.user.id;
 
   const { error: profileError } = await supabaseClient
     .from("users")

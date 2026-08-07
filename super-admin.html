@@ -182,11 +182,12 @@
   </style>
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-900">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
 
-  <div class="mobile-topbar">
+  <header class="mobile-topbar">
     <span class="text-base font-semibold">Se2L</span>
     <button id="mobile-menu-btn" class="text-2xl leading-none text-slate-600" aria-label="Open menu">☰</button>
-  </div>
+  </header>
 
   <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
 
@@ -195,7 +196,7 @@
     <aside id="app-sidebar" class="app-sidebar">
       <div class="sidebar-brand">
         <div class="sidebar-brand-mark">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <path d="M12 2L2 7V12C2 16.97 6.24 21.44 12 22.5C17.76 21.44 22 16.97 22 12V7L12 2Z" stroke="#ffffff" stroke-width="1.6" stroke-linejoin="round"/>
             <path d="M9 12L11 14L15.5 9.5" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
@@ -230,7 +231,7 @@
       <button id="signout-btn" class="btn btn-ghost btn-sm btn-block" style="margin-top: auto; justify-content: flex-start;">Sign out</button>
     </aside>
 
-    <main class="app-main">
+    <main class="app-main" id="main-content">
       <div class="max-w-2xl mx-auto">
 
         <div id="panel-overview" class="admin-panel is-active-panel">
@@ -239,28 +240,28 @@
     <div class="grid grid-cols-4 gap-3 mb-6">
       <div class="admin-stat-card">
         <div class="icon-tile" style="width:2rem; height:2rem; margin-bottom:0.5rem;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:1.1rem; height:1.1rem;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:1.1rem; height:1.1rem;" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         </div>
         <p class="admin-stat-label">App managers</p>
         <p id="stat-app-managers" class="admin-stat-value">—</p>
       </div>
       <div class="admin-stat-card">
         <div class="icon-tile icon-tile-mint" style="width:2rem; height:2rem; margin-bottom:0.5rem;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:1.1rem; height:1.1rem;"><circle cx="12" cy="12" r="9"/><polygon points="12 7 14 12 12 17 10 12 12 7"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:1.1rem; height:1.1rem;" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polygon points="12 7 14 12 12 17 10 12 12 7"/></svg>
         </div>
         <p class="admin-stat-label">Visa journeys</p>
         <p id="stat-journeys" class="admin-stat-value">—</p>
       </div>
       <div class="admin-stat-card">
         <div class="icon-tile" style="width:2rem; height:2rem; margin-bottom:0.5rem;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:1.1rem; height:1.1rem;"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:1.1rem; height:1.1rem;" aria-hidden="true"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
         </div>
         <p class="admin-stat-label">UK regions</p>
         <p id="stat-regions" class="admin-stat-value">—</p>
       </div>
       <div class="admin-stat-card">
         <div class="icon-tile icon-tile-navy-solid" style="width:2rem; height:2rem; margin-bottom:0.5rem;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:1.1rem; height:1.1rem;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:1.1rem; height:1.1rem;" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
         </div>
         <p class="admin-stat-label">Content status</p>
         <p id="stat-content-status" class="admin-stat-value admin-stat-value-small">Loading...</p>
@@ -268,7 +269,7 @@
     </div>
 
     <div class="admin-section-heading">
-      <svg viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-dark)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:1.1rem; height:1.1rem;"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-dark)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:1.1rem; height:1.1rem;" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
       <p class="text-sm font-medium">System checks</p>
     </div>
     <div class="flex flex-col gap-2">
@@ -295,13 +296,13 @@
     <!-- SE2L-73: manage App Manager accounts -->
     <div id="app-manager-accounts-section" class="mt-8">
       <div class="admin-section-heading">
-        <svg viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-dark)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:1.1rem; height:1.1rem;"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-dark)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:1.1rem; height:1.1rem;" aria-hidden="true"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
         <h2 class="text-base font-semibold">App Manager accounts</h2>
       </div>
 
       <form id="invite-form" class="bg-white border border-slate-200 rounded-xl p-4 flex gap-3 items-end mb-4">
         <div class="flex-1">
-          <label class="text-sm font-medium block mb-1">Invite a new App Manager</label>
+          <label for="invite_email" class="text-sm font-medium block mb-1">Invite a new App Manager</label>
           <input id="invite_email" type="email" required class="form-input" placeholder="name@example.com" />
         </div>
         <button type="submit" class="btn btn-primary">Send invite</button>
@@ -318,7 +319,7 @@
     <!-- SE2L-74: configure available visa types and UK regions -->
     <div id="visa-region-section" class="mt-8">
       <div class="admin-section-heading">
-        <svg viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-dark)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:1.1rem; height:1.1rem;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-dark)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:1.1rem; height:1.1rem;" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
         <h2 class="text-base font-semibold">Visa types & UK regions</h2>
       </div>
       <p class="text-sm text-slate-500 mb-4">
@@ -353,7 +354,7 @@
     <!-- SE2L-75: override or unpublish any content, regardless of author -->
     <div id="moderation-section" class="mt-8">
       <div class="admin-section-heading">
-        <svg viewBox="0 0 24 24" fill="none" stroke="var(--color-critical)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:1.1rem; height:1.1rem;"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--color-critical)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:1.1rem; height:1.1rem;" aria-hidden="true"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/></svg>
         <h2 class="text-base font-semibold">Content moderation</h2>
       </div>
       <p class="text-sm text-slate-500 mb-4">
@@ -373,7 +374,7 @@
     <div id="panel-settings" class="admin-panel">
       <!-- SE2L-77: manage platform settings -->
       <div class="admin-section-heading">
-        <svg viewBox="0 0 24 24" fill="none" stroke="var(--color-navy)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:1.1rem; height:1.1rem;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--color-navy)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:1.1rem; height:1.1rem;" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         <h2 class="text-base font-semibold">Platform settings</h2>
       </div>
 
@@ -385,11 +386,11 @@
       <div class="bg-white border border-slate-200 rounded-xl p-4 mb-6">
         <div class="grid grid-cols-2 gap-4 mb-4">
           <div>
-            <label class="text-sm font-medium block mb-1">Site name</label>
+            <label for="branding_site_name" class="text-sm font-medium block mb-1">Site name</label>
             <input id="branding_site_name" type="text" class="form-input" placeholder="Se2L" />
           </div>
           <div>
-            <label class="text-sm font-medium block mb-1">Accent color</label>
+            <label for="branding_support_email" class="text-sm font-medium block mb-1">Accent color</label>
             <div class="flex gap-2 items-center">
               <input id="branding_accent_color" type="color" class="form-input" style="height:2.5rem; width:3.5rem; padding:0.25rem;" />
               <input id="branding_accent_color_text" type="text" class="flex-1 form-input" placeholder="#0d4d4d" />
@@ -413,7 +414,7 @@
         Edit the subject and content sent for each automated email. Text like <code>{{invite_link}}</code> gets replaced with the real value when an email actually sends — don't remove those unless you mean to.
       </p>
       <div class="bg-white border border-slate-200 rounded-xl p-4 mb-6">
-        <label class="text-sm font-medium block mb-1">Which email</label>
+        <label for="email_template_select" class="text-sm font-medium block mb-1">Which email</label>
         <select id="email_template_select" class="form-input mb-3">
           <option value="app_manager_invite">App Manager invite</option>
           <option value="dependant_invite">Household member invite</option>
@@ -424,10 +425,10 @@
         </select>
         <p id="email-template-placeholders" class="text-xs text-slate-400 mb-3"></p>
 
-        <label class="text-sm font-medium block mb-1">Subject</label>
+        <label for="email_template_subject" class="text-sm font-medium block mb-1">Subject</label>
         <input id="email_template_subject" type="text" class="form-input mb-4" />
 
-        <label class="text-sm font-medium block mb-1">Content (HTML)</label>
+        <label for="email_template_body" class="text-sm font-medium block mb-1">Content (HTML)</label>
         <textarea id="email_template_body" rows="8" class="form-input mb-2 font-mono"></textarea>
         <p id="email-template-save-message" class="text-sm mb-3 hidden"></p>
 
@@ -443,10 +444,10 @@
         This content is shown on the public Terms of Service page, linked from every page's footer.
       </p>
       <div class="bg-white border border-slate-200 rounded-xl p-4">
-        <label class="text-sm font-medium block mb-1">Page title</label>
+        <label for="terms_title" class="text-sm font-medium block mb-1">Page title</label>
         <input id="terms_title" type="text" class="form-input mb-4" />
 
-        <label class="text-sm font-medium block mb-1">Content</label>
+        <label for="terms_body" class="text-sm font-medium block mb-1">Content</label>
         <textarea id="terms_body" rows="10" class="form-input mb-2" placeholder="Use lines starting with '- ' for a bullet list."></textarea>
         <p id="terms-save-message" class="text-sm mb-3 hidden"></p>
 

@@ -1071,9 +1071,266 @@ async function loadJourneyVisaTypeAndRegionOptions() {
     || `<option value="">${t("appmgr.no_regions_configured")}</option>`;
 }
 
-// Sidebar section-switching — shows one of Journeys/Tasks/Reorder at a
-// time instead of stacking all three on one long page. Purely a display
-// toggle; every section's data still loads on page load same as before.
+// SE2L-68/69/70/71: Analytics — computed client-side from the same tables
+// and phase-detection logic dashboard.js already uses per-user (arrival
+// date + phase day windows), not a simplified approximation. SE2L-72
+// (email open/click rates) is deliberately NOT included here — there's
+// no tracking data source for it yet (see the panel's own note).
+let analyticsLoaded = false;
+
+async function loadAnalytics() {
+  if (analyticsLoaded) return;
+  analyticsLoaded = true;
+
+  const [usersRes, journeysRes, phasesRes, tasksRes, taskPhasesRes, taskVisaRes, taskRegionRes, completionsRes, feedbackRes] = await Promise.all([
+    supabaseClient.from("users").select("id, visa_type, uk_region, arrival_date, role"),
+    supabaseClient.from("journeys").select("id, visa_type, uk_region"),
+    supabaseClient.from("phases").select("id, journey_id, name, days_after_arrival_start, days_after_arrival_end, sort_order"),
+    supabaseClient.from("tasks").select("id, title").eq("status", "published"),
+    supabaseClient.from("task_phases").select("task_id, phase_id"),
+    supabaseClient.from("task_visa_types").select("task_id, visa_type"),
+    supabaseClient.from("task_uk_regions").select("task_id, uk_region"),
+    supabaseClient.from("user_task_state").select("user_id, task_id, status").eq("status", "complete"),
+    supabaseClient.from("task_feedback").select("task_id, is_helpful")
+  ]);
+
+  // Regular newcomers only — excludes staff by their actual role value.
+  // (Not a null/blank check: this schema defaults regular users' role to
+  // "primary" rather than leaving it null, so filtering on falsiness was
+  // wrongly excluding every real newcomer from these counts.)
+  const users = (usersRes.data || []).filter(u => u.role !== "app_manager" && u.role !== "super_admin");
+  const journeys = journeysRes.data || [];
+  const phases = phasesRes.data || [];
+  const tasks = tasksRes.data || [];
+  const completions = new Set((completionsRes.data || []).map(c => c.user_id + "::" + c.task_id));
+  const feedback = feedbackRes.data || [];
+
+  const phaseById = Object.fromEntries(phases.map(p => [p.id, p]));
+  const journeyByKey = Object.fromEntries(journeys.map(j => [j.visa_type + "::" + j.uk_region, j]));
+  const phasesByJourney = {};
+  phases.forEach(p => { (phasesByJourney[p.journey_id] ||= []).push(p); });
+  Object.values(phasesByJourney).forEach(arr => arr.sort((a, b) => a.sort_order - b.sort_order));
+
+  const taskVisaTypes = {};
+  (taskVisaRes.data || []).forEach(l => { (taskVisaTypes[l.task_id] ||= []).push(l.visa_type); });
+  const taskRegions = {};
+  (taskRegionRes.data || []).forEach(l => { (taskRegions[l.task_id] ||= []).push(l.uk_region); });
+  const taskPhaseIds = {};
+  (taskPhasesRes.data || []).forEach(l => { (taskPhaseIds[l.task_id] ||= []).push(l.phase_id); });
+
+  // Per-user: their journey, current phase, and days since arrival —
+  // identical logic to dashboard.js's own phase-timeline calculation,
+  // just run here for every user instead of just the signed-in one.
+  const userInfo = users.map(u => {
+    const journey = journeyByKey[u.visa_type + "::" + u.uk_region];
+    if (!journey || !u.arrival_date) return null;
+    const journeyPhases = phasesByJourney[journey.id] || [];
+    const arrival = new Date(u.arrival_date);
+    const today = new Date();
+    const daysSince = Math.floor((today - arrival) / (1000 * 60 * 60 * 24));
+    const currentPhase = journeyPhases.find(p => daysSince >= p.days_after_arrival_start && daysSince < p.days_after_arrival_end);
+    const currentSortOrder = currentPhase ? currentPhase.sort_order : (journeyPhases.length ? journeyPhases[journeyPhases.length - 1].sort_order + 1 : 0);
+    return { id: u.id, visa_type: u.visa_type, uk_region: u.uk_region, journeyPhases, currentPhase, currentSortOrder };
+  }).filter(Boolean);
+
+  // ---- SE2L-71: active users by journey & phase ----
+  const activeCounts = {};
+  userInfo.forEach(u => {
+    const phaseName = u.currentPhase ? u.currentPhase.name : "Past all phases";
+    const key = `${u.visa_type}|${u.uk_region}|${phaseName}`;
+    activeCounts[key] = (activeCounts[key] || 0) + 1;
+  });
+
+  // ---- SE2L-68: completion rates by phase & visa type ----
+  // "Eligible" = task's visa/region tags match the user, AND the task's
+  // phase (matched by name against the user's own journey) is at or
+  // before the user's current phase — i.e. they should have reached it.
+  const completionAgg = {};
+  userInfo.forEach(u => {
+    tasks.forEach(t => {
+      if (!(taskVisaTypes[t.id] || []).includes(u.visa_type)) return;
+      if (!(taskRegions[t.id] || []).includes(u.uk_region)) return;
+      const linkedPhaseNames = new Set((taskPhaseIds[t.id] || []).map(pid => phaseById[pid]?.name).filter(Boolean));
+      const userPhaseForTask = u.journeyPhases.find(p => linkedPhaseNames.has(p.name));
+      if (!userPhaseForTask) return;
+      if (userPhaseForTask.sort_order > u.currentSortOrder) return;
+
+      const key = `${u.visa_type}|${userPhaseForTask.name}`;
+      completionAgg[key] ||= { eligible: 0, completed: 0, sortOrder: userPhaseForTask.sort_order, visaType: u.visa_type, phaseName: userPhaseForTask.name };
+      completionAgg[key].eligible++;
+      if (completions.has(u.id + "::" + t.id)) completionAgg[key].completed++;
+    });
+  });
+
+  const completionRows = Object.values(completionAgg).sort((a, b) =>
+    a.visaType.localeCompare(b.visaType) || a.sortOrder - b.sortOrder
+  );
+
+  // ---- SE2L-69: drop-off points ----
+  // Biggest fall in completion % from one phase to the next-in-order
+  // phase, within the same visa type.
+  const dropoffRows = [];
+  const byVisaType = {};
+  completionRows.forEach(r => { (byVisaType[r.visaType] ||= []).push(r); });
+  Object.entries(byVisaType).forEach(([visaType, rows]) => {
+    for (let i = 1; i < rows.length; i++) {
+      const prevRate = rows[i - 1].eligible ? rows[i - 1].completed / rows[i - 1].eligible : 0;
+      const currRate = rows[i].eligible ? rows[i].completed / rows[i].eligible : 0;
+      const drop = prevRate - currRate;
+      if (drop > 0) {
+        dropoffRows.push({ visaType, from: rows[i - 1].phaseName, to: rows[i].phaseName, drop, prevRate, currRate });
+      }
+    }
+  });
+  dropoffRows.sort((a, b) => b.drop - a.drop);
+
+  // ---- SE2L-70: feedback ratings per task ----
+  const feedbackAgg = {};
+  feedback.forEach(f => {
+    feedbackAgg[f.task_id] ||= { up: 0, down: 0 };
+    if (f.is_helpful === true) feedbackAgg[f.task_id].up++;
+    else if (f.is_helpful === false) feedbackAgg[f.task_id].down++;
+  });
+  const taskTitleById = Object.fromEntries(tasks.map(t => [t.id, t.title]));
+  const feedbackRows = Object.entries(feedbackAgg)
+    .map(([taskId, counts]) => ({ title: taskTitleById[taskId] || t("appmgr.analytics_unknown_task"), ...counts, total: counts.up + counts.down }))
+    .filter(r => r.total > 0)
+    .sort((a, b) => b.total - a.total);
+
+  renderAnalyticsSummary(users.length, completionRows, feedbackRows);
+  renderActiveUsers(activeCounts);
+  renderCompletionRates(completionRows);
+  renderDropoff(dropoffRows);
+  renderFeedback(feedbackRows);
+}
+
+function renderAnalyticsSummary(totalUsers, completionRows, feedbackRows) {
+  const el = document.getElementById("analytics-summary-cards");
+  const totalEligible = completionRows.reduce((s, r) => s + r.eligible, 0);
+  const totalCompleted = completionRows.reduce((s, r) => s + r.completed, 0);
+  const overallRate = totalEligible ? Math.round((totalCompleted / totalEligible) * 100) : 0;
+  const totalFeedback = feedbackRows.reduce((s, r) => s + r.total, 0);
+
+  el.innerHTML = `
+    <div class="admin-stat-card">
+      <p class="admin-stat-label">${t("appmgr.analytics_stat_users")}</p>
+      <p class="admin-stat-value">${totalUsers}</p>
+    </div>
+    <div class="admin-stat-card">
+      <p class="admin-stat-label">${t("appmgr.analytics_stat_overall_completion")}</p>
+      <p class="admin-stat-value">${overallRate}%</p>
+    </div>
+    <div class="admin-stat-card">
+      <p class="admin-stat-label">${t("appmgr.analytics_stat_feedback_count")}</p>
+      <p class="admin-stat-value">${totalFeedback}</p>
+    </div>
+  `;
+}
+
+function renderActiveUsers(activeCounts) {
+  const el = document.getElementById("analytics-active-users");
+  const rows = Object.entries(activeCounts).sort((a, b) => b[1] - a[1]);
+  if (rows.length === 0) {
+    el.innerHTML = `<p class="text-slate-400">${t("appmgr.analytics_no_data")}</p>`;
+    return;
+  }
+  el.innerHTML = `
+    <table class="w-full text-sm">
+      <thead><tr class="text-left text-slate-500 border-b" style="border-color: var(--color-border);">
+        <th class="pb-2">${t("appmgr.visa_type_label")}</th>
+        <th class="pb-2">${t("appmgr.uk_region_label")}</th>
+        <th class="pb-2">${t("appmgr.phase_label")}</th>
+        <th class="pb-2 text-right">${t("appmgr.analytics_users_col")}</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(([key, count]) => {
+          const [visaType, region, phaseName] = key.split("|");
+          return `<tr class="border-b" style="border-color: var(--color-border);">
+            <td class="py-2">${visaType}</td>
+            <td class="py-2">${region}</td>
+            <td class="py-2">${phaseName}</td>
+            <td class="py-2 text-right font-medium">${count}</td>
+          </tr>`;
+        }).join("")}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderCompletionRates(rows) {
+  const el = document.getElementById("analytics-completion");
+  if (rows.length === 0) {
+    el.innerHTML = `<p class="text-slate-400">${t("appmgr.analytics_no_data")}</p>`;
+    return;
+  }
+  el.innerHTML = `
+    <table class="w-full text-sm">
+      <thead><tr class="text-left text-slate-500 border-b" style="border-color: var(--color-border);">
+        <th class="pb-2">${t("appmgr.visa_type_label")}</th>
+        <th class="pb-2">${t("appmgr.phase_label")}</th>
+        <th class="pb-2 text-right">${t("appmgr.analytics_completed_col")}</th>
+        <th class="pb-2 text-right">${t("appmgr.analytics_rate_col")}</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r => {
+          const pct = r.eligible ? Math.round((r.completed / r.eligible) * 100) : 0;
+          return `<tr class="border-b" style="border-color: var(--color-border);">
+            <td class="py-2">${r.visaType}</td>
+            <td class="py-2">${r.phaseName}</td>
+            <td class="py-2 text-right">${r.completed} / ${r.eligible}</td>
+            <td class="py-2 text-right font-medium">${pct}%</td>
+          </tr>`;
+        }).join("")}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderDropoff(rows) {
+  const el = document.getElementById("analytics-dropoff");
+  if (rows.length === 0) {
+    el.innerHTML = `<p class="text-slate-400">${t("appmgr.analytics_no_dropoff")}</p>`;
+    return;
+  }
+  el.innerHTML = rows.slice(0, 5).map((r, i) => `
+    <div class="flex justify-between items-center py-2 ${i > 0 ? "border-t" : ""}" style="border-color: var(--color-border);">
+      <div>
+        <span class="text-xs text-indigo-600 font-medium">${r.visaType}</span>
+        <p class="text-sm font-medium mt-0.5">${r.from} \u2192 ${r.to}</p>
+      </div>
+      <span class="text-sm font-medium" style="color: var(--color-critical);">-${Math.round(r.drop * 100)}pp</span>
+    </div>
+  `).join("");
+}
+
+function renderFeedback(rows) {
+  const el = document.getElementById("analytics-feedback");
+  if (rows.length === 0) {
+    el.innerHTML = `<p class="text-slate-400">${t("appmgr.analytics_no_feedback")}</p>`;
+    return;
+  }
+  el.innerHTML = `
+    <table class="w-full text-sm">
+      <thead><tr class="text-left text-slate-500 border-b" style="border-color: var(--color-border);">
+        <th class="pb-2">${t("appmgr.title_label")}</th>
+        <th class="pb-2 text-right">\uD83D\uDC4D</th>
+        <th class="pb-2 text-right">\uD83D\uDC4E</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r => `<tr class="border-b" style="border-color: var(--color-border);">
+          <td class="py-2">${r.title}</td>
+          <td class="py-2 text-right" style="color: var(--color-success-dark);">${r.up}</td>
+          <td class="py-2 text-right" style="color: var(--color-critical);">${r.down}</td>
+        </tr>`).join("")}
+      </tbody>
+    </table>
+  `;
+}
+
+// Sidebar section-switching — shows one of Journeys/Tasks/Reorder/Analytics
+// at a time instead of stacking all four on one long page. Purely a display
+// toggle; every section's data still loads on page load same as before,
+// except Analytics which lazy-loads on first click (see loadAnalytics).
 function setupPanelSwitching() {
   const subnavLinks = document.querySelectorAll(".sidebar-subnav [data-panel-target]");
 
@@ -1087,6 +1344,10 @@ function setupPanelSwitching() {
       });
 
       subnavLinks.forEach(l => l.classList.toggle("is-active-subnav", l === link));
+
+      if (targetId === "panel-analytics") {
+        loadAnalytics();
+      }
     });
   });
 }

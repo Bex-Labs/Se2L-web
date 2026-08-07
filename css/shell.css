@@ -6,6 +6,28 @@
    Tailwind, so it works with no build step regardless of what
    output.css was last compiled with. */
 
+/* --- Skip link ---
+   Lets keyboard/screen-reader users jump straight past the sidebar nav
+   (4-5+ links on every page) to the actual page content. Hidden until
+   it receives keyboard focus, per standard pattern. */
+.skip-link {
+  position: absolute;
+  top: -3rem;
+  left: 1rem;
+  z-index: 100;
+  background: var(--color-navy);
+  color: #ffffff;
+  padding: 0.65rem 1.1rem;
+  border-radius: var(--radius-control);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: top 0.15s ease;
+}
+.skip-link:focus {
+  top: 1rem;
+}
+
 .app-shell {
   display: flex;
   min-height: 100vh;

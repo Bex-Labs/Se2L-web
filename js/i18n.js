@@ -10,14 +10,29 @@
 //      it generates dynamically (alert messages, template-literal
 //      content in rendered lists, etc.) rather than only static HTML.
 //
-// SE2L-83 (activate additional languages) will make the active language
-// selectable — for now this always resolves to "en", but the rest of the
-// mechanism (dictionary lookup, data-i18n scanning, window.t) is already
-// built generically, so switching languages later doesn't require
-// touching this file's logic, just adding more lang/xx.js dictionaries.
+// SE2L-83: the active language is now selectable — see
+// se2lGetActiveLanguage()/window.se2lSetLanguage() below. Adding a new
+// language still only requires a new lang/xx.js dictionary (loaded
+// before this file) plus adding it to the language <select> options
+// where relevant; this file's mechanism doesn't need to change.
 
-const SE2L_DEFAULT_LANGUAGE = "en";
+// SE2L-83: the active language now comes from localStorage (set by the
+// language <select> on onboarding/invite pages, or the language switcher
+// on settings.html), falling back to English if nothing's been chosen
+// yet or the stored value doesn't have a loaded dictionary. Using
+// localStorage rather than a fresh Supabase profile fetch on every page
+// load keeps this fast and avoids needing to touch every page's own JS
+// just to read profile.language.
+function se2lGetActiveLanguage() {
+  const stored = localStorage.getItem("se2l_language");
+  if (stored && window.SE2L_LANG_DICTS && window.SE2L_LANG_DICTS[stored]) {
+    return stored;
+  }
+  return "en";
+}
+
 let se2lActiveDict = null;
+let se2lActiveLanguage = "en";
 
 // Translates everything data-i18n-tagged within a given subtree. Exposed
 // globally so any page's JS can call this after inserting new dynamic
@@ -48,8 +63,18 @@ function se2lTranslateElement(root) {
   });
 }
 
-function se2lApplyTranslations(dict) {
+function se2lApplyTranslations(dict, lang) {
   se2lActiveDict = dict;
+  se2lActiveLanguage = lang || "en";
+
+  // Arabic and Urdu are right-to-left languages — set the document
+  // direction so the browser mirrors layout correctly. This alone
+  // doesn't fix everything (some custom flex/spacing still needs
+  // direction-aware CSS), but it's the essential base-level switch.
+  const rtlLanguages = ["ar", "ur"];
+  document.documentElement.dir = rtlLanguages.includes(se2lActiveLanguage) ? "rtl" : "ltr";
+  document.documentElement.lang = se2lActiveLanguage;
+
   se2lTranslateElement(document);
 
   // Global lookup for each page's own JS. Supports optional {placeholder}
@@ -77,7 +102,7 @@ function se2lApplyTranslations(dict) {
 }
 
 function se2lLoadTranslations() {
-  const lang = SE2L_DEFAULT_LANGUAGE;
+  const lang = se2lGetActiveLanguage();
   const dict = window.SE2L_LANG_DICTS && window.SE2L_LANG_DICTS[lang];
 
   if (!dict) {
@@ -86,7 +111,20 @@ function se2lLoadTranslations() {
     return;
   }
 
-  se2lApplyTranslations(dict);
+  se2lApplyTranslations(dict, lang);
 }
+
+// Exposed so settings.html's language switcher (and the onboarding/invite
+// page language selects) can change the active language immediately
+// without a full page reload, and so future page loads pick up the
+// stored choice via se2lGetActiveLanguage() above.
+window.se2lSetLanguage = function (lang) {
+  if (!window.SE2L_LANG_DICTS || !window.SE2L_LANG_DICTS[lang]) {
+    console.warn(`i18n: cannot switch to "${lang}" — no dictionary loaded for it.`);
+    return;
+  }
+  localStorage.setItem("se2l_language", lang);
+  se2lApplyTranslations(window.SE2L_LANG_DICTS[lang], lang);
+};
 
 se2lLoadTranslations();

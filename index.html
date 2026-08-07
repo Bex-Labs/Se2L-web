@@ -90,7 +90,7 @@
       width: 2.5rem;
       height: 2.5rem;
       border-radius: 9999px;
-      background: var(--color-accent);
+      background: var(--color-accent-dark);
       color: #fff;
       display: flex;
       align-items: center;
@@ -133,7 +133,7 @@
     .landing-footer { max-width: 76rem; margin: 0 auto; padding: 0 2rem 2rem; display: grid; grid-template-columns: 1fr; gap: 2rem; }
     @media (min-width: 700px) { .landing-footer { grid-template-columns: 1.4fr 1fr 1fr; } }
     .landing-footer-desc { font-size: 0.82rem; color: var(--color-text-secondary); line-height: 1.6; margin-top: 0.75rem; max-width: 22rem; }
-    .landing-footer-col h4 { font-size: 0.78rem; font-weight: 700; color: var(--color-text); margin-bottom: 0.75rem; }
+    .landing-footer-col h3 { font-size: 0.78rem; font-weight: 700; color: var(--color-text); margin-bottom: 0.75rem; }
     .landing-footer-col a { display: block; font-size: 0.82rem; color: var(--color-text-secondary); text-decoration: none; margin-bottom: 0.5rem; }
     .landing-footer-col a:hover { color: var(--color-text); }
     .landing-footer-bottom {
@@ -148,7 +148,7 @@
   <header class="landing-header">
     <div class="landing-header-brand">
       <div class="landing-header-mark">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <path d="M12 2L2 7V12C2 16.97 6.24 21.44 12 22.5C17.76 21.44 22 16.97 22 12V7L12 2Z" stroke="#ffffff" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12L11 14L15.5 9.5" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
@@ -165,6 +165,7 @@
     </div>
   </header>
 
+  <main>
   <section class="landing-hero">
     <div>
       <span class="badge badge-eyebrow" data-i18n="index.hero_eyebrow">Official Newcomer Platform</span>
@@ -183,7 +184,7 @@
            an unlicensed photo in the implementation. -->
       <div class="landing-hero-photo">Photo placeholder — newcomers settling into life in the UK</div>
       <div class="landing-hero-check">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
       </div>
       <div class="landing-hero-badge" data-i18n="index.stat_roadmaps">Active roadmaps: 12,400+</div>
     </div>
@@ -197,21 +198,21 @@
     <div class="landing-step-grid">
       <div class="landing-step">
         <div class="icon-tile">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
         </div>
         <p class="landing-step-title" data-i18n="index.step1_title">1. Create your profile</p>
         <p class="landing-step-desc" data-i18n="index.step1_desc">Tell us your visa type, arrival date, and destination city to receive tailored advice.</p>
       </div>
       <div class="landing-step">
         <div class="icon-tile icon-tile-mint">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         </div>
         <p class="landing-step-title" data-i18n="index.step2_title">2. Get your roadmap</p>
         <p class="landing-step-desc" data-i18n="index.step2_desc">Receive a step-by-step checklist covering NHS registration, NI numbers, and housing.</p>
       </div>
       <div class="landing-step">
         <div class="icon-tile icon-tile-navy-solid">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>
         </div>
         <p class="landing-step-title" data-i18n="index.step3_title">3. Navigate with confidence</p>
         <p class="landing-step-desc" data-i18n="index.step3_desc">Execute your tasks with verified links and support from the community by your side.</p>
@@ -222,30 +223,30 @@
   <section class="landing-bento">
     <div class="card card-accent">
       <div class="icon-tile">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21C12 21 4 15.5 4 9.5a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 9.5C20 15.5 12 21 12 21z"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21C12 21 4 15.5 4 9.5a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 9.5C20 15.5 12 21 12 21z"/></svg>
       </div>
       <p class="landing-bento-title">NI Number &amp; NHS Access</p>
       <p class="landing-bento-desc">Essential guides for setting up your legal and health identity in the UK, without the stress.</p>
-      <a href="resources.html" class="landing-bento-link">Learn more <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
+      <a href="resources.html" class="landing-bento-link">Learn more <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></a>
     </div>
     <div class="landing-bento-row">
       <div class="card">
         <div class="icon-tile">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="10" width="18" height="9" rx="1"/><path d="M3 10L12 4l9 6"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="10" width="18" height="9" rx="1"/><path d="M3 10L12 4l9 6"/></svg>
         </div>
         <p class="landing-bento-title">Banking</p>
         <p class="landing-bento-desc">Compare top UK banks and fintech solutions for newcomers.</p>
       </div>
       <div class="card" style="background: var(--color-accent-bg);">
         <div class="icon-tile icon-tile-mint">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
         </div>
         <p class="landing-bento-title">Rent Search</p>
         <p class="landing-bento-desc">Understand the rental market, deposits, and council tax.</p>
       </div>
       <div class="card" style="grid-column: 1 / -1;">
         <div class="icon-tile">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         </div>
         <p class="landing-bento-title">Community Hubs</p>
         <p class="landing-bento-desc">Connect with local groups and meetups in your new city to build your network instantly.</p>
@@ -259,25 +260,27 @@
     <a href="onboarding.html" class="btn btn-secondary btn-lg" style="background: #fff;" data-i18n="index.hero_cta_primary">Start Your Free Roadmap</a>
   </section>
 
+  </main>
+
   <footer>
     <div class="landing-footer">
       <div>
         <div class="landing-header-brand">
           <div class="landing-header-mark" style="width: 1.75rem; height: 1.75rem;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L2 7V12C2 16.97 6.24 21.44 12 22.5C17.76 21.44 22 16.97 22 12V7L12 2Z" stroke="#ffffff" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12L11 14L15.5 9.5" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2L2 7V12C2 16.97 6.24 21.44 12 22.5C17.76 21.44 22 16.97 22 12V7L12 2Z" stroke="#ffffff" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12L11 14L15.5 9.5" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
           <span class="landing-header-title" style="font-size: 1.05rem;">Se2L</span>
         </div>
         <p class="landing-footer-desc">Helping individuals and families navigate their relocation to the United Kingdom with trust, clarity, and empathy.</p>
       </div>
       <div class="landing-footer-col">
-        <h4>Partners</h4>
+        <h3>Partners</h3>
         <a href="#">GOV.UK</a>
         <a href="#">Citizens Advice</a>
         <a href="#">NHS Guide</a>
       </div>
       <div class="landing-footer-col">
-        <h4>Connect</h4>
+        <h3>Connect</h3>
         <a href="#">Community Hub</a>
         <a href="#">Success Stories</a>
         <a href="#">Contact Support</a>
@@ -296,6 +299,8 @@
   <script src="js/supabase-config.js"></script>
   <script src="js/branding.js"></script>
   <script src="js/lang/en.js"></script>
+  <script src="js/lang/fr.js"></script>
+  <script src="js/lang/zh.js"></script>
   <script src="js/i18n.js"></script>
 
 </body>

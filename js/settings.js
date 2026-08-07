@@ -2,6 +2,36 @@ const form = document.getElementById("change-password-form");
 const messageEl = document.getElementById("change-password-message");
 const submitBtn = document.getElementById("change-password-btn");
 
+// --- SE2L-83: language switcher ---
+// Set the dropdown to whatever's currently active (from localStorage,
+// via i18n.js) rather than always defaulting to English on page load.
+const languageSwitcher = document.getElementById("language-switcher");
+const languageMessage = document.getElementById("language-switch-message");
+
+if (languageSwitcher) {
+  const currentLang = localStorage.getItem("se2l_language") || "en";
+  languageSwitcher.value = currentLang;
+
+  languageSwitcher.addEventListener("change", async (e) => {
+    const newLang = e.target.value;
+
+    // Switches immediately (no reload needed) via the mechanism in i18n.js.
+    window.se2lSetLanguage(newLang);
+
+    // Also persist to the profile, so this preference is remembered
+    // even if localStorage is ever cleared, and so it's available for
+    // anything else that might want to read it server-side later
+    // (e.g. deciding which language to send notification emails in).
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (user) {
+      await supabaseClient.from("users").update({ language: newLang }).eq("id", user.id);
+    }
+
+    languageMessage.textContent = "Language updated.";
+    languageMessage.classList.remove("hidden");
+  });
+}
+
 // Populates the sidebar identity strip and shows the correct nav links
 // for whoever is actually logged in — this page is reachable by any
 // signed-in user, not just App Managers, so it can't assume a role.
