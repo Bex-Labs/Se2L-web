@@ -27,14 +27,20 @@ self.addEventListener("push", (event) => {
 
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  const targetUrl = event.notification.data?.url || "/dashboard.html";
+  // Resolves "dashboard.html" against this service worker's own scope
+  // rather than hardcoding "/dashboard.html" — the same root-vs-
+  // subdirectory issue as the registration path fix in push.js. This
+  // way it's correct whether the site lives at a domain root or under
+  // a subdirectory, without needing to know which at deploy time.
+  const relativeTarget = event.notification.data?.url || "dashboard.html";
+  const targetUrl = new URL(relativeTarget, self.registration.scope).href;
 
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
       // Focus an existing Se2L tab if one's already open, rather than
       // always opening a new one.
       for (const client of clientList) {
-        if (client.url.includes(targetUrl) && "focus" in client) {
+        if (client.url === targetUrl && "focus" in client) {
           return client.focus();
         }
       }

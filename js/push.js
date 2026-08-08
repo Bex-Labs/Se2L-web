@@ -25,7 +25,11 @@ async function getExistingSubscription() {
 }
 
 async function subscribeToPush(userId) {
-  const registration = await navigator.serviceWorker.register("/sw.js");
+  // Relative path (not "/sw.js") — resolves correctly whether the site
+  // is served from a domain root (production) or a subdirectory (e.g.
+  // Live Server serving this project as /se2l-web/), since a relative
+  // path resolves against the current page's URL, not the domain root.
+  const registration = await navigator.serviceWorker.register("sw.js");
   await navigator.serviceWorker.ready;
 
   const subscription = await registration.pushManager.subscribe({

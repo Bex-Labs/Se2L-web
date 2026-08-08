@@ -104,7 +104,7 @@ Deno.serve(async () => {
     const payload = JSON.stringify({
       title: content.title,
       body: content.body,
-      url: "/dashboard.html",
+      url: "dashboard.html",
     });
 
     let anySucceeded = false;
