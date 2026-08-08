@@ -42,11 +42,12 @@
   left: 0;
   z-index: 30;
   width: 248px;
-  background: var(--color-surface);
-  border-right: 1px solid var(--color-border);
+  background: var(--sidebar-bg);
+  border-right: none;
   padding: 2.25rem 1.5rem;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
   transform: translateX(-100%);
   transition: transform 0.2s ease;
 }
@@ -66,14 +67,15 @@
   padding: 0.75rem 1rem !important;
   border-radius: var(--radius-control) !important;
   font-weight: 500;
+  color: var(--sidebar-text) !important;
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 .app-sidebar nav a:hover {
-  background: var(--color-surface-muted);
+  background: var(--sidebar-hover-bg);
 }
 .app-sidebar nav a.bg-indigo-50.text-indigo-700 {
   background: var(--color-accent-bg) !important;
-  color: var(--color-accent-dark) !important;
+  color: #1c6b3c !important;
   font-weight: 600;
 }
 
@@ -87,12 +89,18 @@
   left: 0;
   right: 0;
   z-index: 20;
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
+  background: var(--sidebar-bg);
+  border-bottom: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0.75rem 1rem;
+}
+.mobile-topbar span {
+  color: #ffffff !important;
+}
+.mobile-topbar button {
+  color: var(--sidebar-text) !important;
 }
 
 .sidebar-backdrop {
@@ -147,11 +155,12 @@
   width: 1.75rem;
   height: 1.75rem;
   border-radius: 0.45rem;
-  background: var(--color-navy);
+  background: var(--sidebar-mark-bg);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  color: #ffffff;
 }
 /* .app-sidebar-title is already display:none below 768px and shown as
    a plain block above it (see the @media rule further down) — reusing
@@ -161,7 +170,7 @@
   font-family: var(--font-heading);
   font-weight: 800;
   font-size: 1.15rem;
-  color: var(--color-text);
+  color: #ffffff;
   margin: 0;
   padding: 0;
 }
@@ -170,19 +179,19 @@
    the sidebar, matching the reference's support callout. */
 .sidebar-help-card {
   margin-top: 1.25rem;
-  background: var(--color-surface-muted);
+  background: var(--sidebar-card-bg);
   border-radius: var(--radius-control);
   padding: 0.85rem 0.95rem;
 }
 .sidebar-help-card-title {
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--color-text);
+  color: #ffffff;
   margin: 0 0 0.35rem;
 }
 .sidebar-help-card-body {
   font-size: 0.72rem;
-  color: var(--color-text-secondary);
+  color: var(--sidebar-text-muted);
   line-height: 1.4;
   margin: 0;
 }
@@ -196,7 +205,7 @@
   gap: 0.75rem;
   padding: 0.85rem;
   margin-bottom: 1.5rem;
-  background: var(--color-surface-muted);
+  background: var(--sidebar-card-bg);
   border-radius: var(--radius-control);
 }
 .sidebar-identity-avatar {
@@ -222,7 +231,7 @@
 .sidebar-identity-email {
   font-size: 0.72rem;
   font-weight: 600;
-  color: var(--color-text);
+  color: #ffffff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -232,6 +241,8 @@
   width: fit-content;
   font-size: 0.65rem;
   padding: 0.15rem 0.6rem;
+  background: var(--sidebar-hover-bg);
+  color: var(--sidebar-text);
 }
 
 .sidebar-subnav {
@@ -240,26 +251,29 @@
   gap: 0.15rem;
   margin: 0.1rem 0 0.4rem 1.25rem;
   padding-left: 0.5rem;
-  border-left: 2px solid var(--color-border);
+  border-left: 2px solid var(--sidebar-border);
 }
 .sidebar-subnav a {
   font-size: 0.8rem;
-  color: var(--color-text-secondary);
+  color: var(--sidebar-text-muted);
   padding: 0.35rem 0.5rem !important;
   border-radius: var(--radius-control);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 .sidebar-subnav a:hover {
-  background: var(--color-surface-muted);
-  color: var(--color-text);
+  background: var(--sidebar-hover-bg);
+  color: var(--sidebar-text);
 }
 .sidebar-subnav a.is-active-subnav {
-  background: var(--color-accent-bg);
-  color: var(--color-accent-dark);
+  background: var(--color-accent-bg) !important;
+  color: #1c6b3c !important;
   font-weight: 600;
 }
 .app-sidebar nav > a.is-active-subnav {
-  background: var(--color-accent-bg);
-  color: var(--color-accent-dark);
+  background: var(--color-accent-bg) !important;
+  color: #1c6b3c !important;
   font-weight: 600;
 }
 
@@ -279,14 +293,14 @@
 .sidebar-task-jump-wrap {
   margin-top: 1.25rem;
   padding-top: 1rem;
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid var(--sidebar-border);
 }
 .sidebar-task-jump-heading {
   font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: var(--color-text-muted);
+  color: var(--sidebar-text-muted);
   margin-bottom: 0.5rem;
   padding: 0 0.5rem;
 }
@@ -297,11 +311,11 @@
   padding: 0.45rem 0.5rem;
   border-radius: var(--radius-control);
   font-size: 0.8rem;
-  color: var(--color-text-secondary);
+  color: var(--sidebar-text);
 }
 .sidebar-task-jump-item:hover {
-  background: var(--color-surface-muted);
-  color: var(--color-text);
+  background: var(--sidebar-hover-bg);
+  color: #ffffff;
 }
 .sidebar-task-jump-dot {
   width: 0.4rem;
@@ -319,17 +333,18 @@
 #signout-btn {
   margin-top: auto;
   justify-content: flex-start !important;
-  color: var(--color-text-muted) !important;
+  color: var(--sidebar-text-muted) !important;
 }
 #signout-btn:hover {
-  color: var(--color-critical) !important;
+  color: #ff8a7a !important;
+  background: var(--sidebar-hover-bg) !important;
 }
 
 .family-member-card {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  background: var(--color-surface);
+  background: var(--sidebar-card-bg);
   border-radius: var(--radius-control);
   padding: 0.5rem 0.65rem;
 }
@@ -349,15 +364,15 @@
 .family-member-name {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--color-accent-dark);
+  color: #ffffff;
 }
 .family-member-relationship {
   font-weight: 400;
-  color: var(--color-text-secondary);
+  color: var(--sidebar-text-muted);
 }
 .family-member-status {
   font-size: 0.75rem;
-  color: var(--color-text-secondary);
+  color: var(--sidebar-text-muted);
 }
 
 @media (min-width: 768px) {

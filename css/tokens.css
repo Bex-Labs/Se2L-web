@@ -7,12 +7,24 @@
    confident modern product, not a document or a wellness app. */
 
 :root {
+  /* Dark navy sidebar tokens — used only within .app-sidebar/.mobile-topbar.
+     Kept separate from the main light-background text tokens above since
+     they need the opposite contrast direction (light text on dark navy,
+     not dark text on light surfaces). */
+  --sidebar-bg: var(--color-navy);
+  --sidebar-text: rgba(255, 255, 255, 0.82);
+  --sidebar-text-muted: rgba(255, 255, 255, 0.55);
+  --sidebar-hover-bg: rgba(255, 255, 255, 0.08);
+  --sidebar-border: rgba(255, 255, 255, 0.15);
+  --sidebar-card-bg: rgba(255, 255, 255, 0.08);
+  --sidebar-mark-bg: rgba(255, 255, 255, 0.14);
+
   --color-bg: #faf6f1;            /* warm cream page background */
   --color-surface: #ffffff;
   --color-surface-muted: #f2ede5;
   --color-text: #161f3d;          /* near-navy ink for body text/headings */
   --color-text-secondary: #5c6178;
-  --color-text-muted: #9096a8;
+  --color-text-muted: #656b7d;    /* WCAG AA fix: was #9096a8 (2.7-3.0:1, fails); this passes 4.5:1+ on bg/surface/surface-muted */
   --color-border: #ece6da;
   --color-backdrop: rgba(15, 26, 68, 0.4);
 
@@ -25,14 +37,14 @@
   --color-accent-bg: #d9f2e2;     /* pale mint tint — badges, active sidebar item */
   --color-accent-light: #bfe8cd;
 
-  --color-brass: #c99a52;
+  --color-brass: #7a5d28;         /* WCAG AA fix: was #c99a52 (2.17:1 on brass-bg, fails); this passes 5.22:1 */
   --color-brass-bg: #f5ecd8;
 
   --color-critical: #c1483a;
   --color-critical-bg: #f7ddd8;
-  --color-warning: #c99a52;
+  --color-warning: #7a5d28;       /* same fix as brass — they share one hue */
   --color-warning-bg: #f5ecd8;
-  --color-important: #c99a52;
+  --color-important: #7a5d28;
 
   --color-success: #2fae63;
   --color-success-dark: #22824a;

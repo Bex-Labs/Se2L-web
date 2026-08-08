@@ -77,6 +77,28 @@
 .phase-step.is-current .phase-step-dot { background: var(--color-navy); width: 0.75rem; height: 0.75rem; }
 .phase-step.is-current .phase-step-label { color: var(--color-text); font-weight: 700; }
 
+/* Only "done" phase steps are actually clickable (they open the phase
+   review section) — current/locked steps have no click handler, so they
+   deliberately don't get this treatment; adding a hover highlight there
+   would imply an interaction that doesn't exist. */
+.phase-step.is-done {
+  cursor: pointer;
+  border-radius: var(--radius-control) !important;
+  transition: background-color 0.15s ease;
+}
+.phase-step.is-done:hover,
+.phase-step.is-done:focus-visible {
+  background: var(--color-accent-bg) !important;
+}
+.phase-step.is-done:hover .phase-step-label,
+.phase-step.is-done:focus-visible .phase-step-label {
+  color: var(--color-accent-dark);
+}
+.phase-step.is-done:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-accent);
+}
+
 /* --- Task grid: replaces the old compact list-row cards with the
    reference's card anatomy — icon tile, badge, title, description,
    explicit CTA button. --- */
@@ -115,4 +137,19 @@
 #upcoming-phase-teaser .rounded-xl,
 #phase-review-section.rounded-xl {
   border-radius: var(--radius-card) !important;
+}
+
+/* Phase review task title link — previously styled to look exactly
+   like plain text (no underline, inherited color), which meant it was
+   a real working link with zero visual affordance telling anyone it
+   was clickable. */
+.phase-review-task-link {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-text);
+  text-decoration: none;
+}
+.phase-review-task-link:hover {
+  color: var(--color-navy);
+  text-decoration: underline;
 }

@@ -186,10 +186,10 @@ async function loadDashboard() {
   taskCountSpan.textContent = t("dashboard.task_count", { completed: completedCount, total: tasks.length });
 
   const categoryIcons = {
-    healthcare: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21C12 21 4 15.5 4 9.5a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 9.5C20 15.5 12 21 12 21z"/></svg>`,
-    banking: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="10" width="18" height="9" rx="1"/><path d="M3 10L12 4l9 6"/><line x1="7" y1="13" x2="7" y2="16"/><line x1="12" y1="13" x2="12" y2="16"/><line x1="17" y1="13" x2="17" y2="16"/></svg>`,
-    housing: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>`,
-    default: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>`
+    healthcare: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21C12 21 4 15.5 4 9.5a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 9.5C20 15.5 12 21 12 21z"/></svg>`,
+    banking: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="10" width="18" height="9" rx="1"/><path d="M3 10L12 4l9 6"/><line x1="7" y1="13" x2="7" y2="16"/><line x1="12" y1="13" x2="12" y2="16"/><line x1="17" y1="13" x2="17" y2="16"/></svg>`,
+    housing: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>`,
+    default: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>`
   };
   const iconTileVariant = { Critical: "", Important: "icon-tile-mint", Optional: "" };
   let firstIncompleteAssigned = false;
@@ -204,7 +204,7 @@ async function loadDashboard() {
     const categoryKey = (task.category || "").toLowerCase();
     const icon = categoryIcons[categoryKey] || categoryIcons.default;
     const statusBadge = isDone
-      ? `<span class="badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> ${t("common.done")}</span>`
+      ? `<span class="badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> ${t("common.done")}</span>`
       : isFirstIncomplete
         ? `<span class="badge">${t("dashboard.status_in_progress")}</span>`
         : `<span class="badge badge-pending">${t("dashboard.status_pending")}</span>`;
@@ -222,7 +222,7 @@ async function loadDashboard() {
       <p class="task-grid-desc">${task.category || t("common.general")} · ${task.urgency}</p>
       <a href="task-detail.html?id=${task.id}" class="btn ${ctaClass} btn-sm">
         ${ctaLabel}
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
       </a>
     </div>
   `;
@@ -423,13 +423,13 @@ async function loadPhaseReview(phaseId, phaseName, userId, visaType, ukRegion) {
     return `
       <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 flex justify-between items-center">
         <div>
-          <p class="text-sm font-medium">${task.title}</p>
+          <a href="task-detail.html?id=${task.id}" class="phase-review-task-link">${task.title}</a>
           <div class="flex gap-2 items-center mt-1">
             ${linkRow}
           </div>
         </div>
         <button type="button" data-share-url="${shareUrl}" data-share-title="${task.title}" class="share-task-btn btn btn-ghost btn-sm">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.5" x2="15.4" y2="6.5"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.5" x2="15.4" y2="6.5"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/></svg>
           ${t("common.share")}
         </button>
       </div>
