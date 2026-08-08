@@ -80,6 +80,19 @@
           <p id="language-switch-message" class="text-sm mt-3 hidden" style="color: var(--color-accent-dark);"></p>
         </div>
 
+        <div class="card mb-6">
+          <h2 style="font-family: var(--font-heading); font-weight: 700; font-size: 1.05rem; margin-bottom: 0.25rem;">Push notifications</h2>
+          <p class="text-sm text-slate-500 mb-4">Get a notification on this device when a new phase starts, a phase is wrapping up, or you hit a milestone.</p>
+
+          <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;">
+            <input type="checkbox" id="push-toggle" style="width: 1.1rem; height: 1.1rem;" />
+            <span class="text-sm font-medium">Enable push notifications on this device</span>
+          </label>
+
+          <p id="push-unsupported" class="text-sm mt-3 hidden" style="color: var(--color-text-muted);">Your browser doesn't support push notifications.</p>
+          <p id="push-message" class="text-sm mt-3 hidden" style="color: var(--color-accent-dark);"></p>
+        </div>
+
         <div class="card card-status-pending">
           <h2 style="font-family: var(--font-heading); font-weight: 700; font-size: 1.05rem; margin-bottom: 0.25rem;">Change password</h2>
           <p class="text-sm text-slate-500 mb-4">Choose a new password for your account. You'll stay signed in on this device.</p>
@@ -119,6 +132,7 @@
   <script src="js/i18n.js"></script>
   <script src="js/shell.js"></script>
   <script src="js/settings.js"></script>
+  <script src="js/push.js"></script>
 
 </body>
 </html>
