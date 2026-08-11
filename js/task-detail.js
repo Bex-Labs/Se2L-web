@@ -83,11 +83,10 @@ async function loadTaskDetail() {
 
   if (sidebarProfile?.role === "app_manager") {
     document.getElementById("app-manager-link")?.classList.remove("hidden");
-    document.getElementById("dashboard-nav-link")?.classList.add("hidden");
-  }
-  if (sidebarProfile?.role === "super_admin") {
+  } else if (sidebarProfile?.role === "super_admin") {
     document.getElementById("super-admin-link")?.classList.remove("hidden");
-    document.getElementById("dashboard-nav-link")?.classList.add("hidden");
+  } else {
+    document.getElementById("dashboard-nav-link")?.classList.remove("hidden");
   }
 
   const taskId = getTaskIdFromUrl();

@@ -66,18 +66,18 @@ async function loadSidebarIdentity() {
 
   if (profile?.role === "app_manager") {
     document.getElementById("app-manager-link")?.classList.remove("hidden");
-    dashboardNavLink?.classList.add("hidden");
     if (backLink) {
       backLink.href = "app-manager.html";
       backLink.textContent = "← Back to app manager dashboard";
     }
   } else if (profile?.role === "super_admin") {
     document.getElementById("super-admin-link")?.classList.remove("hidden");
-    dashboardNavLink?.classList.add("hidden");
     if (backLink) {
       backLink.href = "super-admin.html";
       backLink.textContent = "← Back to platform overview";
     }
+  } else {
+    dashboardNavLink?.classList.remove("hidden");
   }
 }
 

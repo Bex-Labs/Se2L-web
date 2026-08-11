@@ -5,7 +5,7 @@
 // embedded client-side, that's how Web Push authentication is designed
 // to work. The matching PRIVATE key lives only in the edge function's
 // environment secrets, never in any file that reaches the browser.
-const PUSH_VAPID_PUBLIC_KEY = "BEuUGqGdHN15qO11fz88xZis2UYp9iumsh3TTt1aLjglHm3X0D0NITkCzYhNCe-eoIXFd7_EhaegmP_XMtlh8J0";
+const PUSH_VAPID_PUBLIC_KEY = "BK9TsePjtUFp1a5y-kJyXYoMb8oVHvXaqi6qiXUfeFe0DxS4ybuKc1Im1_Y0pQlz4WntQoqFRCoCoQOlPLjqnEA";
 
 function urlBase64ToUint8Array(base64String) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -68,6 +68,12 @@ async function unsubscribeFromPush(userId) {
   const message = document.getElementById("push-message");
   const unsupportedNote = document.getElementById("push-unsupported");
   if (!toggle) return; // Not on a page with this UI.
+
+  // Browsers sometimes restore a checkbox's checked state from before a
+  // reload, independent of any JS — reset explicitly so the box never
+  // shows "checked" unless getExistingSubscription() below actually
+  // confirms a real, active subscription.
+  toggle.checked = false;
 
   if (!isPushSupported()) {
     toggle.disabled = true;
