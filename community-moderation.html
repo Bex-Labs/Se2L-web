@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Se2L — Community moderation</title>
+  <link href="css/output.css" rel="stylesheet">
+  <link href="css/tokens.css" rel="stylesheet">
+  <link href="css/components.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+  <link href="css/shell.css" rel="stylesheet">
+  <link href="css/app-manager.css" rel="stylesheet">
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="mobile-topbar">
+    <span class="text-base font-semibold">Se2L</span>
+    <button id="mobile-menu-btn" class="text-2xl leading-none text-slate-600" aria-label="Open menu">☰</button>
+  </header>
+
+  <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+
+  <div class="app-shell">
+
+    <aside id="app-sidebar" class="app-sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-mark">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M12 2L2 7V12C2 16.97 6.24 21.44 12 22.5C17.76 21.44 22 16.97 22 12V7L12 2Z" stroke="#ffffff" stroke-width="1.6" stroke-linejoin="round"/>
+            <path d="M9 12L11 14L15.5 9.5" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="app-sidebar-title">Se2L</span>
+      </div>
+
+      <div class="sidebar-identity">
+        <div id="sidebar-identity-avatar" class="sidebar-identity-avatar">··</div>
+        <div class="sidebar-identity-info">
+          <span id="sidebar-user-email" class="sidebar-identity-email">Loading…</span>
+          <span class="status-pill">App Manager</span>
+        </div>
+      </div>
+
+      <nav class="flex flex-col gap-1" style="margin-top: 1rem;">
+        <a href="app-manager.html" class="px-3 py-2 rounded-lg text-sm text-slate-600 flex items-center gap-2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:1rem;height:1rem;flex-shrink:0;"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg><span>Manage content</span></a>
+        <a href="community-moderation.html" class="px-3 py-2 rounded-lg text-sm font-medium bg-indigo-50 text-indigo-700 flex items-center gap-2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:1rem;height:1rem;flex-shrink:0;"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg><span>Community moderation</span></a>
+        <a href="resources.html" class="px-3 py-2 rounded-lg text-sm text-slate-600 flex items-center gap-2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:1rem;height:1rem;flex-shrink:0;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span>Resources</span></a>
+        <a href="preview.html" class="px-3 py-2 rounded-lg text-sm text-slate-600 flex items-center gap-2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:1rem;height:1rem;flex-shrink:0;"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg><span>Preview as newcomer</span></a>
+        <a href="settings.html" class="px-3 py-2 rounded-lg text-sm text-slate-600 flex items-center gap-2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:1rem;height:1rem;flex-shrink:0;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Settings</span></a>
+      </nav>
+      <button id="signout-btn" class="btn btn-ghost btn-sm btn-block" style="margin-top: auto; justify-content: flex-start;">Sign out</button>
+    </aside>
+
+    <main class="app-main" id="main-content">
+      <div class="max-w-2xl mx-auto">
+
+        <span class="badge mb-4">App manager</span>
+
+        <h1 style="font-family: var(--font-heading); font-weight: 800; font-size: 1.5rem; margin-bottom: 0.25rem;">Community moderation</h1>
+        <p class="text-sm text-slate-500 mb-6">Posts and replies reported by community members, awaiting review.</p>
+
+        <div class="flex gap-2 mb-6">
+          <button type="button" class="btn btn-sm community-tab is-active" data-status="pending">Pending</button>
+          <button type="button" class="btn btn-sm community-tab" data-status="reviewed">Reviewed</button>
+          <button type="button" class="btn btn-sm community-tab" data-status="dismissed">Dismissed</button>
+        </div>
+
+        <p id="mod-loading-state" class="text-sm text-slate-500 text-center" style="padding: 2rem 0;">Loading…</p>
+        <p id="mod-empty-state" class="text-sm text-slate-500 text-center hidden" style="padding: 2rem 0;">Nothing here.</p>
+
+        <div id="mod-queue"></div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/branding.js"></script>
+  <script src="js/lang/en.js"></script>
+  <script src="js/lang/fr.js"></script>
+  <script src="js/lang/zh.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/shell.js"></script>
+  <script src="js/community-moderation.js"></script>
+
+  <script>
+    (async function () {
+      const emailEl = document.getElementById("sidebar-user-email");
+      if (!emailEl) return;
+      const { data } = await supabaseClient.auth.getUser();
+      const email = data?.user?.email;
+      emailEl.textContent = email || "Unknown user";
+      const avatarEl = document.getElementById("sidebar-identity-avatar");
+      if (avatarEl && email) {
+        const namePart = email.split("@")[0];
+        const initials = namePart.replace(/[^a-zA-Z]/g, " ").trim().split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase();
+        avatarEl.textContent = initials || namePart.slice(0, 2).toUpperCase();
+      }
+      window.se2lCacheIdentity?.(email, "App Manager");
+    })();
+  </script>
+
+</body>
+</html>

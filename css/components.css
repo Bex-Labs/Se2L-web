@@ -189,3 +189,23 @@
   border-radius: 4px;
   transition: width 0.3s ease;
 }
+
+/* --- Community tabs: reuses .btn base styling, active state matches
+   the app's navy accent (same pattern as .btn-primary) --- */
+.community-tab {
+  border-radius: 9999px;
+}
+.community-tab.is-active {
+  background: var(--color-navy);
+  color: #ffffff;
+}
+/* --- Community: brief pressed feedback when a post card is clicked into --- */
+.card.is-pressed {
+  background: var(--color-navy-bg);
+  transition: background-color 0.1s ease;
+}
+/* --- Community: brief pressed feedback when a post card is clicked into --- */
+.card.is-pressed {
+  background: var(--color-navy-bg);
+  transition: background-color 0.1s ease;
+}

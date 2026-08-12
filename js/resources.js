@@ -149,6 +149,7 @@ async function checkAuthAndActivateShell() {
     const initials = namePart.replace(/[^a-zA-Z]/g, " ").trim().split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase();
     avatarEl.textContent = initials || namePart.slice(0, 2).toUpperCase();
   }
+  window.se2lCacheIdentity?.(user.email, roleLabels[profile?.role] || "Newcomer");
 
   if (profile?.role === "super_admin") {
     document.getElementById("super-admin-link")?.classList.remove("hidden");
