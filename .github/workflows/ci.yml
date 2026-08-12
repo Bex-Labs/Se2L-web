@@ -1,0 +1,45 @@
+name: CI
+
+# Runs on every push and pull request targeting main — catches broken
+# JS and accidentally-committed secrets before they reach Vercel via
+# the existing GitHub → Vercel auto-deploy integration. No build step,
+# no dependencies to install — matches the app's vanilla JS/no-bundler
+# stack exactly.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  js-syntax-check:
+    name: JS syntax check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check every .js file parses correctly
+        run: |
+          echo "Checking JS syntax..."
+          fail=0
+          while IFS= read -r -d '' file; do
+            if ! node --check "$file"; then
+              echo "::error file=$file::Syntax error in $file"
+              fail=1
+            fi
+          done < <(find . -name "*.js" -not -path "./node_modules/*" -print0)
+          exit $fail
+
+  secret-scan:
+    name: Secret scanning
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Scan for accidentally committed secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          extra_args: --only-verified
