@@ -119,3 +119,101 @@ form.addEventListener("submit", async (e) => {
   showMessage("Password updated successfully.", false);
   form.reset();
 });
+
+// --- SE2L-95: editable journey details (visa type, arrival date, region) ---
+// Lets a user correct/update the fields that drive their personalised
+// roadmap, instead of these being fixed forever at signup. Also doubles
+// as the fastest way to QA-test different visa/arrival scenarios without
+// needing direct Supabase access.
+//
+// task_visa_types / task_uk_regions are junction tables (task_id + value),
+// not option/definition tables, so the valid values are hardcoded here
+// rather than queried. Update these two arrays if new visa types or
+// regions are ever seeded (see SE2L-90 pattern for adding new journeys).
+const VISA_TYPES = [
+  { value: "skilled_worker", label: "Skilled Worker" },
+  { value: "student", label: "Student" },
+  { value: "graduate", label: "Graduate" },
+  { value: "youth_mobility", label: "Youth Mobility" },
+  { value: "bno", label: "BN(O)" },
+  { value: "asylum_seeker", label: "Asylum Seeker" }
+];
+
+const UK_REGIONS = [
+  { value: "england", label: "England" },
+  { value: "scotland", label: "Scotland" },
+  { value: "wales", label: "Wales" },
+  { value: "northern_ireland", label: "Northern Ireland" }
+];
+
+const journeyForm = document.getElementById("journey-details-form");
+const journeyMessageEl = document.getElementById("journey-details-message");
+const journeySubmitBtn = document.getElementById("journey-details-btn");
+const visaTypeSelect = document.getElementById("visa_type");
+const arrivalDateInput = document.getElementById("arrival_date");
+const ukRegionSelect = document.getElementById("uk_region");
+
+function showJourneyMessage(text, isError) {
+  journeyMessageEl.textContent = text;
+  journeyMessageEl.classList.remove("hidden", "text-red-600", "text-green-600");
+  journeyMessageEl.classList.add(isError ? "text-red-600" : "text-green-600");
+}
+
+async function initJourneyDetailsForm() {
+  if (!journeyForm) return;
+
+  visaTypeSelect.innerHTML = VISA_TYPES
+    .map(v => `<option value="${v.value}">${v.label}</option>`)
+    .join("");
+
+  ukRegionSelect.innerHTML = UK_REGIONS
+    .map(r => `<option value="${r.value}">${r.label}</option>`)
+    .join("");
+
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) return;
+
+  const { data: profile } = await supabaseClient
+    .from("users")
+    .select("visa_type, arrival_date, uk_region")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (profile) {
+    if (profile.visa_type) visaTypeSelect.value = profile.visa_type;
+    if (profile.arrival_date) arrivalDateInput.value = profile.arrival_date;
+    if (profile.uk_region) ukRegionSelect.value = profile.uk_region;
+  }
+}
+
+initJourneyDetailsForm();
+
+if (journeyForm) {
+  journeyForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    journeySubmitBtn.disabled = true;
+    journeySubmitBtn.textContent = "Saving...";
+
+    const { data: { user } } = await supabaseClient.auth.getUser();
+
+    const { error } = await supabaseClient
+      .from("users")
+      .update({
+        visa_type: visaTypeSelect.value,
+        arrival_date: arrivalDateInput.value,
+        uk_region: ukRegionSelect.value
+      })
+      .eq("id", user.id);
+
+    journeySubmitBtn.disabled = false;
+    journeySubmitBtn.textContent = "Save journey details";
+
+    if (error) {
+      showJourneyMessage("Couldn't save journey details: " + error.message, true);
+      return;
+    }
+
+    showJourneyMessage("Journey details updated. Your roadmap will reflect this on next visit to the dashboard.", false);
+  });
+}
