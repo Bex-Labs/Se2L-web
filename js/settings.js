@@ -159,6 +159,11 @@ function showJourneyMessage(text, isError) {
   journeyMessageEl.classList.add(isError ? "text-red-600" : "text-green-600");
 }
 
+// Tracks the values as loaded from the DB, so on submit we can tell
+// whether anything actually changed — no need to warn/confirm if the
+// user just clicked Save without touching any field.
+let journeyOriginalValues = null;
+
 async function initJourneyDetailsForm() {
   if (!journeyForm) return;
 
@@ -184,6 +189,12 @@ async function initJourneyDetailsForm() {
     if (profile.arrival_date) arrivalDateInput.value = profile.arrival_date;
     if (profile.uk_region) ukRegionSelect.value = profile.uk_region;
   }
+
+  journeyOriginalValues = {
+    visa_type: visaTypeSelect.value,
+    arrival_date: arrivalDateInput.value,
+    uk_region: ukRegionSelect.value
+  };
 }
 
 initJourneyDetailsForm();
@@ -192,6 +203,33 @@ if (journeyForm) {
   journeyForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    const newValues = {
+      visa_type: visaTypeSelect.value,
+      arrival_date: arrivalDateInput.value,
+      uk_region: ukRegionSelect.value
+    };
+
+    const hasChanged = !journeyOriginalValues ||
+      newValues.visa_type !== journeyOriginalValues.visa_type ||
+      newValues.arrival_date !== journeyOriginalValues.arrival_date ||
+      newValues.uk_region !== journeyOriginalValues.uk_region;
+
+    // SE2L-95: warn before committing a change that affects visa type,
+    // arrival date, or region — these drive which "journey" (phases/tasks)
+    // the dashboard shows. Nothing already completed is ever deleted
+    // (user_task_state rows persist regardless), but the roadmap can
+    // reshuffle to a different task set and the progress bar can appear
+    // to drop, since it's calculated against whatever task list currently
+    // matches the profile. Only prompted when something actually changed.
+    if (hasChanged) {
+      const confirmed = window.confirm(
+        "Changing your visa type, arrival date, or region will update your roadmap and may show a different set of tasks. " +
+        "Progress on tasks that still apply will be kept, but your roadmap may look different afterwards.\n\n" +
+        "Continue?"
+      );
+      if (!confirmed) return;
+    }
+
     journeySubmitBtn.disabled = true;
     journeySubmitBtn.textContent = "Saving...";
 
@@ -199,11 +237,7 @@ if (journeyForm) {
 
     const { error } = await supabaseClient
       .from("users")
-      .update({
-        visa_type: visaTypeSelect.value,
-        arrival_date: arrivalDateInput.value,
-        uk_region: ukRegionSelect.value
-      })
+      .update(newValues)
       .eq("id", user.id);
 
     journeySubmitBtn.disabled = false;
@@ -214,6 +248,7 @@ if (journeyForm) {
       return;
     }
 
+    journeyOriginalValues = newValues;
     showJourneyMessage("Journey details updated. Your roadmap will reflect this on next visit to the dashboard.", false);
   });
 }
