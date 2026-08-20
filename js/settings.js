@@ -227,10 +227,9 @@ if (journeyForm) {
     // to drop, since it's calculated against whatever task list currently
     // matches the profile. Only prompted when something actually changed.
     if (hasChanged) {
-      const confirmed = window.confirm(
+      const confirmed = await se2lConfirm(
         "Changing your visa type, arrival date, or region will update your roadmap and may show a different set of tasks. " +
-        "Progress on tasks that still apply will be kept, but your roadmap may look different afterwards.\n\n" +
-        "Continue?"
+        "Progress on tasks that still apply will be kept, but your roadmap may look different afterwards. Continue?"
       );
       if (!confirmed) return;
     }

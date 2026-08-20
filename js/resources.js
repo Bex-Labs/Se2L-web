@@ -194,7 +194,7 @@ document.getElementById("resource-form").addEventListener("submit", async (e) =>
   const url = document.getElementById("resource_url").value.trim();
 
   if (!title) {
-    alert("Please enter a title.");
+    se2lToast("Please enter a title.", "error");
     return;
   }
 
@@ -209,11 +209,11 @@ document.getElementById("resource-form").addEventListener("submit", async (e) =>
     });
 
   if (error) {
-    alert("Could not save resource: " + error.message);
+    se2lToast("Could not save resource: " + error.message, "error");
     return;
   }
 
-  alert("Resource saved.");
+  se2lToast("Resource saved.", "success");
   document.getElementById("resource-form").reset();
   await loadResources();
 });

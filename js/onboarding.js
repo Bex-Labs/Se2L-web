@@ -100,7 +100,7 @@ form.addEventListener("submit", async (e) => {
     });
 
   if (profileError) {
-    alert(window.t("onboarding.profile_failed_prefix") + profileError.message);
+    se2lToast(window.t("onboarding.profile_failed_prefix") + profileError.message, "error");
     return;
   }
 
@@ -113,6 +113,6 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
-  alert(window.t("onboarding.success_message"));
+  se2lToast(window.t("onboarding.success_message"), "success");
   window.location.href = "dashboard.html";
 });

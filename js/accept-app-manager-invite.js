@@ -58,7 +58,7 @@ form.addEventListener("submit", async (e) => {
   });
 
   if (error) {
-    alert("Account creation failed: " + error.message);
+    se2lToast("Account creation failed: " + error.message, "error");
     return;
   }
 
@@ -80,10 +80,10 @@ form.addEventListener("submit", async (e) => {
 
   if (acceptError || !acceptResult || acceptResult.error) {
     console.error("Failed to finalize invite:", acceptError || acceptResult?.error);
-    alert("Your account was created, but we couldn't finish setting up App Manager access. Please contact your Super Admin.");
+    se2lToast("Your account was created, but we couldn't finish setting up App Manager access. Please contact your Super Admin.", "error");
     return;
   }
 
-  alert("Account created! Redirecting to the App Manager dashboard...");
+  se2lToast("Account created! Redirecting to the App Manager dashboard...", "success");
   window.location.href = "app-manager.html";
 });

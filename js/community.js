@@ -243,7 +243,12 @@ function initNewPostForm() {
 // --- Reporting ---
 
 async function reportPost(postId) {
-  const reason = window.prompt("What's the issue with this post? (optional)");
+  const reason = await se2lPrompt("What's the issue with this post?", {
+    heading: "Report post",
+    placeholder: "Optional — let us know what's wrong",
+    confirmLabel: "Submit report",
+    required: false
+  });
   if (reason === null) return; // user cancelled
 
   const { error } = await supabaseClient.from("community_flags").insert({
@@ -255,11 +260,11 @@ async function reportPost(postId) {
 
   if (error) {
     console.error("Failed to report post:", error);
-    window.alert("Something went wrong submitting your report — please try again.");
+    se2lToast("Something went wrong submitting your report — please try again.", "error");
     return;
   }
 
-  window.alert("Thanks — this post has been reported for review.");
+  se2lToast("Thanks — this post has been reported for review.", "success");
 }
 
 // --- Init ---
@@ -274,4 +279,5 @@ async function reportPost(postId) {
   initTabs();
   initNewPostForm();
   await loadFeed();
-})();
+}) 
+();

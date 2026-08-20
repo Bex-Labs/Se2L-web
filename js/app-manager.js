@@ -123,7 +123,7 @@ async function cloneJourneyIntoForm(journeyId) {
     .single();
 
   if (error || !journey) {
-    alert(t("appmgr.clone_load_error_prefix") + (error?.message || t("common.not_found")));
+    se2lToast(t("appmgr.clone_load_error_prefix") + (error?.message || t("common.not_found")), "error");
     return;
   }
 
@@ -160,7 +160,7 @@ async function cloneJourneyIntoForm(journeyId) {
   document.getElementById("journey-section").scrollIntoView({ behavior: "smooth", block: "start" });
   document.getElementById("journey_uk_region").focus();
 
-  alert(t("appmgr.clone_success", { name: journey.name, count: sortedPhases.length }));
+  se2lToast(t("appmgr.clone_success", { name: journey.name, count: sortedPhases.length }), "success");
 }
 
 // --- SE2L-65: configure Phase time windows on an existing journey ---
@@ -197,7 +197,7 @@ async function toggleJourneyPhaseEditor(journeyId) {
     .order("sort_order", { ascending: true });
 
   if (error) {
-    alert(t("appmgr.phase_load_error_prefix") + error.message);
+    se2lToast(t("appmgr.phase_load_error_prefix") + error.message, "error");
     return;
   }
 
@@ -227,7 +227,7 @@ async function savePhaseEdits(journeyId, rowsDiv) {
   const rows = Array.from(rowsDiv.children);
 
   if (rows.length === 0) {
-    alert(t("appmgr.needs_one_phase"));
+    se2lToast(t("appmgr.needs_one_phase"), "error");
     return;
   }
 
@@ -241,11 +241,11 @@ async function savePhaseEdits(journeyId, rowsDiv) {
 
   for (const p of parsed) {
     if (!p.name || p.start === "" || p.end === "") {
-      alert(t("appmgr.phase_needs_fields"));
+      se2lToast(t("appmgr.phase_needs_fields"), "error");
       return;
     }
     if (Number(p.start) > Number(p.end)) {
-      alert(t("appmgr.phase_start_after_end", { name: p.name }));
+      se2lToast(t("appmgr.phase_start_after_end", { name: p.name }), "error");
       return;
     }
   }
@@ -255,7 +255,7 @@ async function savePhaseEdits(journeyId, rowsDiv) {
   const byStart = [...parsed].sort((a, b) => Number(a.start) - Number(b.start));
   for (let i = 1; i < byStart.length; i++) {
     if (Number(byStart[i].start) <= Number(byStart[i - 1].end)) {
-      const proceed = confirm(t("appmgr.phase_overlap_warning", { name1: byStart[i - 1].name, name2: byStart[i].name }));
+      const proceed = await se2lConfirm(t("appmgr.phase_overlap_warning", { name1: byStart[i - 1].name, name2: byStart[i].name }));
       if (!proceed) return;
       break;
     }
@@ -296,9 +296,9 @@ async function savePhaseEdits(journeyId, rowsDiv) {
   }
 
   if (blockedDeletions.length > 0) {
-    alert(t("appmgr.phases_saved_blocked", { count: blockedDeletions.length }));
+    se2lToast(t("appmgr.phases_saved_blocked", { count: blockedDeletions.length }), "error");
   } else {
-    alert(t("appmgr.phases_updated"));
+    se2lToast(t("appmgr.phases_updated"), "success");
   }
 
   document.getElementById(`phase-editor-${journeyId}`).classList.add("hidden");
@@ -319,22 +319,22 @@ async function handleJourneyFormSubmit(e) {
   const phaseRows = collectPhaseRows();
 
   if (!visaType) {
-    alert(t("appmgr.specify_visa_type"));
+    se2lToast(t("appmgr.specify_visa_type"), "error");
     return;
   }
 
   if (phaseRows.length === 0) {
-    alert(t("appmgr.needs_one_phase_journey"));
+    se2lToast(t("appmgr.needs_one_phase_journey"), "error");
     return;
   }
 
   for (const phase of phaseRows) {
     if (!phase.name || phase.days_after_arrival_start === "" || phase.days_after_arrival_end === "") {
-      alert(t("appmgr.phase_needs_fields"));
+      se2lToast(t("appmgr.phase_needs_fields"), "error");
       return;
     }
     if (Number(phase.days_after_arrival_start) > Number(phase.days_after_arrival_end)) {
-      alert(t("appmgr.phase_start_after_end", { name: phase.name }));
+      se2lToast(t("appmgr.phase_start_after_end", { name: phase.name }), "error");
       return;
     }
   }
@@ -349,7 +349,7 @@ async function handleJourneyFormSubmit(e) {
     .maybeSingle();
 
   if (existingJourney) {
-    alert(t("appmgr.duplicate_journey", { visaType: visaType.replace("_", " "), region: ukRegion.replace("_", " ") }));
+    se2lToast(t("appmgr.duplicate_journey", { visaType: visaType.replace("_", " "), region: ukRegion.replace("_", " ") }), "error");
     return;
   }
 
@@ -360,7 +360,7 @@ async function handleJourneyFormSubmit(e) {
     .single();
 
   if (journeyError || !newJourney) {
-    alert(t("appmgr.journey_create_error_prefix") + (journeyError?.message || t("common.unknown_error")));
+    se2lToast(t("appmgr.journey_create_error_prefix") + (journeyError?.message || t("common.unknown_error")), "error");
     return;
   }
 
@@ -375,9 +375,9 @@ async function handleJourneyFormSubmit(e) {
   const { error: phaseError } = await supabaseClient.from("phases").insert(phaseInserts);
 
   if (phaseError) {
-    alert(t("appmgr.journey_phases_failed_prefix") + phaseError.message + "\n" + t("appmgr.journey_phases_failed_suffix"));
+    se2lToast(t("appmgr.journey_phases_failed_prefix") + phaseError.message + " " + t("appmgr.journey_phases_failed_suffix"), "error");
   } else {
-    alert(t("appmgr.journey_created_with_phases", { count: phaseInserts.length }));
+    se2lToast(t("appmgr.journey_created_with_phases", { count: phaseInserts.length }), "success");
   }
 
   resetJourneyForm();
@@ -503,7 +503,7 @@ async function loadTaskForEdit(taskId) {
     .single();
 
   if (error || !task) {
-    alert(t("appmgr.task_load_error"));
+    se2lToast(t("appmgr.task_load_error"), "error");
     return;
   }
 
@@ -564,7 +564,7 @@ async function loadTaskForEdit(taskId) {
 }
 
 async function archiveTask(taskId) {
-  if (!confirm(t("appmgr.archive_confirm"))) return;
+  if (!(await se2lConfirm(t("appmgr.archive_confirm"), { confirmLabel: "Archive", danger: true }))) return;
   await changeTaskStatus(taskId, "archived");
 }
 
@@ -579,7 +579,7 @@ async function changeTaskStatus(taskId, newStatus, reviewNote) {
     .single();
 
   if (fetchError || !existingTask) {
-    alert(t("appmgr.task_status_load_error"));
+    se2lToast(t("appmgr.task_status_load_error"), "error");
     return;
   }
 
@@ -591,7 +591,7 @@ async function changeTaskStatus(taskId, newStatus, reviewNote) {
     .eq("id", taskId);
 
   if (updateError) {
-    alert(t("appmgr.task_status_update_error_prefix") + updateError.message);
+    se2lToast(t("appmgr.task_status_update_error_prefix") + updateError.message, "error");
     return;
   }
 
@@ -868,7 +868,7 @@ async function handleFormSubmit(e) {
   if (document.getElementById("region_northern_ireland").checked) regions.push("northern_ireland");
 
   if (!phaseName || visaTypes.length === 0 || regions.length === 0) {
-    alert(t("appmgr.select_phase_visa_region"));
+    se2lToast(t("appmgr.select_phase_visa_region"), "error");
     return;
   }
 
@@ -898,7 +898,7 @@ async function handleFormSubmit(e) {
       .eq("id", taskId);
 
     if (updateError) {
-      alert(t("appmgr.task_update_error_prefix") + updateError.message);
+      se2lToast(t("appmgr.task_update_error_prefix") + updateError.message, "error");
       return;
     }
 
@@ -926,7 +926,7 @@ async function handleFormSubmit(e) {
       .single();
 
     if (taskError) {
-      alert(t("appmgr.task_create_error_prefix") + taskError.message);
+      se2lToast(t("appmgr.task_create_error_prefix") + taskError.message, "error");
       return;
     }
 
@@ -977,7 +977,7 @@ async function handleFormSubmit(e) {
     status
   );
 
-  alert(taskId ? t("appmgr.task_saved") : t("appmgr.task_created_as", { status: statusLabels[status || "draft"] }));
+  se2lToast(taskId ? t("appmgr.task_saved") : t("appmgr.task_created_as", { status: statusLabels[status || "draft"] }), "success");
   resetForm();
   loadExistingTasks();
 }
@@ -1154,9 +1154,10 @@ async function saveTaskOrder() {
   const results = await Promise.all(updates);
   const failed = results.filter(r => r.error);
 
-  alert(failed.length > 0
-    ? t("appmgr.order_save_partial_fail", { count: failed.length })
-    : t("appmgr.order_saved"));
+  se2lToast(
+    failed.length > 0 ? t("appmgr.order_save_partial_fail", { count: failed.length }) : t("appmgr.order_saved"),
+    failed.length > 0 ? "error" : "success"
+  );
 }
 
 

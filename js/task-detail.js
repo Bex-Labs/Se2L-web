@@ -225,7 +225,7 @@ async function loadTaskDetail() {
       const error = await saveBookmarkState(isBookmarked);
       if (error) {
         console.error(error);
-        alert("Could not update bookmark.");
+        se2lToast("Could not update bookmark.", "error");
       }
     });
 
@@ -233,7 +233,7 @@ async function loadTaskDetail() {
       const error = await saveBookmarkState(isBookmarked);
       if (error) {
         console.error(error);
-        alert("Could not save note.");
+        se2lToast("Could not save note.", "error");
       } else {
         saveNoteBtn.textContent = "Saved ✓";
         setTimeout(() => { saveNoteBtn.textContent = "Save note"; }, 1500);
@@ -286,7 +286,7 @@ async function loadTaskDetail() {
 
       if (upsertError) {
         console.error(upsertError);
-        alert("Could not update task status.");
+        se2lToast("Could not update task status.", "error");
       }
     });
   }
@@ -356,7 +356,7 @@ async function loadTaskDetail() {
       const error = await saveFeedbackState(currentRating);
       if (error) {
         console.error(error);
-        alert("Could not save feedback.");
+        se2lToast("Could not save feedback.", "error");
       }
     });
 
@@ -366,7 +366,7 @@ async function loadTaskDetail() {
       const error = await saveFeedbackState(currentRating);
       if (error) {
         console.error(error);
-        alert("Could not save feedback.");
+        se2lToast("Could not save feedback.", "error");
       }
     });
 
@@ -374,7 +374,7 @@ async function loadTaskDetail() {
       const error = await saveFeedbackState(currentRating);
       if (error) {
         console.error(error);
-        alert("Could not save feedback.");
+        se2lToast("Could not save feedback.", "error");
       } else {
         saveFeedbackBtn.textContent = "Saved ✓";
         setTimeout(() => { saveFeedbackBtn.textContent = "Save feedback"; }, 1500);

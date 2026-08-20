@@ -160,27 +160,27 @@ async function deleteReply(replyId, isAccepted) {
     ? "This is the accepted answer — deleting it will remove it for everyone who finds this question, including the asker. This can't be undone. Continue?"
     : "Delete this reply? This can't be undone.";
 
-  if (!window.confirm(message)) return;
+  if (!(await se2lConfirm(message, { confirmLabel: "Delete", danger: true }))) return;
 
   const { error } = await supabaseClient.from("community_replies").delete().eq("id", replyId);
 
   if (error) {
     console.error("Failed to delete reply:", error);
-    window.alert("Something went wrong — please try again.");
+    se2lToast("Something went wrong — please try again.", "error");
     return;
   }
   await refreshPage(currentPost.id);
 }
 
 async function deletePost(postId) {
-  const confirmed = window.confirm("Delete this post and all its replies? This can't be undone.");
+  const confirmed = await se2lConfirm("Delete this post and all its replies? This can't be undone.", { confirmLabel: "Delete", danger: true });
   if (!confirmed) return;
 
   const { error } = await supabaseClient.from("community_posts").delete().eq("id", postId);
 
   if (error) {
     console.error("Failed to delete post:", error);
-    window.alert("Something went wrong — please try again.");
+    se2lToast("Something went wrong — please try again.", "error");
     return;
   }
   window.location.href = "community.html";
@@ -205,7 +205,7 @@ async function markAsAnswer(replyId) {
 
   if (error) {
     console.error("Failed to mark answer:", error);
-    window.alert("Something went wrong — please try again.");
+    se2lToast("Something went wrong — please try again.", "error");
     return;
   }
   await refreshPage(currentPost.id);
@@ -214,7 +214,12 @@ async function markAsAnswer(replyId) {
 // --- Reporting ---
 
 async function reportItem(targetType, targetId) {
-  const reason = window.prompt("What's the issue with this? (optional)");
+  const reason = await se2lPrompt("What's the issue with this?", {
+    heading: "Report content",
+    placeholder: "Optional — let us know what's wrong",
+    confirmLabel: "Submit report",
+    required: false
+  });
   if (reason === null) return;
 
   const { error } = await supabaseClient.from("community_flags").insert({
@@ -226,10 +231,10 @@ async function reportItem(targetType, targetId) {
 
   if (error) {
     console.error("Failed to report:", error);
-    window.alert("Something went wrong submitting your report — please try again.");
+    se2lToast("Something went wrong submitting your report — please try again.", "error");
     return;
   }
-  window.alert("Thanks — this has been reported for review.");
+  se2lToast("Thanks — this has been reported for review.", "success");
 }
 
 // --- Reply form ---

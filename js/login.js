@@ -45,7 +45,7 @@ googleBtn.addEventListener("click", async () => {
     }
   });
   if (error) {
-    alert(window.t("login.failed_prefix") + error.message);
+    se2lToast(window.t("login.failed_prefix") + error.message, "error");
   }
 });
 
@@ -80,7 +80,7 @@ form.addEventListener("submit", async (e) => {
     submitBtn.disabled = false;
 
     if (error) {
-      alert(window.t("login.failed_prefix") + error.message);
+      se2lToast(window.t("login.failed_prefix") + error.message, "error");
       return;
     }
 
@@ -96,7 +96,7 @@ form.addEventListener("submit", async (e) => {
   });
 
   if (error) {
-    alert(window.t("login.failed_prefix") + error.message);
+    se2lToast(window.t("login.failed_prefix") + error.message, "error");
     return;
   }
 

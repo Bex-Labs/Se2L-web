@@ -462,7 +462,7 @@ async function shareLink(url, title, btn) {
     btn.textContent = t("common.copied");
     setTimeout(() => { btn.textContent = original; }, 1500);
   } catch (err) {
-    alert(t("dashboard.copy_link_failed_prefix") + url);
+    se2lToast(t("dashboard.copy_link_failed_prefix") + url, "error");
   }
 }
 

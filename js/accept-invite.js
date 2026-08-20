@@ -62,7 +62,7 @@ form.addEventListener("submit", async (e) => {
   });
 
   if (error) {
-    alert("Account creation failed: " + error.message);
+    se2lToast("Account creation failed: " + error.message, "error");
     return;
   }
 
@@ -86,10 +86,10 @@ form.addEventListener("submit", async (e) => {
 
   if (acceptError || !acceptResult || acceptResult.error) {
     console.error("Failed to finalize invite:", acceptError || acceptResult?.error);
-    alert("Your account was created, but we couldn't finish linking your invite. Please contact support.");
+    se2lToast("Your account was created, but we couldn't finish linking your invite. Please contact support.", "error");
     return;
   }
 
-  alert("Account created! Redirecting to your dashboard...");
+  se2lToast("Account created! Redirecting to your dashboard...", "success");
   window.location.href = "dashboard.html";
 });

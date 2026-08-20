@@ -644,7 +644,7 @@ video {
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 .h-full {

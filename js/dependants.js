@@ -113,7 +113,7 @@ form.addEventListener("submit", async (e) => {
 
   if (dependantsError) {
     console.error("Failed to save household members:", dependantsError.message);
-    alert(window.t("onboarding.dependants_save_failed"));
+    se2lToast(window.t("onboarding.dependants_save_failed"), "error");
     window.location.href = "dashboard.html";
     return;
   }
@@ -155,6 +155,6 @@ form.addEventListener("submit", async (e) => {
 
   // Returns to Settings if reached from there to add household members
   // later, or the dashboard by default (e.g. during initial onboarding).
-  alert(window.t("onboarding.success_message"));
+  se2lToast(window.t("onboarding.success_message"), "success");
   window.location.href = returnTo;
 });

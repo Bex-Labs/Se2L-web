@@ -129,15 +129,16 @@ async function dismissFlag(flagId) {
 
   if (error) {
     console.error("Failed to dismiss flag:", error);
-    window.alert("Something went wrong — please try again.");
+    se2lToast("Something went wrong — please try again.", "error");
     return;
   }
   await loadQueue();
 }
 
 async function removeContent(flagId, targetType, targetId) {
-  const confirmed = window.confirm(
-    `This will permanently delete this ${targetType}. This can't be undone. Continue?`
+  const confirmed = await se2lConfirm(
+    `This will permanently delete this ${targetType}. This can't be undone. Continue?`,
+    { confirmLabel: "Delete", danger: true }
   );
   if (!confirmed) return;
 
@@ -146,7 +147,7 @@ async function removeContent(flagId, targetType, targetId) {
 
   if (deleteError) {
     console.error("Failed to delete content:", deleteError);
-    window.alert("Something went wrong deleting this content — please try again.");
+    se2lToast("Something went wrong deleting this content — please try again.", "error");
     return;
   }
 

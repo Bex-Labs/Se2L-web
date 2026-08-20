@@ -124,7 +124,7 @@ async function toggleAppManagerActive(targetUserId, makeActive) {
     ? "Reactivate this App Manager's access?"
     : "Deactivate this App Manager? They'll be signed out and unable to log back in until reactivated.";
 
-  if (!confirm(confirmMessage)) return;
+  if (!(await se2lConfirm(confirmMessage, { confirmLabel: makeActive ? "Reactivate" : "Deactivate", danger: !makeActive }))) return;
 
   const { data: { session } } = await supabaseClient.auth.getSession();
 
@@ -134,7 +134,7 @@ async function toggleAppManagerActive(targetUserId, makeActive) {
   });
 
   if (error || !data || data.error) {
-    alert("Could not update account status: " + (data?.error || error?.message || "unknown error"));
+    se2lToast("Could not update account status: " + (data?.error || error?.message || "unknown error"), "error");
     return;
   }
 
@@ -183,7 +183,7 @@ document.getElementById("invite-form").addEventListener("submit", async (e) => {
     .single();
 
   if (insertError || !invite) {
-    alert("Could not create invite: " + (insertError?.message || "unknown error"));
+    se2lToast("Could not create invite: " + (insertError?.message || "unknown error"), "error");
     return;
   }
 
@@ -194,9 +194,9 @@ document.getElementById("invite-form").addEventListener("submit", async (e) => {
   });
 
   if (sendError) {
-    alert("Invite created, but the email failed to send. You may need to share the link manually.");
+    se2lToast("Invite created, but the email failed to send. You may need to share the link manually.", "error");
   } else {
-    alert(`Invite sent to ${email}.`);
+    se2lToast(`Invite sent to ${email}.`, "success");
   }
 
   document.getElementById("invite-form").reset();
@@ -257,7 +257,7 @@ async function toggleOptionActive(tableName, optionId, makeActive, listElementId
     .eq("id", optionId);
 
   if (error) {
-    alert("Could not update: " + error.message);
+    se2lToast("Could not update: " + error.message, "error");
     return;
   }
 
@@ -275,7 +275,7 @@ document.getElementById("add-visa-type-form").addEventListener("submit", async (
     .insert({ value, label });
 
   if (error) {
-    alert("Could not add visa type: " + error.message);
+    se2lToast("Could not add visa type: " + error.message, "error");
     return;
   }
 
@@ -294,7 +294,7 @@ document.getElementById("add-uk-region-form").addEventListener("submit", async (
     .insert({ value, label });
 
   if (error) {
-    alert("Could not add UK region: " + error.message);
+    se2lToast("Could not add UK region: " + error.message, "error");
     return;
   }
 
@@ -363,18 +363,17 @@ function renderModerationTasks() {
   `).join("");
 
   listDiv.querySelectorAll(".moderation-task-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", async () => {
       if (btn.dataset.reject === "true") {
         // SE2L-95 follow-up: same required-reason rule as app-manager.js's
         // review flow — unpublishing from here shouldn't be a silent,
         // unexplained action either.
-        const reason = prompt("Why is this being unpublished? This will be shown to the person who submitted it.");
+        const reason = await se2lPrompt(
+          "Why is this being unpublished? This will be shown to the person who submitted it.",
+          { heading: "Unpublish task", confirmLabel: "Unpublish" }
+        );
         if (reason === null) return; // cancelled
-        if (!reason.trim()) {
-          alert("Please give a reason so the App Manager knows what happened.");
-          return;
-        }
-        updateModerationTaskStatus(btn.dataset.taskId, btn.dataset.newStatus, reason.trim());
+        updateModerationTaskStatus(btn.dataset.taskId, btn.dataset.newStatus, reason);
         return;
       }
       updateModerationTaskStatus(btn.dataset.taskId, btn.dataset.newStatus);
@@ -383,7 +382,11 @@ function renderModerationTasks() {
 }
 
 async function updateModerationTaskStatus(taskId, newStatus, reviewNote) {
-  if (!confirm(`Change this task's status to "${newStatus}"? This overrides it regardless of who created it.`)) return;
+  const confirmed = await se2lConfirm(
+    `Change this task's status to "${newStatus}"? This overrides it regardless of who created it.`,
+    { confirmLabel: "Confirm" }
+  );
+  if (!confirmed) return;
 
   // Fetch first so the audit trail has a real "before" snapshot, same
   // pattern as changeTaskStatus in app-manager.js — moderation actions
@@ -396,7 +399,7 @@ async function updateModerationTaskStatus(taskId, newStatus, reviewNote) {
     .single();
 
   if (fetchError || !existingTask) {
-    alert("Could not load task.");
+    se2lToast("Could not load task.", "error");
     return;
   }
 
@@ -408,7 +411,7 @@ async function updateModerationTaskStatus(taskId, newStatus, reviewNote) {
     .eq("id", taskId);
 
   if (error) {
-    alert("Could not update task: " + error.message);
+    se2lToast("Could not update task: " + error.message, "error");
     return;
   }
 
@@ -474,7 +477,7 @@ function renderModerationResources() {
 }
 
 async function updateModerationResourceStatus(resourceId) {
-  if (!confirm("Unpublish this resource? This overrides it regardless of who created it.")) return;
+  if (!(await se2lConfirm("Unpublish this resource? This overrides it regardless of who created it."))) return;
 
   const { error } = await supabaseClient
     .from("resources")
@@ -482,7 +485,7 @@ async function updateModerationResourceStatus(resourceId) {
     .eq("id", resourceId);
 
   if (error) {
-    alert("Could not update resource: " + error.message);
+    se2lToast("Could not update resource: " + error.message, "error");
     return;
   }
 
