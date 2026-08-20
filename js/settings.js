@@ -254,9 +254,41 @@ if (journeyForm) {
     }
 
     journeyOriginalValues = newValues;
+    // Re-lock region after a successful save — a fresh "Change region"
+    // click is required again for any future change, same deliberate
+    // gate as the first time.
+    ukRegionSelect.disabled = true;
     showJourneyMessage("Journey details updated. Your roadmap will reflect this on next visit to the dashboard.", false);
   });
 }
+
+// --- SE2L-95 follow-up: region change gated behind an explicit confirm ---
+// Region defaults to locked (disabled) in the HTML. Unlike visa type or
+// arrival date, a real region change usually means a physical move —
+// rarer and more disruptive to the roadmap — so it gets its own
+// deliberate confirmation step before the field even becomes editable,
+// on top of the general save-time warning that still applies to all
+// three fields together.
+const changeRegionLink = document.getElementById("change-region-link");
+const changeRegionModal = document.getElementById("change-region-modal");
+
+changeRegionLink?.addEventListener("click", () => {
+  if (changeRegionModal) changeRegionModal.style.display = "flex";
+});
+
+document.getElementById("change-region-cancel")?.addEventListener("click", () => {
+  if (changeRegionModal) changeRegionModal.style.display = "none";
+});
+
+changeRegionModal?.addEventListener("click", (e) => {
+  if (e.target.id === "change-region-modal") changeRegionModal.style.display = "none";
+});
+
+document.getElementById("change-region-confirm")?.addEventListener("click", () => {
+  if (changeRegionModal) changeRegionModal.style.display = "none";
+  ukRegionSelect.disabled = false;
+  ukRegionSelect.focus();
+});
 
 // --- Household members list ---
 // Queries family_dependants_view (same as dashboard.js's loadFamilySection)

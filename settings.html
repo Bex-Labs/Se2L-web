@@ -112,8 +112,11 @@
             </div>
 
             <div class="form-field">
-              <label for="uk_region" class="form-label">Region</label>
-              <select id="uk_region" class="form-select" required></select>
+              <div style="display: flex; align-items: baseline; justify-content: space-between;">
+                <label for="uk_region" class="form-label" style="margin-bottom: 0;">Region</label>
+                <button type="button" id="change-region-link" style="background: none; border: none; padding: 0; cursor: pointer; font-size: 0.72rem; font-weight: 600; color: var(--color-accent-dark);">Change region</button>
+              </div>
+              <select id="uk_region" class="form-select" required disabled></select>
             </div>
 
             <p id="journey-details-message" class="text-sm mb-4 hidden"></p>
@@ -123,6 +126,21 @@
             </div>
 
           </form>
+        </div>
+
+        <!-- SE2L-95 follow-up: region-change confirmation modal. Region is
+             gated behind an extra deliberate step compared to visa type or
+             arrival date, since a real region change is rarer and usually
+             means a physical move, unlike a visa outcome updating. -->
+        <div id="change-region-modal" style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 1rem;">
+          <div class="card" style="width: 100%; max-width: 26rem;">
+            <h2 style="font-family: var(--font-heading); font-weight: 700; font-size: 1.1rem; margin-bottom: 0.35rem;">Change region?</h2>
+            <p class="text-sm text-slate-500 mb-3">Changing your region may show a different set of tasks and phases. Tasks tied to your current region will no longer be visible, though nothing you've already completed is deleted.</p>
+            <div class="flex justify-end gap-2 mt-2">
+              <button type="button" id="change-region-cancel" class="btn btn-secondary btn-sm">Cancel</button>
+              <button type="button" id="change-region-confirm" class="btn btn-primary btn-sm">Continue</button>
+            </div>
+          </div>
         </div>
 
         <!-- SE2L-95 follow-up: view/add household members, since dependants
