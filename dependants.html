@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Se2L — Household members</title>
+  <link href="css/output.css" rel="stylesheet">
+  <link href="css/tokens.css" rel="stylesheet">
+  <link href="css/components.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    /* Reuses the same split-screen shell pattern as onboarding.html
+       for visual continuity across the signup -> onboarding ->
+       dependants sequence. */
+    html, body { height: 100%; }
+    body { display: flex; }
+
+    .onboarding-shell { display: flex; width: 100%; min-height: 100vh; }
+
+    .onboarding-panel {
+      flex: 0 0 38%;
+      min-width: 320px;
+      background: linear-gradient(160deg, var(--color-navy) 0%, #16225a 60%, #1a2d4a 100%);
+      padding: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      color: #ffffff;
+      position: relative;
+      overflow: hidden;
+    }
+    .onboarding-panel::before {
+      content: "";
+      position: absolute;
+      top: -3.5rem;
+      right: -3.5rem;
+      width: 13rem;
+      height: 13rem;
+      border-radius: 9999px;
+      background: rgba(47, 174, 99, 0.15);
+    }
+    .onboarding-panel::after {
+      content: "";
+      position: absolute;
+      bottom: -4.5rem;
+      left: -2.5rem;
+      width: 15rem;
+      height: 15rem;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .onboarding-panel-brand { display: flex; align-items: center; gap: 0.55rem; position: relative; z-index: 1; }
+    .onboarding-panel-brand-mark {
+      width: 2rem; height: 2rem; border-radius: 0.5rem;
+      background: rgba(255,255,255,0.12);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .onboarding-panel-brand-title { font-family: var(--font-heading); font-weight: 800; font-size: 1.25rem; }
+
+    .onboarding-panel-copy { margin-top: auto; position: relative; z-index: 1; }
+    .onboarding-panel-copy h2 {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 1.85rem;
+      line-height: 1.25;
+      margin: 0 0 1rem;
+    }
+    .onboarding-panel-copy p {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.75);
+      line-height: 1.6;
+      margin: 0 0 2rem;
+      max-width: 26rem;
+    }
+
+    .onboarding-form-panel {
+      flex: 1;
+      background: var(--color-bg);
+      padding: 2.5rem 3.5rem 4rem;
+      overflow-y: auto;
+    }
+    .onboarding-wrap { max-width: 34rem; }
+    .onboarding-hint { font-size: 0.72rem; color: var(--color-text-muted); margin-top: 0.35rem; line-height: 1.4; }
+    .onboarding-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--color-border); }
+
+    .dependant-entry { background: var(--color-surface-muted); border-radius: var(--radius-card); padding: 1.25rem; margin-bottom: 1rem; }
+    .dependant-entry .form-field { margin-bottom: 1rem; }
+    .dependant-entry-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1.25rem; }
+    @media (max-width: 560px) { .dependant-entry-grid { grid-template-columns: 1fr; } }
+
+    @media (max-width: 860px) {
+      .onboarding-shell { flex-direction: column; }
+      .onboarding-form-panel { order: 1; padding: 1.5rem 1.5rem 2rem; }
+      .onboarding-panel { order: 2; flex: 0 0 auto; padding: 1.75rem 2rem; }
+      .onboarding-panel-copy { margin-top: 1.25rem; }
+      .onboarding-panel-copy h2 { font-size: 1.25rem; margin-bottom: 0.6rem; }
+      .onboarding-panel-copy p { display: none; }
+    }
+  </style>
+</head>
+<body class="text-slate-900">
+
+  <div class="onboarding-shell">
+
+    <aside class="onboarding-panel">
+      <div class="onboarding-panel-brand">
+        <div class="onboarding-panel-brand-mark">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M12 2L2 7V12C2 16.97 6.24 21.44 12 22.5C17.76 21.44 22 16.97 22 12V7L12 2Z" stroke="#ffffff" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12L11 14L15.5 9.5" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="onboarding-panel-brand-title">Se2L</span>
+      </div>
+
+      <div class="onboarding-panel-copy">
+        <h2 data-i18n="dependants.hero_heading">Who's settling with you?</h2>
+        <p data-i18n="dependants.hero_subtext">Add anyone in your household so we can build their checklists too, and send adults their own invite.</p>
+      </div>
+    </aside>
+
+    <main class="onboarding-form-panel">
+      <div class="onboarding-wrap">
+
+        <span class="badge badge-eyebrow" data-i18n="dependants.eyebrow">Household members</span>
+        <h1 style="font-family: var(--font-heading); font-weight: 800; font-size: 1.5rem; margin: 0.75rem 0 0.25rem;" data-i18n="dependants.heading">Tell us who's settling with you</h1>
+        <p class="text-slate-600 text-sm mb-4" data-i18n="dependants.subtext">Adults you add will get their own invite to set up an account. Children get their own checklist under yours.</p>
+
+        <form id="dependants-form" class="card">
+
+          <div id="dependants-container"></div>
+
+          <button type="button" id="add-dependant-btn" class="btn btn-secondary btn-sm" data-i18n="onboarding.add_household_member">
+            + Add household member
+          </button>
+
+          <div class="onboarding-actions">
+            <a href="dashboard.html" id="dependants-skip-link" class="btn btn-secondary" data-i18n="dependants.skip">Not now</a>
+            <button type="submit" class="btn btn-primary" data-i18n="dependants.submit">Save household members</button>
+          </div>
+
+        </form>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- template for one household member entry, cloned by dependants.js -->
+  <template id="dependant-entry-template">
+    <div class="dependant-entry">
+      <div class="dependant-entry-grid">
+        <div class="form-field">
+          <label class="form-label" data-i18n="onboarding.dep_name_label">Full name</label>
+          <input type="text" class="dependant-name form-input" required />
+        </div>
+        <div class="form-field">
+          <label class="form-label" data-i18n="onboarding.dep_dob_label">Date of birth</label>
+          <input type="date" class="dependant-dob form-input" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" data-i18n="onboarding.dep_category_label">Category</label>
+          <select class="dependant-type form-select">
+            <option value="minor" data-i18n="onboarding.dep_category_child">Child</option>
+            <option value="adult" data-i18n="onboarding.dep_category_adult">Adult (partner / relative)</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-label" data-i18n="onboarding.dep_relationship_label">Relationship</label>
+          <input type="text" class="dependant-relationship form-input" placeholder="e.g. Son, Daughter, Niece" data-i18n-placeholder="onboarding.dep_relationship_placeholder" />
+        </div>
+        <div class="dependant-email-wrapper hidden form-field">
+          <label class="form-label" data-i18n="onboarding.dep_email_label">Email (for their invite)</label>
+          <input type="email" class="dependant-email form-input" placeholder="their@email.com" data-i18n-placeholder="onboarding.dep_email_placeholder" />
+        </div>
+      </div>
+      <button type="button" class="remove-dependant-btn btn btn-ghost btn-sm" style="color: var(--color-critical);" data-i18n="onboarding.dep_remove">Remove</button>
+    </div>
+  </template>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/branding.js"></script>
+  <script src="js/lang/en.js"></script>
+  <script src="js/lang/fr.js"></script>
+  <script src="js/lang/zh.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/dependants.js"></script>
+
+</body>
+</html>

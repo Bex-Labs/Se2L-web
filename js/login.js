@@ -7,6 +7,31 @@ const magicLinkMessage = document.getElementById("magic-link-message");
 const submitBtn = document.getElementById("login-submit-btn");
 const googleBtn = document.getElementById("google-signin-btn");
 
+// --- Shared-link context ---
+// When task-detail.js redirects here because someone clicked a shared
+// task link while logged out, explain why (rather than a silent bounce)
+// and preserve the original destination so we can send them straight
+// back after they authenticate, instead of dumping them on the dashboard.
+const urlParams = new URLSearchParams(window.location.search);
+const nextParam = urlParams.get("next");
+const reasonParam = urlParams.get("reason");
+
+if (reasonParam === "shared_task") {
+  const sharedTaskMessage = document.getElementById("shared-task-message");
+  if (sharedTaskMessage) {
+    sharedTaskMessage.textContent = window.t("login.shared_task_message");
+    sharedTaskMessage.classList.remove("hidden");
+  }
+}
+
+// Carry the same destination through to signup, so someone who needs to
+// create an account first still lands back on the shared task afterward
+// rather than the default dashboard.
+const registerLink = document.getElementById("register-link");
+if (registerLink && nextParam) {
+  registerLink.href = `signup.html?next=${encodeURIComponent(nextParam)}`;
+}
+
 // --- SE2L-79: Google OAuth ---
 // redirectTo points back at this same page — the onAuthStateChange
 // listener below (shared with the password/magic-link flows) picks up
@@ -96,6 +121,16 @@ async function redirectAfterAuth(userId) {
   // their profile rather than a dashboard with no visa/region data.
   if (profileError && profileError.code === "PGRST116") {
     window.location.href = "onboarding.html";
+    return;
+  }
+
+  // An existing account that arrived here via a shared task link — send
+  // them straight back to it instead of the dashboard, now that they're
+  // authenticated. Only applies to people who already had an account;
+  // brand-new sign-ups go through onboarding first (handled above/in
+  // onboarding.js), same as any other new user.
+  if (nextParam && !profileError) {
+    window.location.href = decodeURIComponent(nextParam);
     return;
   }
 

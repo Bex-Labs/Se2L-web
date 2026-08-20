@@ -1,4 +1,5 @@
 let currentUser = null;
+let currentUserRole = null;
 
 async function checkAppManagerAccess() {
   const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
@@ -14,13 +15,17 @@ async function checkAppManagerAccess() {
     .eq("id", user.id)
     .single();
 
-  if (!profile || profile.role !== "app_manager") {
+  // Super Admin needs access to this same page to review and publish
+  // what App Managers submit — see SE2L-95 follow-up: publishing is
+  // gated to Super Admin only, so they must be able to reach this screen.
+  if (!profile || (profile.role !== "app_manager" && profile.role !== "super_admin")) {
     document.querySelector(".max-w-2xl").innerHTML = `
       <p class="text-sm text-red-600 mt-10">${t("common.access_denied")}</p>
     `;
     return null;
   }
 
+  currentUserRole = profile.role;
   return user;
 }
 
@@ -428,15 +433,16 @@ function extractYouTubeId(url) {
 
 // --- SE2L-63: content version audit trail helper ---
 // Writes a snapshot row every time a task is created or changed, so App
-// Managers (and later, Super Admins) can see a full history of edits.
-async function recordTaskVersion(taskId, changeType, snapshot, previousStatus, newStatus) {
+// Managers (and Super Admins) can see a full history of edits.
+async function recordTaskVersion(taskId, changeType, snapshot, previousStatus, newStatus, reviewNote) {
   const { error } = await supabaseClient.from("task_versions").insert({
     task_id: taskId,
     changed_by: currentUser.id,
     change_type: changeType,
     previous_status: previousStatus || null,
     new_status: newStatus || null,
-    snapshot: snapshot
+    snapshot: snapshot,
+    review_note: reviewNote || null
   });
 
   if (error) {
@@ -565,7 +571,7 @@ async function archiveTask(taskId) {
 // --- SE2L-62: draft -> in_review -> published state transitions ---
 // Handles moving a task through the review workflow, and logs every
 // transition into task_versions (SE2L-63) so there's a full audit trail.
-async function changeTaskStatus(taskId, newStatus) {
+async function changeTaskStatus(taskId, newStatus, reviewNote) {
   const { data: existingTask, error: fetchError } = await supabaseClient
     .from("tasks")
     .select("*")
@@ -594,7 +600,8 @@ async function changeTaskStatus(taskId, newStatus) {
     "status_change",
     { ...existingTask, status: newStatus },
     previousStatus,
-    newStatus
+    newStatus,
+    reviewNote
   );
 
   loadExistingTasks();
@@ -621,8 +628,16 @@ function renderStatusActions(task) {
     buttons.push(`<button data-status-action="in_review" data-task-id="${task.id}" class="text-xs text-amber-700 font-medium">${t("appmgr.submit_for_review")}</button>`);
   }
   if (task.status === "in_review") {
-    buttons.push(`<button data-status-action="published" data-task-id="${task.id}" class="text-xs text-green-700 font-medium">${t("appmgr.publish")}</button>`);
-    buttons.push(`<button data-status-action="draft" data-task-id="${task.id}" class="text-xs text-slate-500 font-medium">${t("appmgr.send_back_to_draft")}</button>`);
+    // Only Super Admin can publish — App Managers can submit for review
+    // but cannot approve their own or anyone else's work. See the
+    // SE2L-95 follow-up discussion: this is a deliberate governance
+    // rule, not a bug, so it's checked by role rather than left open.
+    if (currentUserRole === "super_admin") {
+      buttons.push(`<button data-status-action="published" data-task-id="${task.id}" class="text-xs text-green-700 font-medium">${t("appmgr.publish")}</button>`);
+      buttons.push(`<button data-status-action="draft" data-reject="true" data-task-id="${task.id}" class="text-xs text-slate-500 font-medium">${t("appmgr.send_back_to_draft")}</button>`);
+    } else {
+      buttons.push(`<span class="text-xs text-slate-400">${t("appmgr.awaiting_review")}</span>`);
+    }
   }
   if (task.status === "published") {
     buttons.push(`<button data-status-action="draft" data-task-id="${task.id}" class="text-xs text-slate-500 font-medium">${t("appmgr.unpublish_to_draft")}</button>`);
@@ -642,7 +657,7 @@ async function loadExistingTasks() {
   // parallel via Promise.all rather than one after another — this was
   // previously two sequential round-trips for no reason, which is the
   // actual cause of the visible delay before tasks appeared.
-  const [{ data: allPhases }, { data: tasks }] = await Promise.all([
+  const [{ data: allPhases }, { data: tasks }, { data: versionRows }] = await Promise.all([
     supabaseClient
       .from("phases")
       .select("name")
@@ -650,8 +665,25 @@ async function loadExistingTasks() {
     supabaseClient
       .from("tasks")
       .select("*, task_phases(phases(name))")
+      .order("created_at", { ascending: false }),
+    // Rejection notes: pulled here so a draft task that was previously
+    // sent back can show the reviewer's feedback inline, rather than
+    // the App Manager having to dig through a separate history view.
+    supabaseClient
+      .from("task_versions")
+      .select("task_id, review_note, created_at")
+      .not("review_note", "is", null)
       .order("created_at", { ascending: false })
   ]);
+
+  // Most recent review_note per task — since versionRows is already
+  // ordered newest-first, the first one seen per task_id wins.
+  const latestRejectionNoteByTask = {};
+  (versionRows || []).forEach(v => {
+    if (!latestRejectionNoteByTask[v.task_id]) {
+      latestRejectionNoteByTask[v.task_id] = v.review_note;
+    }
+  });
 
   const seenPhaseNames = new Set();
   const orderedPhaseNames = (allPhases || []).filter(p => {
@@ -663,6 +695,17 @@ async function loadExistingTasks() {
   if (!tasks || tasks.length === 0) {
     listDiv.innerHTML = `<p class="text-sm text-slate-400">${t("appmgr.no_tasks_yet")}</p>`;
     return;
+  }
+
+  const reviewCountBadge = document.getElementById("review-count-badge");
+  if (reviewCountBadge) {
+    const inReviewCount = tasks.filter(t => t.status === "in_review").length;
+    if (currentUserRole === "super_admin" && inReviewCount > 0) {
+      reviewCountBadge.textContent = `${inReviewCount} ${inReviewCount === 1 ? t("appmgr.needs_review_singular") : t("appmgr.needs_review_plural")}`;
+      reviewCountBadge.classList.remove("hidden");
+    } else {
+      reviewCountBadge.classList.add("hidden");
+    }
   }
 
   const urgencyRank = { Critical: 0, Important: 1, Optional: 2 };
@@ -689,6 +732,7 @@ async function loadExistingTasks() {
 
     const rows = groupTasks.map(task => {
       const urgencyColor = { Critical: "var(--color-critical)", Important: "var(--color-warning)", Optional: "var(--color-text-muted)" };
+      const rejectionNote = task.status === "draft" ? latestRejectionNoteByTask[task.id] : null;
       return `
       <div class="task-row ${task.status === "archived" ? "opacity-50" : ""}" style="border-left-color: ${urgencyColor[task.urgency] || "var(--color-border)"}">
         <div class="task-row-main">
@@ -698,6 +742,7 @@ async function loadExistingTasks() {
             <span class="task-row-meta-text">${task.urgency} · ${task.category || t("appmgr.uncategorised")}</span>
             ${task.scheduled_publish_at && task.status !== "published" ? `<span class="task-row-meta-text">· ${t("appmgr.scheduled_prefix")} ${new Date(task.scheduled_publish_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</span>` : ""}
           </div>
+          ${rejectionNote ? `<p class="text-xs" style="color: var(--color-critical); margin-top: 0.35rem;">${t("appmgr.sent_back_prefix")} ${rejectionNote}</p>` : ""}
         </div>
         <div class="task-row-actions">
           ${renderStatusActions(task)}
@@ -726,9 +771,70 @@ async function loadExistingTasks() {
   });
 
   listDiv.querySelectorAll("[data-status-action]").forEach(btn => {
-    btn.addEventListener("click", () => changeTaskStatus(btn.dataset.taskId, btn.dataset.statusAction));
+    btn.addEventListener("click", () => {
+      if (btn.dataset.reject === "true") {
+        openRejectReasonModal(btn.dataset.taskId, btn.dataset.statusAction);
+        return;
+      }
+      changeTaskStatus(btn.dataset.taskId, btn.dataset.statusAction);
+    });
   });
 }
+
+// --- SE2L-95 follow-up: in-app rejection reason modal ---
+// Replaces the native window.prompt() dialog, which looked out of place
+// next to the rest of the styled UI. Tracks which task/status the modal
+// is currently open for, so Confirm knows what to act on.
+let pendingRejectTaskId = null;
+let pendingRejectNewStatus = null;
+
+function openRejectReasonModal(taskId, newStatus) {
+  pendingRejectTaskId = taskId;
+  pendingRejectNewStatus = newStatus;
+  const modal = document.getElementById("reject-reason-modal");
+  const input = document.getElementById("reject-reason-input");
+  const errorEl = document.getElementById("reject-reason-error");
+  if (input) input.value = "";
+  if (errorEl) errorEl.classList.add("hidden");
+  if (modal) modal.style.display = "flex";
+  input?.focus();
+}
+
+function closeRejectReasonModal() {
+  const modal = document.getElementById("reject-reason-modal");
+  if (modal) modal.style.display = "none";
+  pendingRejectTaskId = null;
+  pendingRejectNewStatus = null;
+}
+
+document.getElementById("reject-reason-cancel")?.addEventListener("click", closeRejectReasonModal);
+
+document.getElementById("reject-reason-input")?.addEventListener("input", () => {
+  document.getElementById("reject-reason-error")?.classList.add("hidden");
+});
+
+// Clicking the dark overlay outside the card also cancels, same as
+// clicking Cancel — standard modal behavior.
+document.getElementById("reject-reason-modal")?.addEventListener("click", (e) => {
+  if (e.target.id === "reject-reason-modal") closeRejectReasonModal();
+});
+
+document.getElementById("reject-reason-confirm")?.addEventListener("click", () => {
+  const input = document.getElementById("reject-reason-input");
+  const errorEl = document.getElementById("reject-reason-error");
+  const reason = input?.value.trim();
+
+  if (!reason) {
+    errorEl?.classList.remove("hidden");
+    input?.focus();
+    return;
+  }
+
+  const taskId = pendingRejectTaskId;
+  const newStatus = pendingRejectNewStatus;
+  closeRejectReasonModal();
+  changeTaskStatus(taskId, newStatus, reason);
+});
 
 async function handleFormSubmit(e) {
   e.preventDefault();
@@ -1384,6 +1490,32 @@ async function init() {
   await loadReorderPhaseOptions();
   document.getElementById("reorder_phase_select").addEventListener("change", (e) => loadTasksForReorder(e.target.value));
   document.getElementById("save-task-order-btn").addEventListener("click", saveTaskOrder);
+
+  setupRealtimeTaskSync();
+}
+
+// --- SE2L-95 follow-up: keep the task list in sync across sessions ---
+// Without this, a Super Admin reviewing in one browser/window and an
+// App Manager working in another would each see a stale list until they
+// manually refresh — which is exactly the gap that made the rejection
+// reason "invisible" until a manual reload. Debounced since a single
+// action (e.g. reject) can trigger both a tasks update and a
+// task_versions insert in quick succession, which would otherwise
+// double-fetch.
+let realtimeSyncTimeout = null;
+function scheduleTaskListRefresh() {
+  clearTimeout(realtimeSyncTimeout);
+  realtimeSyncTimeout = setTimeout(() => {
+    loadExistingTasks();
+  }, 400);
+}
+
+function setupRealtimeTaskSync() {
+  supabaseClient
+    .channel("app-manager-task-sync")
+    .on("postgres_changes", { event: "*", schema: "public", table: "tasks" }, scheduleTaskListRefresh)
+    .on("postgres_changes", { event: "*", schema: "public", table: "task_versions" }, scheduleTaskListRefresh)
+    .subscribe();
 }
 
 init();

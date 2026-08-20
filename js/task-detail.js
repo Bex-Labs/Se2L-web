@@ -52,7 +52,12 @@ async function loadTaskDetail() {
   const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
 
   if (authError || !user) {
-    window.location.href = "login.html";
+    // Preserve where they were headed (e.g. a shared task link) so
+    // login.js can send them straight back after signing in, and pass
+    // a reason so login.html can explain why they landed here instead
+    // of just silently bouncing them.
+    const next = encodeURIComponent(window.location.pathname + window.location.search);
+    window.location.href = `login.html?next=${next}&reason=shared_task`;
     return;
   }
 

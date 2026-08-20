@@ -3,18 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Se2L — Log in</title>
+  <title>Se2L — Sign up</title>
   <link href="css/output.css" rel="stylesheet">
   <link href="css/tokens.css" rel="stylesheet">
   <link href="css/components.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
   <style>
-    /* Page-specific layout only — buttons, inputs, badges, and dividers
-       now come from components.css. Kept local: the overall page frame
-       (header/main/footer split), the login card wrapper, and the
-       password-visibility toggle, none of which exist on any other page. */
+    /* Mirrors login.html's page frame (same card/header/footer pattern),
+       kept as its own local block per the established per-page style
+       convention (see onboarding.html's onboarding- prefixed styles). */
 
-    .login-page-wrap {
+    .signup-page-wrap {
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -24,7 +23,7 @@
       background-image: radial-gradient(var(--color-navy-bg) 1.5px, transparent 1.5px);
       background-size: 22px 22px;
     }
-    .login-page-wrap::before {
+    .signup-page-wrap::before {
       content: "";
       position: absolute;
       top: -6rem;
@@ -35,7 +34,7 @@
       background: radial-gradient(circle, var(--color-accent-bg) 0%, rgba(217,242,226,0) 70%);
       pointer-events: none;
     }
-    .login-page-wrap::after {
+    .signup-page-wrap::after {
       content: "";
       position: absolute;
       bottom: -8rem;
@@ -47,7 +46,7 @@
       pointer-events: none;
     }
 
-    .login-header {
+    .signup-header {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -56,7 +55,7 @@
       position: relative;
       z-index: 1;
     }
-    .login-header-mark {
+    .signup-header-mark {
       width: 2rem;
       height: 2rem;
       border-radius: 0.5rem;
@@ -66,14 +65,14 @@
       justify-content: center;
       flex-shrink: 0;
     }
-    .login-header-title {
+    .signup-header-title {
       font-family: var(--font-heading);
       font-weight: 800;
       font-size: 1.3rem;
       color: var(--color-navy);
     }
 
-    .login-main {
+    .signup-main {
       flex: 1;
       display: flex;
       align-items: center;
@@ -83,43 +82,29 @@
       z-index: 1;
     }
 
-    .login-card {
+    .signup-card {
       width: 100%;
       max-width: 24rem;
       box-shadow: 0 4px 20px rgba(15, 26, 68, 0.08);
     }
-    .login-card .badge { margin-bottom: 0.75rem; }
-    .login-card h1 {
+    .signup-card .badge { margin-bottom: 0.75rem; }
+    .signup-card h1 {
       font-family: var(--font-heading);
       font-weight: 700;
       font-size: 1.5rem;
       margin-bottom: 0.375rem;
       color: var(--color-text);
     }
-    .login-card p.login-sub {
+    .signup-card p.signup-sub {
       font-size: 0.8rem;
       color: var(--color-text-secondary);
       margin-bottom: 1.5rem;
       line-height: 1.4;
     }
 
-    .login-field-row {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      margin-bottom: 0.35rem;
-    }
-    .login-field-row .form-label { margin-bottom: 0; }
-    .login-forgot {
-      font-size: 0.75rem;
-      color: var(--color-accent);
-      font-weight: 500;
-    }
-    .login-forgot:hover { text-decoration: underline; }
-
-    .login-password-wrap { position: relative; }
-    .login-password-wrap input { padding-right: 2.5rem; }
-    .login-toggle-password {
+    .signup-password-wrap { position: relative; }
+    .signup-password-wrap input { padding-right: 2.5rem; }
+    .signup-toggle-password {
       position: absolute;
       right: 0.5rem;
       top: 50%;
@@ -132,9 +117,9 @@
       display: flex;
       align-items: center;
     }
-    .login-toggle-password svg { width: 1.1rem; height: 1.1rem; }
+    .signup-toggle-password svg { width: 1.1rem; height: 1.1rem; }
 
-    .login-footer {
+    .signup-footer {
       padding: 1.25rem 1.5rem;
       border-top: 1px solid var(--color-border);
       display: flex;
@@ -145,64 +130,67 @@
       position: relative;
       z-index: 1;
     }
-    .login-footer span,
-    .login-footer a { font-size: 0.7rem; color: var(--color-text-muted); }
-    .login-footer a:hover { color: var(--color-text-secondary); }
+    .signup-footer span,
+    .signup-footer a { font-size: 0.7rem; color: var(--color-text-muted); }
+    .signup-footer a:hover { color: var(--color-text-secondary); }
+
+    /* Post-submit "check your email" state — replaces the form in place
+       rather than navigating away, since there's nowhere useful to go
+       until the person confirms their email. */
+    #signup-confirm-panel .badge { margin-bottom: 0.75rem; }
   </style>
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-900">
 
-  <div class="login-page-wrap">
+  <div class="signup-page-wrap">
 
-    <header class="login-header">
-      <div class="login-header-mark">
+    <header class="signup-header">
+      <div class="signup-header-mark">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <path d="M12 2L2 7V12C2 16.97 6.24 21.44 12 22.5C17.76 21.44 22 16.97 22 12V7L12 2Z" stroke="#ffffff" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12L11 14L15.5 9.5" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
-      <span class="login-header-title">Se2L</span>
+      <span class="signup-header-title">Se2L</span>
     </header>
 
-    <main class="login-main">
-      <div class="login-card card">
+    <main class="signup-main">
+      <div class="signup-card card" id="signup-form-panel">
 
-        <span class="badge" data-i18n="login.eyebrow">Official entry portal</span>
-        <h1 data-i18n="login.heading">Welcome back</h1>
-        <p class="login-sub" data-i18n="login.subtext">Log in to pick up your settlement journey where you left off.</p>
+        <span class="badge" data-i18n="signup.eyebrow">Start your settlement journey</span>
+        <h1 data-i18n="signup.heading">Create your account</h1>
+        <p class="signup-sub" data-i18n="signup.subtext">Just the basics for now — we'll build your personalised roadmap next.</p>
 
-        <button type="button" id="google-signin-btn" class="btn btn-secondary btn-block" style="margin-bottom: 1.25rem; gap: 0.6rem;">
+        <button type="button" id="google-signup-btn" class="btn btn-secondary btn-block" style="margin-bottom: 1.25rem; gap: 0.6rem;">
           <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
             <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l6-6C34 5.1 29.3 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21 21-9.4 21-21c0-1.4-.1-2.7-.4-3.5z"/>
             <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.6 18.9 13 24 13c3.1 0 5.8 1.1 8 3l6-6C34 5.1 29.3 3 24 3 16.3 3 9.6 7.3 6.3 14.7z"/>
             <path fill="#4CAF50" d="M24 45c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.3 36.4 26.8 37 24 37c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 40.6 16.2 45 24 45z"/>
             <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.2 4.2-4.1 5.6l6.2 5.2C40.9 36 44 30.5 44 24c0-1.4-.1-2.7-.4-3.5z"/>
           </svg>
-          <span data-i18n="login.google_signin">Continue with Google</span>
+          <span data-i18n="signup.google_signup">Continue with Google</span>
         </button>
 
         <div class="divider-row" style="margin: 0 0 1.25rem;">
-          <span class="divider-row-label" data-i18n="login.email_divider">or continue with email</span>
+          <span class="divider-row-label" data-i18n="signup.email_divider">or sign up with email</span>
         </div>
 
-        <p id="shared-task-message" class="hidden text-sm" style="color: var(--color-navy); background: var(--color-navy-bg); padding: 0.65rem 0.85rem; border-radius: var(--radius-control); margin-bottom: 1.25rem;"></p>
-
-        <form id="login-form">
+        <form id="signup-form">
 
           <div class="form-field">
-            <div class="login-field-row">
-              <label class="form-label" for="email" data-i18n="login.email_label">Email address</label>
-            </div>
-            <input id="email" type="email" required class="form-input" placeholder="e.g. name@domain.gov.uk" data-i18n-placeholder="login.email_placeholder" />
+            <label class="form-label" for="preferred_name" data-i18n="signup.name_label">What should we call you?</label>
+            <input id="preferred_name" type="text" required class="form-input" placeholder="e.g. Sarah" data-i18n-placeholder="signup.name_placeholder" />
           </div>
 
-          <div class="form-field" id="password-field">
-            <div class="login-field-row">
-              <label class="form-label" for="password" data-i18n="login.password_label">Password</label>
-              <a href="#" class="login-forgot" data-i18n="login.forgot">Forgot?</a>
-            </div>
-            <div class="login-password-wrap">
-              <input id="password" type="password" class="form-input" placeholder="Your password" data-i18n-placeholder="login.password_placeholder" />
-              <button type="button" class="login-toggle-password" id="toggle-password" aria-label="Show password" data-i18n-aria-label="login.show_password">
+          <div class="form-field">
+            <label class="form-label" for="email" data-i18n="signup.email_label">Email address</label>
+            <input id="email" type="email" required class="form-input" placeholder="e.g. name@domain.com" data-i18n-placeholder="signup.email_placeholder" />
+          </div>
+
+          <div class="form-field">
+            <label class="form-label" for="password" data-i18n="signup.password_label">Password</label>
+            <div class="signup-password-wrap">
+              <input id="password" type="password" required minlength="6" class="form-input" placeholder="At least 6 characters" data-i18n-placeholder="signup.password_placeholder" />
+              <button type="button" class="signup-toggle-password" id="toggle-password" aria-label="Show password" data-i18n-aria-label="signup.show_password">
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                   <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
                   <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/>
@@ -211,28 +199,35 @@
             </div>
           </div>
 
-          <p id="magic-link-message" class="hidden text-sm" style="color: var(--color-accent-dark); background: var(--color-accent-bg); padding: 0.65rem 0.85rem; border-radius: var(--radius-control); margin-bottom: 1rem;"></p>
+          <p id="signup-error-message" class="hidden text-sm" style="color: var(--color-critical); margin-bottom: 1rem;"></p>
 
-          <button type="submit" id="login-submit-btn" class="btn btn-primary btn-block" data-i18n="login.submit">Sign in &rarr;</button>
-
-          <div class="text-center mt-3">
-            <button type="button" id="magic-link-toggle" class="text-xs" style="color: var(--color-accent-dark); font-weight: 600; background: none; border: none; cursor: pointer;" data-i18n="login.use_magic_link">
-              Or email me a sign-in link instead
-            </button>
-          </div>
+          <button type="submit" id="signup-submit-btn" class="btn btn-primary btn-block" data-i18n="signup.submit">Create account &rarr;</button>
 
         </form>
 
         <div class="divider-row">
-          <span class="divider-row-label" data-i18n="login.divider">New to Se2L</span>
+          <span class="divider-row-label" data-i18n="signup.divider">Already have an account</span>
         </div>
 
-        <a href="signup.html" id="register-link" class="btn btn-secondary btn-block" data-i18n="login.register">Register account</a>
+        <a href="login.html" class="btn btn-secondary btn-block" data-i18n="signup.login_link">Log in</a>
 
+      </div>
+
+      <!-- Shown in place of the form after a successful email/password signup,
+           since email confirmation is required before onboarding can continue. -->
+      <div class="signup-card card hidden" id="signup-confirm-panel">
+        <span class="badge" data-i18n="signup.confirm_eyebrow">Almost there</span>
+        <h1 data-i18n="signup.confirm_heading">Check your email</h1>
+        <p class="signup-sub">
+          <span data-i18n="signup.confirm_subtext_prefix">We've sent a confirmation link to</span>
+          <strong id="signup-confirm-email"></strong>.
+          <span data-i18n="signup.confirm_subtext_suffix">Click it and we'll get your roadmap started.</span>
+        </p>
+        <a href="login.html" class="btn btn-secondary btn-block" data-i18n="signup.back_to_login">Back to log in</a>
       </div>
     </main>
 
-    <footer class="login-footer">
+    <footer class="signup-footer">
       <span data-i18n="footer.copyright">Se2L UK &copy; 2026 Se2L UK Settlement Service. All rights reserved.</span>
       <a href="#" data-i18n="footer.privacy">Privacy Policy</a>
       <a href="terms.html" data-i18n="footer.terms">Terms of Service</a>
@@ -243,14 +238,11 @@
   </div>
 
   <script>
-    // Show/hide password toggle — presentation-only, doesn't touch
-    // login-form's submit handler or any values, so login.js is
-    // untouched and unaware this exists.
     document.getElementById("toggle-password").addEventListener("click", function () {
       const pw = document.getElementById("password");
       const isHidden = pw.type === "password";
       pw.type = isHidden ? "text" : "password";
-      this.setAttribute("aria-label", isHidden ? window.t("login.hide_password") : window.t("login.show_password"));
+      this.setAttribute("aria-label", isHidden ? window.t("signup.hide_password") : window.t("signup.show_password"));
     });
   </script>
 
@@ -261,7 +253,7 @@
   <script src="js/lang/fr.js"></script>
   <script src="js/lang/zh.js"></script>
   <script src="js/i18n.js"></script>
-  <script src="js/login.js"></script>
+  <script src="js/signup.js"></script>
 
 </body>
 </html>

@@ -125,6 +125,20 @@
           </form>
         </div>
 
+        <!-- SE2L-95 follow-up: view/add household members, since dependants
+             are otherwise only collectible once during onboarding with no
+             way back in afterwards. -->
+        <div class="card mb-6">
+          <h2 style="font-family: var(--font-heading); font-weight: 700; font-size: 1.05rem; margin-bottom: 0.25rem;">Household members</h2>
+          <p class="text-sm text-slate-500 mb-4">People settling with you. Adults get their own invite; children get their own checklist under yours.</p>
+
+          <div id="household-members-list" class="flex flex-col gap-2 mb-4">
+            <p class="text-sm text-slate-400">Loading...</p>
+          </div>
+
+          <a href="dependants.html?return=settings.html" class="btn btn-secondary btn-sm">+ Add household member</a>
+        </div>
+
         <div class="card card-status-pending">
           <h2 style="font-family: var(--font-heading); font-weight: 700; font-size: 1.05rem; margin-bottom: 0.25rem;">Change password</h2>
           <p class="text-sm text-slate-500 mb-4">Choose a new password for your account. You'll stay signed in on this device.</p>

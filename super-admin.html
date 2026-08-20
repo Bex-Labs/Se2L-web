@@ -214,6 +214,7 @@
 
       <nav class="flex flex-col gap-1" style="margin-top: 1rem;">
         <a href="#" data-panel-target="panel-overview" class="px-3 py-2 rounded-lg text-sm font-medium is-active-subnav" style="display:flex;align-items:center;gap:0.5rem;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:1rem;height:1rem;flex-shrink:0;"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span>Platform overview</span></a>
+        <a href="app-manager.html" style="display:flex;align-items:center;gap:0.5rem;justify-content:space-between;padding: 0.5rem 0.75rem; border-radius: 0.5rem; font-size: 0.875rem; color: var(--color-text-secondary, #475569);"><span style="display:flex;align-items:center;gap:0.5rem;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:1rem;height:1rem;flex-shrink:0;"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg><span>Manage content</span></span><span id="sidebar-review-count-badge" class="hidden" style="background: var(--color-warning-bg, #fef3c7); color: var(--color-warning, #b45309); font-size: 0.7rem; font-weight: 600; padding: 0.1rem 0.45rem; border-radius: 9999px;"></span></a>
         <div class="sidebar-subnav">
           <a href="#" data-panel-target="panel-app-managers" style="display:flex;align-items:center;gap:0.5rem;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:0.95rem;height:0.95rem;flex-shrink:0;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>App Managers</span></a>
           <a href="#" data-panel-target="panel-visa-regions" style="display:flex;align-items:center;gap:0.5rem;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:0.95rem;height:0.95rem;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span>Visa & Regions</span></a>
@@ -468,6 +469,26 @@
   <script src="js/branding.js"></script>
   <script src="js/shell.js"></script>
   <script src="js/super-admin.js"></script>
+
+  <script>
+    // Populates the "needs review" count next to Manage content — kept
+    // self-contained here rather than added into super-admin.js, so it
+    // doesn't depend on or risk that file's existing panel-switching logic.
+    (async function loadReviewCountBadge() {
+      const badge = document.getElementById("sidebar-review-count-badge");
+      if (!badge || !window.supabaseClient) return;
+
+      const { count, error } = await supabaseClient
+        .from("tasks")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "in_review");
+
+      if (error || !count) return;
+
+      badge.textContent = count;
+      badge.classList.remove("hidden");
+    })();
+  </script>
 
 </body>
 </html>

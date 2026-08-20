@@ -108,10 +108,6 @@
     .onboarding-hint { font-size: 0.72rem; color: var(--color-text-muted); margin-top: 0.35rem; line-height: 1.4; }
     .onboarding-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--color-border); }
 
-    .dependant-entry { background: var(--color-surface-muted); border-radius: var(--radius-card); padding: 1.25rem; margin-bottom: 1rem; }
-    .dependant-entry .form-field { margin-bottom: 1rem; }
-    .dependant-entry-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1.25rem; }
-    @media (max-width: 560px) { .dependant-entry-grid { grid-template-columns: 1fr; } }
 
     /* Stack panels on narrow viewports rather than squeezing both side
        by side — the reassurance panel becomes a shorter top banner. */
@@ -171,9 +167,9 @@
 
       <div class="onboarding-wrap">
 
-        <span class="badge badge-eyebrow" data-i18n="onboarding.eyebrow">Start your settlement journey</span>
+        <span class="badge badge-eyebrow" data-i18n="onboarding.eyebrow">Let's build your roadmap</span>
 
-        <h1 style="font-family: var(--font-heading); font-weight: 800; font-size: 1.5rem; margin: 0.75rem 0 0.25rem;" data-i18n="onboarding.heading">Tell us about your move to the UK</h1>
+        <h1 id="onboarding-welcome-heading" style="font-family: var(--font-heading); font-weight: 800; font-size: 1.5rem; margin: 0.75rem 0 0.25rem;" data-i18n="onboarding.heading">Tell us about your move to the UK</h1>
         <p class="text-slate-600 text-sm mb-4" data-i18n="onboarding.subtext">We use this to build a personalised checklist for you.</p>
 
         <form id="onboarding-form" class="card">
@@ -217,32 +213,9 @@
             </select>
           </div>
 
-          <!-- SE2L-23: household members section, shown only when has_dependants = yes -->
-          <div id="dependants-section" class="onboarding-section-divider hidden">
-            <div class="flex items-center justify-between mb-3">
-              <label for="email" class="form-label" style="margin-bottom: 0;" data-i18n="onboarding.household_members">Household members</label>
-              <button type="button" id="add-dependant-btn" class="btn btn-secondary btn-sm" data-i18n="onboarding.add_household_member">
-                + Add household member
-              </button>
-            </div>
-            <p class="onboarding-hint mb-3" data-i18n="onboarding.household_hint">Add anyone settling with you — partner, children, or other relatives. Adults you add will get their own invite to set up an account.</p>
-            <div id="dependants-container"></div>
-          </div>
-
-          <div class="onboarding-form-grid onboarding-section-divider">
-            <div class="form-field">
-              <label class="form-label" data-i18n="onboarding.email_label">Email</label>
-              <input id="email" type="email" required placeholder="you@example.com" class="form-input" data-i18n-placeholder="onboarding.email_placeholder" />
-            </div>
-            <div class="form-field">
-              <label for="password" class="form-label" data-i18n="onboarding.password_label">Password</label>
-              <input id="password" type="password" required minlength="6" placeholder="At least 6 characters" class="form-input" data-i18n-placeholder="onboarding.password_placeholder" />
-            </div>
-          </div>
-
           <div class="onboarding-actions">
             <a href="index.html" class="btn btn-secondary" data-i18n="onboarding.back">Back</a>
-            <button type="submit" class="btn btn-primary" data-i18n="onboarding.submit">Create my journey</button>
+            <button type="submit" class="btn btn-primary" data-i18n="onboarding.submit">Continue</button>
           </div>
 
         </form>
@@ -250,38 +223,6 @@
       </div>
     </main>
   </div>
-
-  <!-- SE2L-23: template for one household member entry, cloned by onboarding.js -->
-  <template id="dependant-entry-template">
-    <div class="dependant-entry">
-      <div class="dependant-entry-grid">
-        <div class="form-field">
-          <label class="form-label" data-i18n="onboarding.dep_name_label">Full name</label>
-          <input type="text" class="dependant-name form-input" required />
-        </div>
-        <div class="form-field">
-          <label class="form-label" data-i18n="onboarding.dep_dob_label">Date of birth</label>
-          <input type="date" class="dependant-dob form-input" />
-        </div>
-        <div class="form-field">
-          <label class="form-label" data-i18n="onboarding.dep_category_label">Category</label>
-          <select class="dependant-type form-select">
-            <option value="minor" data-i18n="onboarding.dep_category_child">Child</option>
-            <option value="adult" data-i18n="onboarding.dep_category_adult">Adult (partner / relative)</option>
-          </select>
-        </div>
-        <div class="form-field">
-          <label class="form-label" data-i18n="onboarding.dep_relationship_label">Relationship</label>
-          <input type="text" class="dependant-relationship form-input" placeholder="e.g. Son, Daughter, Niece" data-i18n-placeholder="onboarding.dep_relationship_placeholder" />
-        </div>
-        <div class="dependant-email-wrapper hidden form-field">
-          <label class="form-label" data-i18n="onboarding.dep_email_label">Email (for their invite)</label>
-          <input type="email" class="dependant-email form-input" placeholder="their@email.com" data-i18n-placeholder="onboarding.dep_email_placeholder" />
-        </div>
-      </div>
-      <button type="button" class="remove-dependant-btn btn btn-ghost btn-sm" style="color: var(--color-critical);" data-i18n="onboarding.dep_remove">Remove</button>
-    </div>
-  </template>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>

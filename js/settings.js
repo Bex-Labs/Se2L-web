@@ -41,7 +41,7 @@ async function loadSidebarIdentity() {
 
   const { data: profile } = await supabaseClient
     .from("users")
-    .select("role")
+    .select("role, preferred_name")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -50,17 +50,21 @@ async function loadSidebarIdentity() {
     super_admin: "Super Admin"
   };
 
+  const displayName = profile?.preferred_name || user.email;
+
   const emailEl = document.getElementById("sidebar-user-email");
   const rolePillEl = document.getElementById("sidebar-role-pill");
   const avatarEl = document.getElementById("sidebar-identity-avatar");
-  if (emailEl) emailEl.textContent = user.email || "Unknown user";
+  if (emailEl) emailEl.textContent = displayName || "Unknown user";
   if (rolePillEl) rolePillEl.textContent = roleLabels[profile?.role] || "Newcomer";
-  if (avatarEl && user.email) {
-    const namePart = user.email.split("@")[0];
+  if (avatarEl && displayName) {
+    // Initials from the preferred name if set (e.g. "Sarah" -> "S"), or
+    // from the email's local part as before for accounts without one.
+    const namePart = profile?.preferred_name || user.email.split("@")[0];
     const initials = namePart.replace(/[^a-zA-Z]/g, " ").trim().split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase();
     avatarEl.textContent = initials || namePart.slice(0, 2).toUpperCase();
   }
-  window.se2lCacheIdentity?.(user.email, roleLabels[profile?.role] || "Newcomer");
+  window.se2lCacheIdentity?.(displayName, roleLabels[profile?.role] || "Newcomer");
 
   const backLink = document.getElementById("back-link");
   const dashboardNavLink = document.getElementById("dashboard-nav-link");
@@ -72,6 +76,7 @@ async function loadSidebarIdentity() {
       backLink.textContent = "← Back to app manager dashboard";
     }
   } else if (profile?.role === "super_admin") {
+    document.getElementById("app-manager-link")?.classList.remove("hidden");
     document.getElementById("super-admin-link")?.classList.remove("hidden");
     if (backLink) {
       backLink.href = "super-admin.html";
@@ -252,3 +257,52 @@ if (journeyForm) {
     showJourneyMessage("Journey details updated. Your roadmap will reflect this on next visit to the dashboard.", false);
   });
 }
+
+// --- Household members list ---
+// Queries family_dependants_view (same as dashboard.js's loadFamilySection)
+// rather than the raw dependants table, since that view already excludes
+// fields that shouldn't be exposed and enforces the same access boundary.
+async function loadHouseholdMembersList() {
+  const listEl = document.getElementById("household-members-list");
+  if (!listEl) return;
+
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) return;
+
+  const { data: dependants, error } = await supabaseClient
+    .from("family_dependants_view")
+    .select("*")
+    .eq("primary_user_id", user.id);
+
+  if (error) {
+    listEl.innerHTML = `<p class="text-sm text-red-600">Couldn't load household members.</p>`;
+    return;
+  }
+
+  if (!dependants || dependants.length === 0) {
+    listEl.innerHTML = `<p class="text-sm text-slate-400">No household members added yet.</p>`;
+    return;
+  }
+
+  const statusLabel = {
+    pending: "Invite sent",
+    accepted: "Account set up"
+  };
+
+  listEl.innerHTML = dependants.map(d => {
+    const relationshipLabel = d.relationship || (d.type === "minor" ? "Child" : "Adult");
+    const subLabel = d.type === "adult"
+      ? (statusLabel[d.invite_status] || "—")
+      : "Child";
+    return `
+      <div class="flex items-center justify-between" style="padding: 0.5rem 0; border-bottom: 1px solid var(--color-border);">
+        <div>
+          <p class="text-sm font-medium">${d.name}</p>
+          <p class="text-xs text-slate-500">${relationshipLabel} · ${subLabel}</p>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+loadHouseholdMembersList();

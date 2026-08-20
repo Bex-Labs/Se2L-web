@@ -38,7 +38,7 @@
         <div id="sidebar-identity-avatar" class="sidebar-identity-avatar">··</div>
         <div class="sidebar-identity-info">
           <span id="sidebar-user-email" class="sidebar-identity-email">Loading…</span>
-          <span class="status-pill" data-i18n="roles.app_manager">App Manager</span>
+          <span id="sidebar-role-pill" class="status-pill" data-i18n="roles.app_manager">App Manager</span>
         </div>
       </div>
 
@@ -255,7 +255,10 @@
       </div>
 
       <div>
-        <h2 class="text-base font-medium mb-3" data-i18n="appmgr.existing_tasks">Existing tasks</h2>
+        <div class="flex items-center gap-2 mb-3">
+          <h2 class="text-base font-medium" data-i18n="appmgr.existing_tasks">Existing tasks</h2>
+          <span id="review-count-badge" class="hidden text-xs font-medium" style="background: var(--color-warning-bg, #fef3c7); color: var(--color-warning, #b45309); padding: 0.15rem 0.55rem; border-radius: 9999px;"></span>
+        </div>
         <div id="task-list" class="flex flex-col gap-2"></div>
       </div>
     </div>
@@ -338,6 +341,22 @@
 
   </div>
 
+  <!-- SE2L-95 follow-up: in-app modal for the rejection reason, replacing
+       the native window.prompt() dialog which looked out of place next
+       to the rest of the styled UI. -->
+  <div id="reject-reason-modal" style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 1rem;">
+    <div class="card" style="width: 100%; max-width: 26rem;">
+      <h2 style="font-family: var(--font-heading); font-weight: 700; font-size: 1.1rem; margin-bottom: 0.35rem;" data-i18n="appmgr.reject_modal_heading">Send back to draft</h2>
+      <p class="text-sm text-slate-500 mb-3" data-i18n="appmgr.reject_modal_subtext">This will be shown to the person who submitted it.</p>
+      <textarea id="reject-reason-input" rows="3" class="form-textarea" placeholder="e.g. The GOV.UK link in step 2 is broken" data-i18n-placeholder="appmgr.reject_modal_placeholder"></textarea>
+      <p id="reject-reason-error" class="hidden text-sm mt-2" style="color: var(--color-critical);" data-i18n="appmgr.reject_reason_required">Please give a reason so the App Manager knows what to fix.</p>
+      <div class="flex justify-end gap-2 mt-4">
+        <button type="button" id="reject-reason-cancel" class="btn btn-secondary btn-sm" data-i18n="common.cancel">Cancel</button>
+        <button type="button" id="reject-reason-confirm" class="btn btn-primary btn-sm" data-i18n="appmgr.reject_modal_confirm">Send back</button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
   <script src="js/branding.js"></script>
@@ -349,21 +368,38 @@
   <script src="js/app-manager.js"></script>
 
   <script>
-    // Populates the sidebar identity strip. Purely presentational —
-    // read-only, doesn't touch anything app-manager.js relies on.
+    // Populates the sidebar identity strip. Previously hardcoded "App
+    // Manager" regardless of who was actually logged in — harmless while
+    // only App Managers could reach this page, but wrong once Super
+    // Admin also started accessing it to review/publish. Now reads the
+    // real role and preferred_name, same pattern as settings.js/dashboard.js.
     (async function () {
       const emailEl = document.getElementById("sidebar-user-email");
       if (!emailEl) return;
-      const { data } = await supabaseClient.auth.getUser();
-      const email = data?.user?.email;
-      emailEl.textContent = email || window.t("common.unknown_user");
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (!user) return;
+
+      const { data: profile } = await supabaseClient
+        .from("users")
+        .select("role, preferred_name")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      const roleLabels = { app_manager: "App Manager", super_admin: "Super Admin" };
+      const roleLabel = roleLabels[profile?.role] || "App Manager";
+      const displayName = profile?.preferred_name || user.email;
+
+      emailEl.textContent = displayName || window.t("common.unknown_user");
+      const rolePillEl = document.getElementById("sidebar-role-pill");
+      if (rolePillEl) rolePillEl.textContent = roleLabel;
+
       const avatarEl = document.getElementById("sidebar-identity-avatar");
-      if (avatarEl && email) {
-        const namePart = email.split("@")[0];
+      if (avatarEl && displayName) {
+        const namePart = profile?.preferred_name || user.email.split("@")[0];
         const initials = namePart.replace(/[^a-zA-Z]/g, " ").trim().split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase();
         avatarEl.textContent = initials || namePart.slice(0, 2).toUpperCase();
       }
-      window.se2lCacheIdentity?.(email, "App Manager");
+      window.se2lCacheIdentity?.(displayName, roleLabel);
     })();
   </script>
 

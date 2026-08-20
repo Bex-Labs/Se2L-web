@@ -306,17 +306,33 @@ document.getElementById("add-uk-region-form").addEventListener("submit", async (
 
 let allModerationTasks = [];
 let allModerationResources = [];
+let currentSuperAdminUser = null;
+let moderationRejectionNotes = {};
 
 async function loadModerationTasks() {
-  const { data, error } = await supabaseClient
-    .from("tasks")
-    .select("id, title, status, category, urgency")
-    .order("title", { ascending: true });
+  const [{ data, error }, { data: versionRows }] = await Promise.all([
+    supabaseClient
+      .from("tasks")
+      .select("id, title, status, category, urgency")
+      .order("title", { ascending: true }),
+    supabaseClient
+      .from("task_versions")
+      .select("task_id, review_note, created_at")
+      .not("review_note", "is", null)
+      .order("created_at", { ascending: false })
+  ]);
 
   if (error) {
     document.getElementById("moderation-task-list").innerHTML = `<p class="text-sm text-red-600">Could not load tasks.</p>`;
     return;
   }
+
+  moderationRejectionNotes = {};
+  (versionRows || []).forEach(v => {
+    if (!moderationRejectionNotes[v.task_id]) {
+      moderationRejectionNotes[v.task_id] = v.review_note;
+    }
+  });
 
   allModerationTasks = data || [];
   renderModerationTasks();
@@ -337,21 +353,54 @@ function renderModerationTasks() {
       <div>
         <p class="admin-account-email">${t.title}</p>
         <p class="moderation-status is-${t.status}">${t.status.replace("_", " ")} · ${t.urgency} · ${t.category || "Uncategorised"}</p>
+        ${t.status === "draft" && moderationRejectionNotes[t.id] ? `<p class="text-xs" style="color: var(--color-critical); margin-top: 0.25rem;">Sent back: ${moderationRejectionNotes[t.id]}</p>` : ""}
       </div>
       <div class="flex gap-2">
-        ${t.status !== "draft" && t.status !== "archived" ? `<button data-task-id="${t.id}" data-new-status="draft" class="moderation-action-btn moderation-task-btn">Unpublish</button>` : ""}
+        ${t.status !== "draft" && t.status !== "archived" ? `<button data-task-id="${t.id}" data-new-status="draft" data-reject="true" class="moderation-action-btn moderation-task-btn">Unpublish</button>` : ""}
         ${t.status !== "archived" ? `<button data-task-id="${t.id}" data-new-status="archived" class="moderation-action-btn is-danger moderation-task-btn">Archive</button>` : ""}
       </div>
     </div>
   `).join("");
 
   listDiv.querySelectorAll(".moderation-task-btn").forEach(btn => {
-    btn.addEventListener("click", () => updateModerationTaskStatus(btn.dataset.taskId, btn.dataset.newStatus));
+    btn.addEventListener("click", () => {
+      if (btn.dataset.reject === "true") {
+        // SE2L-95 follow-up: same required-reason rule as app-manager.js's
+        // review flow — unpublishing from here shouldn't be a silent,
+        // unexplained action either.
+        const reason = prompt("Why is this being unpublished? This will be shown to the person who submitted it.");
+        if (reason === null) return; // cancelled
+        if (!reason.trim()) {
+          alert("Please give a reason so the App Manager knows what happened.");
+          return;
+        }
+        updateModerationTaskStatus(btn.dataset.taskId, btn.dataset.newStatus, reason.trim());
+        return;
+      }
+      updateModerationTaskStatus(btn.dataset.taskId, btn.dataset.newStatus);
+    });
   });
 }
 
-async function updateModerationTaskStatus(taskId, newStatus) {
+async function updateModerationTaskStatus(taskId, newStatus, reviewNote) {
   if (!confirm(`Change this task's status to "${newStatus}"? This overrides it regardless of who created it.`)) return;
+
+  // Fetch first so the audit trail has a real "before" snapshot, same
+  // pattern as changeTaskStatus in app-manager.js — moderation actions
+  // were previously invisible to task_versions entirely, which broke
+  // the "full history of edits" promise for anything changed here.
+  const { data: existingTask, error: fetchError } = await supabaseClient
+    .from("tasks")
+    .select("*")
+    .eq("id", taskId)
+    .single();
+
+  if (fetchError || !existingTask) {
+    alert("Could not load task.");
+    return;
+  }
+
+  const previousStatus = existingTask.status;
 
   const { error } = await supabaseClient
     .from("tasks")
@@ -361,6 +410,22 @@ async function updateModerationTaskStatus(taskId, newStatus) {
   if (error) {
     alert("Could not update task: " + error.message);
     return;
+  }
+
+  if (currentSuperAdminUser) {
+    const { error: versionError } = await supabaseClient.from("task_versions").insert({
+      task_id: taskId,
+      changed_by: currentSuperAdminUser.id,
+      change_type: "status_change",
+      previous_status: previousStatus,
+      new_status: newStatus,
+      snapshot: { ...existingTask, status: newStatus },
+      review_note: reviewNote || null
+    });
+
+    if (versionError) {
+      console.error("Could not record task version:", versionError);
+    }
   }
 
   await loadModerationTasks();
@@ -667,6 +732,8 @@ async function init() {
   const user = await checkSuperAdminAccess();
   if (!user) return;
 
+  currentSuperAdminUser = user;
+
   setupPanelSwitching();
   setupSettingsSubpanelSwitching();
 
@@ -679,6 +746,48 @@ async function init() {
   await loadTermsOfService();
   await loadBrandingSettings();
   await loadSelectedEmailTemplate();
+
+  setupRealtimeTaskSync();
+}
+
+// --- SE2L-95 follow-up: same real-time sync as app-manager.js, so
+// Moderation and the review-count badge reflect changes made from the
+// other window without needing a manual refresh.
+let realtimeSyncTimeout = null;
+function scheduleModerationRefresh() {
+  clearTimeout(realtimeSyncTimeout);
+  realtimeSyncTimeout = setTimeout(() => {
+    loadModerationTasks();
+    loadPlatformStats();
+    refreshReviewCountBadge();
+  }, 400);
+}
+
+async function refreshReviewCountBadge() {
+  const badge = document.getElementById("sidebar-review-count-badge");
+  if (!badge) return;
+
+  const { count, error } = await supabaseClient
+    .from("tasks")
+    .select("*", { count: "exact", head: true })
+    .eq("status", "in_review");
+
+  if (error) return;
+
+  if (count > 0) {
+    badge.textContent = count;
+    badge.classList.remove("hidden");
+  } else {
+    badge.classList.add("hidden");
+  }
+}
+
+function setupRealtimeTaskSync() {
+  supabaseClient
+    .channel("super-admin-task-sync")
+    .on("postgres_changes", { event: "*", schema: "public", table: "tasks" }, scheduleModerationRefresh)
+    .on("postgres_changes", { event: "*", schema: "public", table: "task_versions" }, scheduleModerationRefresh)
+    .subscribe();
 }
 
 init();

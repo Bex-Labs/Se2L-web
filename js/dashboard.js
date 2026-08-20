@@ -17,7 +17,7 @@ async function loadDashboard() {
     return;
   }
 
-  if (profile.role === "app_manager") {
+  if (profile.role === "app_manager" || profile.role === "super_admin") {
     document.getElementById("app-manager-link").classList.remove("hidden");
   }
 
@@ -31,17 +31,18 @@ async function loadDashboard() {
     app_manager: t("roles.app_manager"),
     super_admin: t("roles.super_admin")
   };
+  const displayName = profile.preferred_name || user.email;
   const emailEl = document.getElementById("sidebar-user-email");
   const rolePillEl = document.getElementById("sidebar-role-pill");
   const avatarEl = document.getElementById("sidebar-identity-avatar");
-  if (emailEl) emailEl.textContent = user.email || t("common.unknown_user");
+  if (emailEl) emailEl.textContent = displayName || t("common.unknown_user");
   if (rolePillEl) rolePillEl.textContent = roleLabels[profile.role] || t("roles.newcomer");
-  if (avatarEl && user.email) {
-    const namePart = user.email.split("@")[0];
+  if (avatarEl && displayName) {
+    const namePart = profile.preferred_name || user.email.split("@")[0];
     const initials = namePart.replace(/[^a-zA-Z]/g, " ").trim().split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase();
     avatarEl.textContent = initials || namePart.slice(0, 2).toUpperCase();
   }
-  window.se2lCacheIdentity?.(user.email, roleLabels[profile.role] || t("roles.newcomer"));
+  window.se2lCacheIdentity?.(displayName, roleLabels[profile.role] || t("roles.newcomer"));
 
   // --- SE2L-39: For Your Family section ---
   // Called early and independently of the task-list logic below, since that
