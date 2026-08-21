@@ -70,7 +70,13 @@ const PUSH_CONTENT: Record<string, PushContent> = {
   },
 };
 
-Deno.serve(async () => {
+Deno.serve(async (req) => {
+  // --- Verify this is a genuine cron trigger, not a public request ---
+  const cronSecret = Deno.env.get("CRON_SECRET");
+  if (cronSecret && req.headers.get("x-cron-secret") !== cronSecret) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+  }
+
   const { data: rows, error } = await supabase
     .from("notifications_queue")
     .select("id, user_id, notification_type, phase_id")

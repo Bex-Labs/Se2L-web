@@ -1,0 +1,22 @@
+# Environment variables and secrets — never commit real credentials.
+.env
+.env.local
+.env.*.local
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Editor artifacts (VS Code project settings are intentionally tracked
+# via .vscode/settings.json for team consistency — this only ignores
+# personal, machine-specific editor state)
+.vscode/*.log
+*.swp
+
+# Node (in case any tooling is added later, e.g. a linter or bundler)
+node_modules/
+npm-debug.log*
+
+# Supabase local dev state — regenerated per-machine, shouldn't be
+# committed even though supabase/config.toml itself should be tracked
+supabase/.temp/

@@ -89,6 +89,22 @@ Deno.serve(async (req) => {
     });
   }
 
+  // --- Verify newUserId actually belongs to the invited email ---
+  // newUserId is supplied by the client, so it can't be trusted on its
+  // own — anyone who obtained a valid token could otherwise direct
+  // App Manager access onto an arbitrary existing account by passing a
+  // different newUserId. Since this function already holds the service
+  // role key, it can independently ask the Auth Admin API what email
+  // that account really has, rather than trusting the client's claim.
+  const { data: targetUser, error: targetUserError } = await supabase.auth.admin.getUserById(newUserId);
+
+  if (targetUserError || !targetUser?.user || targetUser.user.email?.toLowerCase() !== invite.email.toLowerCase()) {
+    return new Response(JSON.stringify({ error: "This account doesn't match the invited email" }), {
+      status: 403,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   const { error: profileError } = await supabase.from("users").insert({
     id: newUserId,
     email: invite.email,

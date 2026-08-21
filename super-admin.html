@@ -331,8 +331,8 @@
         <div class="visa-region-card">
           <h3 class="text-sm font-medium mb-3">Visa types</h3>
           <form id="add-visa-type-form" class="visa-region-add-form">
-            <input id="new_visa_type_value" type="text" required class="form-input" placeholder="value, e.g. bno" />
-            <input id="new_visa_type_label" type="text" required class="form-input" placeholder="label, e.g. BN(O)" />
+            <input id="new_visa_type_value" type="text" required class="form-input" placeholder="value, e.g. bno" aria-label="Visa type value" />
+            <input id="new_visa_type_label" type="text" required class="form-input" placeholder="label, e.g. BN(O)" aria-label="Visa type display label" />
             <button type="submit" class="btn btn-primary btn-sm">Add</button>
           </form>
           <div id="visa-type-list" class="flex flex-col gap-2"></div>
@@ -341,8 +341,8 @@
         <div class="visa-region-card">
           <h3 class="text-sm font-medium mb-3">UK regions</h3>
           <form id="add-uk-region-form" class="visa-region-add-form">
-            <input id="new_uk_region_value" type="text" required class="form-input" placeholder="value, e.g. wales" />
-            <input id="new_uk_region_label" type="text" required class="form-input" placeholder="label, e.g. Wales" />
+            <input id="new_uk_region_value" type="text" required class="form-input" placeholder="value, e.g. wales" aria-label="UK region value" />
+            <input id="new_uk_region_label" type="text" required class="form-input" placeholder="label, e.g. Wales" aria-label="UK region display label" />
             <button type="submit" class="btn btn-primary btn-sm">Add</button>
           </form>
           <div id="uk-region-list" class="flex flex-col gap-2"></div>
@@ -363,11 +363,11 @@
       </p>
 
       <h3 class="text-sm font-medium mb-2">Tasks</h3>
-      <input id="moderation-task-search" type="search" placeholder="Search tasks by title" class="form-input mb-3" />
+      <input id="moderation-task-search" type="search" placeholder="Search tasks by title" aria-label="Search tasks by title" class="form-input mb-3" />
       <div id="moderation-task-list" class="flex flex-col gap-2 mb-6"></div>
 
       <h3 class="text-sm font-medium mb-2">Resources</h3>
-      <input id="moderation-resource-search" type="search" placeholder="Search resources by title" class="form-input mb-3" />
+      <input id="moderation-resource-search" type="search" placeholder="Search resources by title" aria-label="Search resources by title" class="form-input mb-3" />
       <div id="moderation-resource-list" class="flex flex-col gap-2"></div>
     </div>
     </div>
@@ -393,7 +393,7 @@
           <div>
             <label for="branding_support_email" class="text-sm font-medium block mb-1">Accent color</label>
             <div class="flex gap-2 items-center">
-              <input id="branding_accent_color" type="color" class="form-input" style="height:2.5rem; width:3.5rem; padding:0.25rem;" />
+              <input id="branding_accent_color" type="color" class="form-input" style="height:2.5rem; width:3.5rem; padding:0.25rem;" aria-label="Accent color picker" />
               <input id="branding_accent_color_text" type="text" class="flex-1 form-input" placeholder="#0d4d4d" />
             </div>
           </div>

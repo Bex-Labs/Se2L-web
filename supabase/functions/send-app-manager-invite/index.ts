@@ -94,6 +94,43 @@ Deno.serve(async (req) => {
     });
   }
 
+  // --- Verify the caller is a real, currently-authenticated super_admin ---
+  // Previously missing entirely — anyone who found this function's URL
+  // could trigger it with any email/token/appOrigin, using this trusted
+  // domain to send arbitrarily-addressed invite-style emails. Same
+  // verification pattern already used correctly in set-app-manager-active.
+  const authHeader = req.headers.get("Authorization");
+  const callerToken = authHeader?.replace("Bearer ", "");
+
+  if (!callerToken) {
+    return new Response(JSON.stringify({ error: "Missing authorization" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const { data: { user: caller }, error: callerAuthError } = await supabase.auth.getUser(callerToken);
+
+  if (callerAuthError || !caller) {
+    return new Response(JSON.stringify({ error: "Invalid or expired session" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const { data: callerProfile } = await supabase
+    .from("users")
+    .select("role")
+    .eq("id", caller.id)
+    .maybeSingle();
+
+  if (!callerProfile || callerProfile.role !== "super_admin") {
+    return new Response(JSON.stringify({ error: "Only a super_admin can do this" }), {
+      status: 403,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   let payload: InvitePayload;
   try {
     payload = await req.json();

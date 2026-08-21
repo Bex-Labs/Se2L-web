@@ -188,9 +188,11 @@ document.getElementById("invite-form").addEventListener("submit", async (e) => {
   }
 
   const appOrigin = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, "");
+  const { data: { session } } = await supabaseClient.auth.getSession();
 
   const { error: sendError } = await supabaseClient.functions.invoke("send-app-manager-invite", {
-    body: { email, inviteToken: invite.invite_token, appOrigin }
+    body: { email, inviteToken: invite.invite_token, appOrigin },
+    headers: { Authorization: `Bearer ${session.access_token}` }
   });
 
   if (sendError) {

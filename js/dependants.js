@@ -141,11 +141,15 @@ form.addEventListener("submit", async (e) => {
 
   // --- SE2L-29: assign checklist items to minor dependants ---
   const minors = rows.filter((r) => r.type === "minor");
+  const { data: { session } } = await supabaseClient.auth.getSession();
 
   for (const minor of minors) {
     const { error: checklistError } = await supabaseClient.functions.invoke(
       "assign-child-checklist",
-      { body: { dependantId: minor.id } }
+      {
+        body: { dependantId: minor.id },
+        headers: { Authorization: `Bearer ${session.access_token}` }
+      }
     );
 
     if (checklistError) {

@@ -123,7 +123,13 @@ async function sendEmail(to: string, subject: string, html: string) {
   }
 }
 
-Deno.serve(async () => {
+Deno.serve(async (req) => {
+  // --- Verify this is a genuine cron trigger, not a public request ---
+  const cronSecret = Deno.env.get("CRON_SECRET");
+  if (cronSecret && req.headers.get("x-cron-secret") !== cronSecret) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+  }
+
   const today = new Date().toISOString().split("T")[0];
 
   const { data: rows, error: queueError } = await supabase

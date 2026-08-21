@@ -91,6 +91,19 @@ Deno.serve(async (req) => {
     });
   }
 
+  // --- Verify newUserId actually belongs to the invited email ---
+  // Same reasoning as accept-app-manager-invite: newUserId is client-
+  // supplied and can't be trusted alone. Independently confirm via the
+  // Auth Admin API that this account's real email matches the invite.
+  const { data: targetUser, error: targetUserError } = await supabase.auth.admin.getUserById(newUserId);
+
+  if (targetUserError || !targetUser?.user || targetUser.user.email?.toLowerCase() !== dependant.email.toLowerCase()) {
+    return new Response(JSON.stringify({ error: "This account doesn't match the invited email" }), {
+      status: 403,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   const { error: profileError } = await supabase.from("users").insert({
     id: newUserId,
     email: dependant.email,

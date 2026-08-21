@@ -56,7 +56,18 @@ async function queueNotification(userId: string, notificationType: string, phase
   if (error) console.error(`Failed to queue ${notificationType} for user ${userId}:`, error.message);
 }
 
-Deno.serve(async () => {
+Deno.serve(async (req) => {
+  // --- Verify this is a genuine cron trigger, not a public request ---
+  // Previously had no check at all — anyone who found this function's
+  // URL could trigger it directly, using the service role key's full
+  // database access and running up invocation costs. The cron job
+  // itself must be configured to send this header; set CRON_SECRET as
+  // a function secret and add the matching header to the scheduled call.
+  const cronSecret = Deno.env.get("CRON_SECRET");
+  if (cronSecret && req.headers.get("x-cron-secret") !== cronSecret) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+  }
+
   const today = new Date();
   const todayStr = today.toISOString().split("T")[0];
 

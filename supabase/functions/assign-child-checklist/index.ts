@@ -67,15 +67,48 @@ Deno.serve(async (req) => {
     });
   }
 
+  // --- Verify the caller is authenticated and owns this dependant ---
+  // Previously accepted any dependantId with no check at all. The caller
+  // is always an already-authenticated parent by the time this runs (it's
+  // called right after inserting the dependant row during onboarding),
+  // so this doesn't change the legitimate flow — it just closes the gap
+  // where anyone could trigger checklist assignment for a dependant they
+  // don't own.
+  const authHeader = req.headers.get("Authorization");
+  const callerToken = authHeader?.replace("Bearer ", "");
+
+  if (!callerToken) {
+    return new Response(JSON.stringify({ error: "Missing authorization" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const { data: { user: caller }, error: callerAuthError } = await supabase.auth.getUser(callerToken);
+
+  if (callerAuthError || !caller) {
+    return new Response(JSON.stringify({ error: "Invalid or expired session" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   const { data: dependant, error: dependantError } = await supabase
     .from("dependants")
-    .select("id, type, date_of_birth")
+    .select("id, type, date_of_birth, primary_user_id")
     .eq("id", dependantId)
     .maybeSingle();
 
   if (dependantError || !dependant) {
     return new Response(JSON.stringify({ error: "Dependant not found" }), {
       status: 404,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  if (dependant.primary_user_id !== caller.id) {
+    return new Response(JSON.stringify({ error: "This dependant doesn't belong to you" }), {
+      status: 403,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
